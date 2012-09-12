@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar" name="APIDemo">
+    <property environment="env"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+	<path id="APIDemo.classpath">
+		<fileset id="jars" dir="lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+    <target name="init">
+        <mkdir dir="classes"/>
+        <copy includeemptydirs="false" todir="classes">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+	
+    <target description="Clean all generated files from the distribution" name="clean">
+        <delete dir="classes"/>
+    	<delete file="APIDemo.jar"/>
+    </target>
+	
+    <target description="Build the java classes for the Demonstration application" depends="init" name="build">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="classes" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="APIDemo.classpath"/>
+        </javac>
+    </target>
+	
+	<target description="Build the APIDemo JAR archive" depends="clean,build" name="jar">
+		<pathconvert property="classpath" refid="APIDemo.classpath" pathsep=" " dirsep="/">
+			<map from="${basedir}${file.separator}" to="" />
+		</pathconvert>
+		<copy todir="classes/lib">
+			<fileset dir="lib" includes="**/*.jar"/>
+		</copy>
+
+		<jar destfile="APIDemo.jar" basedir="classes">
+			<manifest>
+				<attribute name="Built-By" value="Betfair"/>
+				<attribute name="Main-Class" value="demo.APIDemo"/>
+				<attribute name="Class-Path" value="${classpath}" />
+			</manifest>
+		</jar>
+		<delete dir="classes/lib"/>
+   		<echo>JAR file built OK. Run the Application with:</echo>
+		<echo>    java -jar APIDemo.jar</echo>
+    </target>
+	
+    <target description="Generate the java stub classes from the betfair WSDL" name="stubs">
+    	<delete file="src\generated\global\BFGlobalServiceStub.java"/>
+    	<echo>Generating stub files for Betfair Global service</echo>
+        <java classname="org.apache.axis2.wsdl.WSDL2Java" failonerror="true" fork="yes">
+            <arg line="-s -p generated.global -uri https://api.betfair.com/global/v3/BFGlobalService.wsdl"/>
+            <classpath refid="APIDemo.classpath"/>
+        </java>
+    	<delete file="src\generated\exchange\BFExchangeServiceStub.java"/>
+    	<echo>Generating stub files for Betfair Exchange service</echo>
+        <java classname="org.apache.axis2.wsdl.WSDL2Java" failonerror="true" fork="yes">
+            <arg line="-s -p generated.exchange -uri https://api.betfair.com/exchange/v5/BFExchangeService.wsdl"/>
+            <classpath refid="APIDemo.classpath"/>
+        </java>
+    </target>
+</project>
