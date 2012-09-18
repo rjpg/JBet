@@ -30,7 +30,7 @@ public class ScraperGoals {
 	protected int updateIntervalScraper = 1000;
 	
 	
-	private  String targetURLString = "http://www.xscores.com/soccer/soccer.jsp?sports=soccer&menu3=2&dt=09/08&flag=sportData";
+	private String targetURLString = "http://www.xscores.com/soccer/soccer.jsp?sports=soccer&menu3=2&dt=09/08&flag=sportData";
 	private static String xpath = "//table/tr";
 
 	private Vector<GameScoreData> gameScoreData=new Vector<GameScoreData>();
@@ -70,6 +70,7 @@ public class ScraperGoals {
 		int month=now.get(Calendar.MONTH);
 		month++;  // ?? but it has to be...
 		//System.out.println(month);
+		day++;
 		if(day>9)
 			targetURLString+=day+"/";
 		else
@@ -100,10 +101,13 @@ public class ScraperGoals {
 			//xmlResponse.getDoctype().
 			//System.out.println(nodeToString(xmlResponse.getDocumentElement()));
 			urlNodes = XPathAPI.selectNodeList(xmlResponse, "//tbody[@id=\"scoretable\"]");
+			
+			
 			//System.out.println("urlNodes size:"+urlNodes.getLength());
 			//System.out.println("------------------------");
 			//System.out.println(nodeToString(urlNodes.item(0)));
 			urlNodes=urlNodes.item(0).getChildNodes();
+			
 			
 			//System.out.println("urlNodes size:"+urlNodes.getLength());
 			
@@ -205,7 +209,8 @@ public class ScraperGoals {
 			
 			//System.out.println(nodeToString(urlNodes.item(0)));
 		} catch (Exception urle) {
-			System.err.println("Error: " + urle.toString());
+			
+			System.err.println("Error: " + urle.toString()+ "(Probably no live games to scrap)");
 		}
 
 		//return urlNodes;
@@ -213,6 +218,7 @@ public class ScraperGoals {
 	
 	public String getTargetURLString() {
 		return targetURLString;
+		
 	}
 
 	public void UpdateListeners(GameScoreData gd)
@@ -236,6 +242,27 @@ public class ScraperGoals {
 	
 	public ScraperGoals()
 	{
+		targetURLString="http://www.xscores.com/soccer/soccer.jsp?sports=soccer&menu3=2&dt=";
+		
+		//05/08&flag=sportData";
+		
+		Calendar now = Calendar.getInstance();
+		int day=now.get(Calendar.DAY_OF_MONTH);
+		int month=now.get(Calendar.MONTH);
+		month++;  // ?? but it has to be...
+		//System.out.println(month);
+		day++;
+		if(day>9)
+			targetURLString+=day+"/";
+		else
+			targetURLString+="0"+day+"/";
+		
+		if(month>9)
+			targetURLString+=month+"&flag=sportData";
+		else
+			targetURLString+="0"+month+"&flag=sportData";
+		
+		
 		startPolling();
 		//System.out.println(list.toString());
 	}
