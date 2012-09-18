@@ -223,10 +223,11 @@ public class ScraperGoals {
 					"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")");
 		}
 		*/
-		System.out.println("------------------------");
-		System.out.println("TeamA:"+gd.getTeamA()+"-"+gd.getActualGoalsA()+"("+gd.getPrevGoalsA()+")\\n"+
-				"TeamB:"+gd.getTeamB()+"-"+gd.getActualGoalsB()+"("+gd.getPrevGoalsB()+")");
-		System.out.println("------------------------");
+		//System.out.println("------------------------");
+		//System.out.println("TeamA:"+gd.getTeamA()+"-"+gd.getActualGoalsA()+"("+gd.getPrevGoalsA()+")\\n"+
+		//		"TeamB:"+gd.getTeamB()+"-"+gd.getActualGoalsB()+"("+gd.getPrevGoalsB()+")");
+		//System.out.println("------------------------");
+		
 		for(UpdateScoresListener usl:updateScoresListener)
 		{
 			usl.scoreUpdated(gd);
@@ -235,7 +236,7 @@ public class ScraperGoals {
 	
 	public ScraperGoals()
 	{
-		//startPolling();
+		startPolling();
 		//System.out.println(list.toString());
 	}
 
