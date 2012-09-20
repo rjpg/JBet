@@ -70,7 +70,7 @@ public class ScraperGoals {
 		int month=now.get(Calendar.MONTH);
 		month++;  // ?? but it has to be...
 		//System.out.println(month);
-		day++;
+		
 		if(day>9)
 			targetURLString+=day+"/";
 		else
@@ -251,7 +251,7 @@ public class ScraperGoals {
 		int month=now.get(Calendar.MONTH);
 		month++;  // ?? but it has to be...
 		//System.out.println(month);
-		day++;
+		
 		if(day>9)
 			targetURLString+=day+"/";
 		else
