@@ -749,58 +749,69 @@ public class NextGoalPanel extends JPanel {
 		return bet;
 	}
 	
-	public void placeBets(Vector<PlaceBets> betsA)
-	{
+	public void placeBets(Vector<PlaceBets> betsA) {
 		System.out.println("placing Bets");
-		long id=0;
-		
-		PlaceBets[] bets=betsA.toArray(new PlaceBets[]{});
-		PlaceBetsResult[] betResult=null;
-		
+		long id = 0;
+
+		PlaceBets[] bets = betsA.toArray(new PlaceBets[] {});
+		PlaceBetsResult[] betResult = null;
+
 		int attempts = 0;
 		while (attempts < 3 && betResult == null) {
-			InterfaceNextGoal.msjf.writeMessageText("ExchangeAPI.placeBets(Back) Attempt :"+attempts, Color.BLUE);
+			InterfaceNextGoal.msjf.writeMessageText(
+					"ExchangeAPI.placeBets(Back) Attempt :" + attempts,
+					Color.BLUE);
 			try {
-				
-				betResult=ExchangeAPI.placeBets(InterfaceNextGoal.selectedExchange,  InterfaceNextGoal.apiContext, bets);
+
+				betResult = ExchangeAPI.placeBets(
+						InterfaceNextGoal.selectedExchange,
+						InterfaceNextGoal.apiContext, bets);
 			} catch (Exception e) {
-				InterfaceNextGoal.msjf.writeMessageText(e.getMessage(), Color.RED);
-				if(e.getMessage().contains(new String("EVENT_SUSPENDED")))
-				{
-					InterfaceNextGoal.msjf.writeMessageText("ExchangeAPI.placeBets Returned NULL: Market is supended | Bet in progress",Color.BLUE);
+				InterfaceNextGoal.msjf.writeMessageText(e.getMessage(),
+						Color.RED);
+				if (e.getMessage().contains(new String("EVENT_SUSPENDED"))) {
+					InterfaceNextGoal.msjf
+							.writeMessageText(
+									"ExchangeAPI.placeBets Returned NULL: Market is supended | Bet in progress",
+									Color.BLUE);
 					attempts--;
 				}
 				e.printStackTrace();
-				InterfaceNextGoal.msjf.writeMessageText("ExchangeAPI.placeBets Returned NULL: No bets placed:Attempt :"+attempts, Color.RED);
+				InterfaceNextGoal.msjf.writeMessageText(
+						"ExchangeAPI.placeBets Returned NULL: No bets placed:Attempt :"
+								+ attempts, Color.RED);
 			}
 			attempts++;
 		}
-		
-		if(betResult==null)
-		{
-			InterfaceNextGoal.msjf.writeMessageText("ExchangeAPI.placeBets Returned NULL: No bets placed", Color.RED);
+
+		if (betResult == null) {
+			InterfaceNextGoal.msjf.writeMessageText(
+					"ExchangeAPI.placeBets Returned NULL: No bets placed",
+					Color.RED);
 			return;
-		}
-		else
-		{
-			for(int x=0;x<betResult.length;x++)
-			{
-			if (betResult[0].getSuccess()) {
-				InterfaceNextGoal.msjf.writeMessageText("Bet Id:" + betResult[x].getBetId()
-							+ " placed("+ bets[x].getSize()+"@"+bets[x].getPrice()+") : Matched " + betResult[x].getSizeMatched()
-							+ "@"
-							+ betResult[x].getAveragePriceMatched(),Color.GREEN);
-				
-				id=betResult[0].getBetId();
-			} else{
-			
-				InterfaceNextGoal.msjf.writeMessageText("Failed to place bet("+ bets[x].getSize()+"@"+bets[x].getPrice()+"): Problem was: "
-							+ betResult[x].getResultCode(),Color.RED);
-				
+		} else {
+			for (int x = 0; x < betResult.length; x++) {
+				if (betResult[0].getSuccess()) {
+					InterfaceNextGoal.msjf.writeMessageText(
+							"Bet Id:" + betResult[x].getBetId() + " placed("
+									+ bets[x].getSize() + "@"
+									+ bets[x].getPrice() + ") : Matched "
+									+ betResult[x].getSizeMatched() + "@"
+									+ betResult[x].getAveragePriceMatched(),
+							Color.GREEN);
+
+					id = betResult[0].getBetId();
+				} else {
+
+					InterfaceNextGoal.msjf.writeMessageText(
+							"Failed to place bet(" + bets[x].getSize() + "@"
+									+ bets[x].getPrice() + "): Problem was: "
+									+ betResult[x].getResultCode(), Color.RED);
+
+				}
 			}
+
 		}
-		
-	}
 	}
 	
 	
