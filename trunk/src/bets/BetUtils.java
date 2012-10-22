@@ -193,6 +193,11 @@ public class BetUtils {
 			bet.setBetType(BetTypeEnum.Factory.fromValue("L"));
 		bet.setPrice(bd.getOddRequested());
 		bet.setSize(Utils.convertAmountToBF(bd.getAmount()));
+		if(bd.isKeepInPlay())
+			bet.setBetPersistenceType(BetPersistenceTypeEnum.IP);
+		else
+			bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
+		
 		return bet;
 	}
 	

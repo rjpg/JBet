@@ -28,21 +28,22 @@ public class BetData {
 	
 	public Calendar timestamp=null;
 	
+	public boolean keepInPlay=false;
+	
 	public int type=1;
 	
 	public static final int BACK = 1;
 	public static final int LAY = 2;
 
 	
-
 	
 	//public boolean PLACED = false; // true if the bet was placed on betfair
 	public int updatesBetInProgress=0;
 	
-	public static final int PLACING_ERROR = -1;
-	public static final int NOT_PLACED = 0;
-	public static final int BET_IN_PROGRESS = 1;
-	public static final int UNMATHED = 2;
+	public static final int PLACING_ERROR = -1;      // after placed error
+	public static final int NOT_PLACED = 0;          // before placed 
+	public static final int BET_IN_PROGRESS = 1;     // waiting 
+	public static final int UNMATHED = 2;            //
 	public static final int PARCIAL_MACHED = 3;
 	public static final int MATHED =  4;
 	public static final int CANCELED = 5;
@@ -146,6 +147,14 @@ public class BetData {
 
 	public void setOwner(BetListener owner) {
 		this.owner = owner;
+	}
+	
+	public boolean isKeepInPlay() {
+		return keepInPlay;
+	}
+
+	public void setKeepInPlay(boolean keepInPlay) {
+		this.keepInPlay = keepInPlay;
 	}
 
 }
