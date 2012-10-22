@@ -2,6 +2,8 @@ package nextGoal;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.exchange.BFExchangeServiceStub.MarketStatusEnum;
+import generated.exchange.BFExchangeServiceStub.PlaceBets;
+import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
 import generated.global.BFGlobalServiceStub.BFEvent;
 import generated.global.BFGlobalServiceStub.EventType;
 import generated.global.BFGlobalServiceStub.GetEventsResp;
@@ -26,17 +28,15 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import nextGoal.NextGoalPanel.MarketThread;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import DataRepository.MarketData.MarketThread;
-
-import correctscore.CorrectScoreMainFrame;
-import correctscore.GameMarketProcessFrame;
-import correctscore.MatchOddPreLive;
 import correctscore.MessageJFrame;
 import demo.handler.ExchangeAPI;
 import demo.handler.GlobalAPI;
@@ -45,36 +45,23 @@ import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedMarketPrices;
 
-public class InterfaceNextGoal extends JFrame{
+public class InterfaceBetList extends JFrame{
+
+	public static int NUMBER_OF_BETS=7;
 
 	JPanel north= new JPanel();
-	JPanel center= null;
+	
+	BetInterface betInterface[]=new BetInterface[NUMBER_OF_BETS];
+	
 	JPanel south = new JPanel();
-	
-	Score scores[] = new Score[16];
-	
-	
-	
-	// north
-	JLabel arLabel=new JLabel("Now Result :",JLabel.RIGHT);
-	JComboBox<Score> arDrop=null;
-	public JCheckBox autoOddsSet=new JCheckBox("Periodic Odds set",false);
-	//JLabel arDataLabel=new JLabel("Odd : ",JLabel.RIGHT);
-	//JCheckBox arNext=new JCheckBox("Process Next Goal");
-	
-	JPanel nextGoalsPanel=new JPanel();
-	// Next Goal A
-	NextGoalPanel nextGoalA=null;
-	
-	// Next Goal B
-	NextGoalPanel nextGoalB=null;
-	
-	// messages
-	public static MessageJFrame msjf=null;
-
 	// Cancel
 	JButton cancelButton=new JButton("CANCEL");
-	
+	boolean stopCicle=false; 
+	// Place
+	JButton placeButton=new JButton("PLACE");
+
+	// messages
+	public static MessageJFrame msjf=null;
 	
 	//Betfair
     private Vector<BFEvent> todayGames=new Vector<BFEvent>();
@@ -92,153 +79,139 @@ public class InterfaceNextGoal extends JFrame{
 	//private static EventType selectedEventType;
 	// -----------------------------------------------------------------
     
-	// THREAD
-	private MarketThread as;
-	private Thread t;
-	private boolean polling = false;
-	//------ demand freq------
 	protected int updateInterval = 5000;
 	
 	
-	public InterfaceNextGoal() {
+	public InterfaceBetList() {
 		super();
 		startBetFair();
 		initialize();
-		startPolling();
 	}
 	
 	public void initialize()
 	{
-		int i=0;
-		for(int a=0;a<=3;a++)
-		{
-			for(int b=0;b<=3;b++)
-			{
-				scores[i]=new Score(a,b);
-				i++;
-				
-			}
-		}
-		
-		//scores[i]=new Score(-1, -1);
-		
-		
-		
-		setTitle("Next Goal - "+todayGames.get(eventSelected).getEventName());
-		setSize(800,600);
+		setTitle("Bet Placer - "+todayGames.get(eventSelected).getEventName());
+		//setSize(800,600);
 		setVisible(true);
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		this.addWindowListener(new WindowAdapter() {
 			 public void windowClosing(WindowEvent e) {
 					e.getWindow().dispose();
-					InterfaceNextGoal.this.msjf.dispose();
-					stopPolling();
+					InterfaceBetList.this.msjf.dispose();
 					logout();
 			 }
 		}
 		);
 		
-		this.setLayout(new BorderLayout());
+		this.getContentPane().setLayout(new BorderLayout());
 		
-		//North
-		north.setLayout(new GridLayout(1, 3));
-		north.add(arLabel);
-		arLabel.setHorizontalAlignment(JLabel.CENTER);
-		north.add(getArDrop());
+		north.setLayout(new GridLayout(NUMBER_OF_BETS, 1));
 		
-		autoOddsSet.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(autoOddsSet.isSelected())
-				{
-					InterfaceNextGoal.this.startPolling();
-				}
-				else
-				{
-					InterfaceNextGoal.this.stopPolling();
-				}
-			}
-		});
+		for (int i=0;i<NUMBER_OF_BETS;i++)
+		{
+			betInterface[i]=new BetInterface(correctScoreMarket);
+			north.add(betInterface[i]);
+		}
 		
 		
+		this.getContentPane().add(north,BorderLayout.NORTH);
 		
-		north.add(autoOddsSet);
-		//north.add(arDataLabel);
-		//arDataLabel.setHorizontalAlignment(JLabel.CENTER);
-	//	north.add(arNext);
-		
-		this.add(north,BorderLayout.NORTH);
-		
-		this.add(getCenterPanel(),BorderLayout.CENTER);
-		
-		
+		msjf=new MessageJFrame("x");
+		msjf.setVisible(false);
+		this.getContentPane().add(msjf.getContentPane(),BorderLayout.CENTER);
+		msjf.writeMessageText("hello", Color.BLUE);
 		
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				nextGoalA.stopPolling();
-				nextGoalB.stopPolling();
+				stopCicle=true;
+				msjf.writeMessageText("Stop Trying", Color.RED);
 			}
 		});
-		this.add(cancelButton,BorderLayout.SOUTH);
 		
-	}
-	
-	public JPanel getCenterPanel()
-	{
-		if(center==null)
-		{
-			center=new JPanel();
-			center.setLayout(new BorderLayout());
-			nextGoalsPanel.setLayout(new GridLayout(1,2));
-			
-			String teamA =todayGames.get(eventSelected).getEventName().split(" v ")[0];
-					
-			String teamB = todayGames.get(eventSelected).getEventName().split(" v ")[1];
-			// Next Goal A
-			nextGoalA=new NextGoalPanel(scores[0],scores[4],teamA,this);
-			
-			// Next Goal B
-			nextGoalB=new NextGoalPanel(scores[0],scores[1],teamB,this);
-			
-			nextGoalsPanel.add( nextGoalA);
-			nextGoalsPanel.add( nextGoalB);
-			
-			center.add(nextGoalsPanel,BorderLayout.NORTH);
-			msjf=new MessageJFrame("x");
-			center.add(msjf.getContentPane(),BorderLayout.CENTER);
-			msjf.setVisible(false);
-			msjf.writeMessageText("hello", Color.BLUE);
-		}
-		return center;
-	}
-	
-	public JComboBox<Score> getArDrop()
-	{
-		if(arDrop==null)
-		{
-			
-			arDrop=new JComboBox<Score>(scores);
-			
-			 
-			arDrop.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						System.out.println(arDrop.getSelectedItem());
-						InterfaceNextGoal.this.nextGoalA.setScores((Score)arDrop.getSelectedItem(), ((Score)arDrop.getSelectedItem()).getNextScoreA());
-						InterfaceNextGoal.this.nextGoalB.setScores((Score)arDrop.getSelectedItem(), ((Score)arDrop.getSelectedItem()).getNextScoreB());
-						
+		placeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				stopCicle=false;
+				msjf.writeMessageText(" ----------------------------------------------------" , Color.BLACK);
+				msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.RED);
+				
+				Vector<PlaceBets> bets=new Vector<PlaceBets>();
+				
+				for (int i=0;i<NUMBER_OF_BETS;i++)
+				{
+					if(betInterface[i].isActive())
+					{
+						if(betInterface[i].getBackLay().equals("L"))
+							msjf.writeMessageText(betInterface[i].getStake()+"@"+betInterface[i].getOdd()+"  "+betInterface[i].getRunner().getName()+"    Lay" , Color.PINK);
+						else
+							msjf.writeMessageText(betInterface[i].getStake()+"@"+betInterface[i].getOdd()+"  "+betInterface[i].getRunner().getName()+"    Back", Color.BLUE);
+						bets.add(betInterface[i].createBet());
 					}
 				}
-					    
-			);
-			
-		}
-		return arDrop;
+				
+				if(bets.size()==0)
+				{
+					msjf.writeMessageText(" No bets Selected to be Placed",Color.ORANGE);
+					return ;
+				}
+				msjf.writeMessageText(" ----------------------------------------------------" , Color.BLACK);
+				
+				if(JOptionPane.showConfirmDialog(null, "Process Selected Bets ?")==0)
+				{
+					msjf.writeMessageText("Starting the process", Color.BLUE);
+					
+					
+						
+					startProcess(bets);	
+						
+					
+					/*while ( stopCicle==false)
+					 //placeBets(bets)==-1 &&
+					{
+						//try {
+						//	Thread.sleep(100);
+						//} catch (InterruptedException e1) {
+						//	// TODO Auto-generated catch block
+						//	e1.printStackTrace();
+						//}
+						msjf.writeMessageText("Trying ...", Color.BLUE);
+					}
+					*/
+					
+				}
+				else
+				{
+					msjf.writeMessageText("Cancelling the process", Color.GREEN);
+				}
+	
+			}
+		});
+		
+		south.setLayout(new BorderLayout());
+		south.add(placeButton,BorderLayout.WEST);
+		south.add(cancelButton,BorderLayout.EAST);
+		this.getContentPane().add(south,BorderLayout.SOUTH);
+		
+		this.repaint();
+		
+		this.setSize(640,400);
+		
+		
+		
+		//this.repaint();
 	}
 	
+	public void startProcess(Vector<PlaceBets> bets)
+	{
+		ProcessThread as;
+		Thread t;
+		as = new ProcessThread(bets);
+		t = new Thread(as);
+		t.start();
+			
+	}
 	  private void startBetFair()
 	    {
 	    	LogManager.resetConfiguration();
@@ -523,8 +496,8 @@ public class InterfaceNextGoal extends JFrame{
 
 				try {
 					correctScoreMarket = ExchangeAPI.getMarket(
-							InterfaceNextGoal.selectedExchange,
-							InterfaceNextGoal.apiContext,
+							InterfaceBetList.selectedExchange,
+							InterfaceBetList.apiContext,
 							markets[indexFound].getMarketId());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -537,93 +510,83 @@ public class InterfaceNextGoal extends JFrame{
 				return 0;
 			}
 			
-			
-			//---------------------------------thread -----
-			public class MarketThread extends Object implements Runnable {
-				private volatile boolean stopRequested;
+		
+			public int placeBets(Vector<PlaceBets> betsA) {
+				msjf.writeMessageText("placing Bets",Color.BLACK);
+				long id = 0;
 
-				private Thread runThread;
+				PlaceBets[] bets = betsA.toArray(new PlaceBets[] {});
+				PlaceBetsResult[] betResult = null;
 
-				public void run() {
-					runThread = Thread.currentThread();
-					stopRequested = false;
-					
-					while (!stopRequested) {
-						System.out.println("pooling");
-						InflatedMarketPrices prices = null;
-
-						try {
-								prices = ExchangeAPI.getMarketPrices(
-										selectedExchange,
-										apiContext,
-										correctScoreMarket.getMarketId());
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							if (prices.getMarketStatus()
-									.equals(MarketStatusEnum._ACTIVE)) {
-								nextGoalA.refreshOdds(prices);
-								nextGoalB.refreshOdds(prices);
-								
-							}
-							else
-							{
-								if (prices.getMarketStatus()
-										.equals(MarketStatusEnum._CLOSED)) {
-									
-									System.out.println("Marke is closed - logout and exit");
-									logout();
-									System.exit(0);
-								}
-								else
-									System.out.println("Market is not active");
-							}
-					
+				
+				try {
+						betResult = ExchangeAPI.placeBets(
+								InterfaceBetList.selectedExchange,
+								InterfaceBetList.apiContext, bets);
+					} catch (Exception e) {
+						msjf.writeMessageText(e.getMessage(),
+								Color.RED);
 						
-						try {
-							Thread.sleep(updateInterval);
-						} catch (Exception e) {
-							// e.printStackTrace();
+						return -1;
+					}
+
+
+				if (betResult == null) {
+					msjf.writeMessageText(
+							"ExchangeAPI.placeBets Returned NULL: No bets placed",
+							Color.RED);
+					return -1;
+				} else {
+					for (int x = 0; x < betResult.length; x++) {
+						if (betResult[0].getSuccess()) {
+							msjf.writeMessageText(
+									"Bet Id:" + betResult[x].getBetId() + " placed("
+											+ bets[x].getSize() + "@"
+											+ bets[x].getPrice() + ") : Matched "
+											+ betResult[x].getSizeMatched() + "@"
+											+ betResult[x].getAveragePriceMatched(),
+									Color.GREEN);
+
+							id = betResult[0].getBetId();
+							
+						} else {
+
+							msjf.writeMessageText(
+									"Failed to place bet(" + bets[x].getSize() + "@"
+											+ bets[x].getPrice() + "): Problem was: "
+											+ betResult[x].getResultCode(), Color.RED);
+							
+
 						}
 					}
-				}
+					return 0;
 
-				public void stopRequest() {
-					stopRequested = true;
-
-					if (runThread != null) {
-						runThread.interrupt();
-
-						// suspend()stop();
-					}
 				}
 			}
-			//-----------------------------------------end thread -------------------
-			
-			public void startPolling() {
-				msjf.writeMessageText("Auto Odds Update Started", Color.ORANGE);
-				autoOddsSet.setSelected(true);
-				if (polling)
-					return;
-				as = new MarketThread();
-				t = new Thread(as);
-				t.start();
+	
 
-				polling = true;
+			public class ProcessThread extends Object implements Runnable {
+			
+				Vector<PlaceBets> bets;
 				
+				public ProcessThread(Vector<PlaceBets> betsA)
+				{
+					bets=betsA;
+				}
+				
+				public void run() {
+					while ( stopCicle==false && placeBets(bets)==-1)
+						{
+							try {
+								Thread.sleep(20);
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							msjf.writeMessageText("Trying ...", Color.BLACK);
+						}
+					
+					msjf.writeMessageText("Ending the process.", Color.BLUE);
+				}
 			}
-
-			public void stopPolling() {
-				msjf.writeMessageText("Auto Odds Update Stoped", Color.ORANGE);
-				autoOddsSet.setSelected(false);
-				if (!polling)
-					return;
-				as.stopRequest();
-				polling = false;
-
-			}
-			
-		
-
 }
