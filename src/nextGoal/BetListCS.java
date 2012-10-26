@@ -1,8 +1,10 @@
 package nextGoal;
 
 import generated.exchange.BFExchangeServiceStub.Market;
+import generated.exchange.BFExchangeServiceStub.MarketStatusEnum;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
+import generated.exchange.BFExchangeServiceStub.Runner;
 import generated.global.BFGlobalServiceStub.BFEvent;
 import generated.global.BFGlobalServiceStub.EventType;
 import generated.global.BFGlobalServiceStub.GetEventsResp;
@@ -23,6 +25,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,14 +34,20 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import DataRepository.RunnerObj;
+import DataRepository.Utils;
+
 import correctscore.MessageJFrame;
 import demo.handler.ExchangeAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.handler.GlobalAPI;
+import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
+import demo.util.InflatedMarketPrices;
+import demo.util.InflatedMarketPrices.InflatedPrice;
+import demo.util.InflatedMarketPrices.InflatedRunner;
 
-public class InterfaceBetList extends JFrame{
+public class BetListCS extends JFrame{
 
 	public static int NUMBER_OF_BETS=7;
 
@@ -55,6 +64,15 @@ public class InterfaceBetList extends JFrame{
 
 	// messages
 	public static MessageJFrame msjf=null;
+	
+	
+	//CS
+	public JPanel panelCS=null;
+	public JComboBox<Score> comboScores=null;
+	public Score scores[] = new Score[16];
+	public static String[] teams={"A","B"};
+	public JComboBox<String> comboTeam=null;
+	public JButton computeOdds=null;
 	
 	//Betfair
     private Vector<BFEvent> todayGames=new Vector<BFEvent>();
@@ -75,7 +93,7 @@ public class InterfaceBetList extends JFrame{
 	protected int updateInterval = 5000;
 	
 	
-	public InterfaceBetList() {
+	public BetListCS() {
 		super();
 		startBetFair();
 		initialize();
@@ -91,7 +109,7 @@ public class InterfaceBetList extends JFrame{
 		this.addWindowListener(new WindowAdapter() {
 			 public void windowClosing(WindowEvent e) {
 					e.getWindow().dispose();
-					InterfaceBetList.this.msjf.dispose();
+					BetListCS.this.msjf.dispose();
 					logout();
 			 }
 		}
@@ -185,6 +203,21 @@ public class InterfaceBetList extends JFrame{
 		south.setLayout(new BorderLayout());
 		south.add(placeButton,BorderLayout.WEST);
 		south.add(cancelButton,BorderLayout.EAST);
+		
+		
+		int i=0;
+		for(int a=0;a<=3;a++)
+		{
+			for(int b=0;b<=3;b++)
+			{
+				scores[i]=new Score(a,b);
+				i++;
+				
+			}
+		}
+		
+		south.add(getPanelCS(),BorderLayout.CENTER);
+		
 		this.getContentPane().add(south,BorderLayout.SOUTH);
 		
 		this.repaint();
@@ -194,7 +227,223 @@ public class InterfaceBetList extends JFrame{
 		this.setAlwaysOnTop(true);
 		
 		//this.repaint();
+		
+		
 	}
+	
+	public JPanel getPanelCS()
+	{
+		if(panelCS==null)
+		{
+			panelCS=new JPanel();
+			
+			comboScores=new JComboBox<Score>(scores);
+			
+			comboTeam=new JComboBox<String>(teams);
+			
+			computeOdds=new JButton("Compute");
+			
+			computeOdds.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					computeOdds();
+				}
+			});
+			
+			panelCS.setLayout(new GridLayout(1, 3));
+			
+			panelCS.add(computeOdds);
+			panelCS.add(comboScores);
+			panelCS.add(comboTeam);
+			
+		}
+		
+		return panelCS;
+		
+	}
+	
+	public void computeOdds()
+	{
+		Score actualScore=(Score) comboScores.getSelectedItem();
+		Runner actualRunner=getRunnerByScore(actualScore);
+		
+		msjf.writeMessageText("Requesting Prices...",Color.BLACK);
+		InflatedMarketPrices prices = null;
+
+		try {
+				prices = ExchangeAPI.getMarketPrices(
+						selectedExchange,
+						apiContext,
+						correctScoreMarket.getMarketId());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(prices==null)
+			{
+				msjf.writeMessageText("Prices Request Return Null.",Color.RED);
+				return;
+			}
+			
+			if (prices.getMarketStatus()
+					.equals(MarketStatusEnum._ACTIVE)) {
+				msjf.writeMessageText("Prices Request Successful.",Color.BLACK);
+				
+				
+			}
+			else
+			{
+				if (prices.getMarketStatus()
+						.equals(MarketStatusEnum._CLOSED)) {
+					
+					msjf.writeMessageText("Marke is closed",Color.RED);
+					return ;
+					
+				}
+				else{
+					msjf.writeMessageText("Market is not active",Color.RED);
+					return;
+				}				
+			}
+		
+			
+			for(BetInterface bi:betInterface)
+			{
+				Score selectedScore=null;
+				Score refScore=null;
+				Score nextScore=null;
+				
+				selectedScore=getScoreByRunner(bi.getRunner());
+				if(selectedScore==null)
+				{
+					msjf.writeMessageText(bi.getRunner().getName()+" Not computed",Color.RED);
+					continue;
+				}
+				
+				if(((String)comboTeam.getSelectedItem()).equals("A"))
+				{	
+					nextScore=actualScore.getNextScoreA();
+					refScore=selectedScore.getPreviousScoreA();
+				}
+				else
+				{	
+					nextScore=actualScore.getNextScoreB();
+					refScore=selectedScore.getPreviousScoreB();
+				}
+				 
+				if(nextScore.goalA>selectedScore.goalA || nextScore.goalB>selectedScore.goalB)
+				{
+					msjf.writeMessageText(bi.getRunner().getName()+" Becames impossible",Color.ORANGE);
+					bi.setOdd(30);
+					bi.setBackLay("L");
+					continue;
+				}
+				
+				
+				msjf.writeMessageText(bi.getRunner().getName()+" Odd Reference "+refScore+"("+getOddBack(prices, getRunnerByScore(refScore).getSelectionId())+")",Color.BLACK);
+				
+				double refOdd=getOddBack(prices, getRunnerByScore(refScore).getSelectionId());
+				double selectedOdd=getOddBack(prices, getRunnerByScore(selectedScore).getSelectionId());
+				
+				if(refOdd<=selectedOdd) //back
+				{
+					bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)+5));
+					bi.setBackLay("B");
+				}
+				else
+				{
+					bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)-7));
+					bi.setBackLay("L");
+				}	
+					
+				
+			}
+			
+		
+		
+	}
+	
+	public double getOddBack(InflatedMarketPrices prices,int selectionID)
+	{
+		for (InflatedRunner r : prices.getRunners()) {
+			if (r.getSelectionId()==selectionID) 
+			{
+				if(r.getBackPrices().size()==0)
+				{
+					msjf.writeMessageText("No Back found for("+getRunnerById(selectionID).getName()+")" , Color.ORANGE);
+				}
+				else
+				{
+					return r.getBackPrices().get(0).getPrice();
+				}
+			}
+		}
+		return 0;
+	}
+	
+	public double getOddLay(InflatedMarketPrices prices,int selectionID)
+	{
+		for (InflatedRunner r : prices.getRunners()) {
+			if (r.getSelectionId()==selectionID) 
+			{
+				if(r.getLayPrices().size()==0)
+				{
+					msjf.writeMessageText("No Lay found for("+getRunnerById(selectionID).getName()+")" , Color.ORANGE);
+				}
+				else
+				{
+					return r.getLayPrices().get(0).getPrice();
+				}
+			}
+		}
+		return 0;
+	}
+
+	
+	public Runner getRunnerByScore(Score s)
+	{
+		for (Runner mr : correctScoreMarket.getRunners().getRunner()) {
+			if (mr.getName().endsWith(s.toString())) 
+			{
+				//msjf.writeMessageText("found:"+mr.getName()+" ID:"+mr.getSelectionId(), Color.BLACK);
+				return mr;
+			}
+		}
+		
+		return null;
+	}
+	
+	public Score getScoreByRunner(Runner r)
+	{
+		for(Score s:scores)
+		{
+			if (r.getName().endsWith(s.toString()))
+				return s;
+		}
+		
+		return null;
+	}
+	
+	public Runner getRunnerById(int id)
+	{
+		for (Runner mr : correctScoreMarket.getRunners().getRunner()) {
+			if (mr.getSelectionId()==id) 
+			{
+				//msjf.writeMessageText("found:"+mr.getName()+" ID:"+mr.getSelectionId(), Color.BLACK);
+				return mr;
+			}
+		}
+		
+		return null;
+	}
+
+	public Score getScoreByRunnerId(int id)
+	{
+		return getScoreByRunner(getRunnerById(id));
+	}
+	
+	
 	
 	public void startProcess(Vector<PlaceBets> bets)
 	{
@@ -489,8 +738,8 @@ public class InterfaceBetList extends JFrame{
 
 				try {
 					correctScoreMarket = ExchangeAPI.getMarket(
-							InterfaceBetList.selectedExchange,
-							InterfaceBetList.apiContext,
+							BetListCS.selectedExchange,
+							BetListCS.apiContext,
 							markets[indexFound].getMarketId());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -514,8 +763,8 @@ public class InterfaceBetList extends JFrame{
 				
 				try {
 						betResult = ExchangeAPI.placeBets(
-								InterfaceBetList.selectedExchange,
-								InterfaceBetList.apiContext, bets);
+								BetListCS.selectedExchange,
+								BetListCS.apiContext, bets);
 					} catch (Exception e) {
 						msjf.writeMessageText(e.getMessage(),
 								Color.RED);
@@ -583,3 +832,4 @@ public class InterfaceBetList extends JFrame{
 				}
 			}
 }
+
