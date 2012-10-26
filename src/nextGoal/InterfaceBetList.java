@@ -198,7 +198,7 @@ public class InterfaceBetList extends JFrame{
 		
 		this.setSize(640,400);
 		
-		
+		this.setAlwaysOnTop(true);
 		
 		//this.repaint();
 	}
