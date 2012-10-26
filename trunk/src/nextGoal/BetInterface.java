@@ -99,6 +99,19 @@ public class BetInterface extends JPanel{
 		return ((OddObj)comboOdd.getSelectedItem()).getOdd();
 	}
 	
+	public void setOdd(double odd)
+	{
+		comboOdd.setSelectedItem(Utils.getOddObjByOdd(odd));
+	}
+	
+	public void setBackLay(String bl)
+	{
+		if(bl.equals(backLay[0]))
+			comboBackLay.setSelectedItem(backLay[0]);
+		if(bl.equals(backLay[1]))
+			comboBackLay.setSelectedItem(backLay[1]);
+	}
+	
 	public String getBackLay()
 	{
 		return (String)comboBackLay.getSelectedItem();

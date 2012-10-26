@@ -35,7 +35,9 @@ public class Score {
 	{
 		goalA=a;
 		goalB=b;
-		if(a==-1 || b==-1 || a>3 || b>3)
+		if(a<0 || b<0)
+			stringResult="Impossible";
+		else if( a>3 || b>3)
 			stringResult="Any Uncoted";
 		else
 			stringResult=goalA+" - "+goalB;
@@ -55,6 +57,16 @@ public class Score {
 	public Score getNextScoreB()
 	{
 		return new Score(goalA,goalB+1);
+	}
+	
+	public Score getPreviousScoreA()
+	{
+		return new Score(goalA-1,goalB);
+	}
+	
+	public Score getPreviousScoreB()
+	{
+		return new Score(goalA,goalB-1);
 	}
 	
 	public Score getSimetricScore()
