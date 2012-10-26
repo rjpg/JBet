@@ -49,7 +49,7 @@ import demo.util.InflatedMarketPrices.InflatedRunner;
 
 public class BetListCS extends JFrame{
 
-	public static int NUMBER_OF_BETS=7;
+	public static int NUMBER_OF_BETS=10;
 
 	JPanel north= new JPanel();
 	
