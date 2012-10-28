@@ -25,15 +25,19 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import nextGoal.NextGoalPanel.MarketThread;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import DataRepository.OddObj;
 import DataRepository.RunnerObj;
 import DataRepository.Utils;
 
@@ -74,6 +78,10 @@ public class BetListCS extends JFrame{
 	public JComboBox<String> comboTeam=null;
 	public JButton computeOdds=null;
 	
+	public JButton computeResults=null;
+	
+	public JCheckBox checkAutoUpdate=null;
+	
 	//Betfair
     private Vector<BFEvent> todayGames=new Vector<BFEvent>();
     public int eventSelected=-1;
@@ -90,13 +98,18 @@ public class BetListCS extends JFrame{
 	//private static EventType selectedEventType;
 	// -----------------------------------------------------------------
     
-	protected int updateInterval = 5000;
 	
+	// THREAD
+	private MarketThread as;
+	private Thread t;
+	private boolean polling = false;
+	protected int updateInterval = 5000;
 	
 	public BetListCS() {
 		super();
 		startBetFair();
 		initialize();
+		startPolling();
 	}
 	
 	public void initialize()
@@ -111,6 +124,7 @@ public class BetListCS extends JFrame{
 					e.getWindow().dispose();
 					BetListCS.this.msjf.dispose();
 					logout();
+					stopPolling();
 			 }
 		}
 		);
@@ -145,6 +159,7 @@ public class BetListCS extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				stopCicle=false;
+				checkAutoUpdate.setSelected(false);
 				msjf.writeMessageText(" ----------------------------------------------------" , Color.BLACK);
 				msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.RED);
 				
@@ -250,15 +265,215 @@ public class BetListCS extends JFrame{
 				}
 			});
 			
-			panelCS.setLayout(new GridLayout(1, 3));
+			computeResults=new	 JButton("Results");
+			
+			computeResults.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					computeResults();
+				}
+			});
+			
+			checkAutoUpdate=new JCheckBox("Auto",false);
+			
+			
+			panelCS.setLayout(new GridLayout(1, 5));
 			
 			panelCS.add(computeOdds);
+			panelCS.add(checkAutoUpdate);
 			panelCS.add(comboScores);
 			panelCS.add(comboTeam);
+			panelCS.add(computeResults);
+			
 			
 		}
 		
 		return panelCS;
+		
+	}
+	
+	public void computeResults()
+	{
+		Score actualScore=(Score) comboScores.getSelectedItem();
+		
+		// 0-0 
+		if(betInterface[0].isAuto())
+			betInterface[0].setRunner(getRunnerByScore(actualScore).getSelectionId());
+		if(((String)comboTeam.getSelectedItem()).equals("A"))
+		{
+			//1-0
+			Runner rn=getRunnerByScore(actualScore.getNextScoreA());
+			if(betInterface[1].isAuto())
+				if(rn==null)
+					betInterface[1].setRunner(-1);
+				else
+					betInterface[1].setRunner(rn.getSelectionId());
+			//2-0
+			if(betInterface[2].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[2].setRunner(-1);
+				else
+					betInterface[2].setRunner(rn.getSelectionId());
+			}
+			//3-0
+			if(betInterface[3].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[3].setRunner(-1);
+				else
+					betInterface[3].setRunner(rn.getSelectionId());
+			}
+			
+			//1-1
+			if(betInterface[4].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[4].setRunner(-1);
+				else
+					betInterface[4].setRunner(rn.getSelectionId());
+			}
+			
+			//2-1
+			if(betInterface[5].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[5].setRunner(-1);
+				else
+					betInterface[5].setRunner(rn.getSelectionId());
+			}
+			
+			//1-2
+			if(betInterface[6].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[6].setRunner(-1);
+				else
+					betInterface[6].setRunner(rn.getSelectionId());
+			}
+			
+			
+			//0-1
+			rn=getRunnerByScore(actualScore.getNextScoreB());
+			if(betInterface[7].isAuto())
+				if(rn==null)
+					betInterface[7].setRunner(-1);
+				else
+					betInterface[7].setRunner(rn.getSelectionId());
+			//0-2
+			if(betInterface[8].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[8].setRunner(-1);
+				else
+					betInterface[8].setRunner(rn.getSelectionId());
+			}
+			//0-3
+			if(betInterface[9].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[9].setRunner(-1);
+				else
+					betInterface[9].setRunner(rn.getSelectionId());
+			}
+			
+		}
+		else
+		{
+			//0-1
+			Runner rn=getRunnerByScore(actualScore.getNextScoreB());
+			if(betInterface[1].isAuto())
+				if(rn==null)
+					betInterface[1].setRunner(-1);
+				else
+					betInterface[1].setRunner(rn.getSelectionId());
+			//0-2
+			if(betInterface[2].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[2].setRunner(-1);
+				else
+					betInterface[2].setRunner(rn.getSelectionId());
+			}
+			//0-3
+			if(betInterface[3].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[3].setRunner(-1);
+				else
+					betInterface[3].setRunner(rn.getSelectionId());
+			}
+			
+			//1-1
+			if(betInterface[4].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[4].setRunner(-1);
+				else
+					betInterface[4].setRunner(rn.getSelectionId());
+			}
+			
+			//1-2
+			if(betInterface[5].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[5].setRunner(-1);
+				else
+					betInterface[5].setRunner(rn.getSelectionId());
+			}
+			
+			//2-1
+			if(betInterface[6].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[6].setRunner(-1);
+				else
+					betInterface[6].setRunner(rn.getSelectionId());
+			}
+			
+			
+			//1-0
+			rn=getRunnerByScore(actualScore.getNextScoreA());
+			if(betInterface[7].isAuto())
+				if(rn==null)
+					betInterface[7].setRunner(-1);
+				else
+					betInterface[7].setRunner(rn.getSelectionId());
+			//2-0
+			if(betInterface[8].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[8].setRunner(-1);
+				else
+					betInterface[8].setRunner(rn.getSelectionId());
+			}
+			//3-0
+			if(betInterface[9].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[9].setRunner(-1);
+				else
+					betInterface[9].setRunner(rn.getSelectionId());
+			}
+			
+			
+		}
+		
+		
 		
 	}
 	
@@ -310,6 +525,8 @@ public class BetListCS extends JFrame{
 			
 			for(BetInterface bi:betInterface)
 			{
+				if(!bi.isAuto())
+					continue;
 				Score selectedScore=null;
 				Score refScore=null;
 				Score nextScore=null;
@@ -341,10 +558,12 @@ public class BetListCS extends JFrame{
 				}
 				
 				
-				msjf.writeMessageText(bi.getRunner().getName()+" Odd Reference "+refScore+"("+getOddBack(prices, getRunnerByScore(refScore).getSelectionId())+")",Color.BLACK);
+				
 				
 				double refOdd=getOddBack(prices, getRunnerByScore(refScore).getSelectionId());
 				double selectedOdd=getOddBack(prices, getRunnerByScore(selectedScore).getSelectionId());
+				
+				msjf.writeMessageText(bi.getRunner().getName()+"("+selectedOdd+") -> Odd Reference "+refScore+"("+getOddBack(prices, getRunnerByScore(refScore).getSelectionId())+")",Color.BLACK);
 				
 				if(refOdd<=selectedOdd) //back
 				{
@@ -831,5 +1050,68 @@ public class BetListCS extends JFrame{
 					msjf.writeMessageText("Ending the process.", Color.BLUE);
 				}
 			}
+			
+			
+			//---------------------------------------------------------------
+			//---------------------------------thread -----
+			public class MarketThread extends Object implements Runnable {
+				private volatile boolean stopRequested;
+
+				private Thread runThread;
+
+				public void run() {
+					runThread = Thread.currentThread();
+					stopRequested = false;
+					
+					while (!stopRequested) {
+						if(checkAutoUpdate.isSelected())
+						{
+							msjf.writeMessageText("Auto Update",Color.GREEN);
+							computeOdds();
+						}
+						try {
+							Thread.sleep(updateInterval);
+						} catch (Exception e) {
+							// e.printStackTrace();
+						}
+					}
+				}
+
+				public void stopRequest() {
+					stopRequested = true;
+
+					if (runThread != null) {
+						runThread.interrupt();
+
+						// suspend()stop();
+					}
+				}
+			}
+			//-----------------------------------------end thread -------------------
+			
+			public void startPolling() {
+				
+				
+				if (polling)
+					return;
+				msjf.writeMessageText("Ready to Auto Update", Color.GREEN);
+				as = new MarketThread();
+				t = new Thread(as);
+				t.start();
+
+				polling = true;
+				
+			}
+
+			public void stopPolling() {
+				if (!polling)
+					return;
+				
+				msjf.writeMessageText("Stop pooling", Color.GREEN);
+				as.stopRequest();
+				polling = false;
+
+			}
+			
 }
 
