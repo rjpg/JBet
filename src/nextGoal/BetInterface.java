@@ -33,6 +33,8 @@ public class BetInterface extends JPanel{
 	public JComboBox<RunnerObj> comboRunner;
 	
 	public JCheckBox checkProcess;
+	
+	public JCheckBox checkAuto;
 
 	public static Market market = null;
 	
@@ -57,13 +59,16 @@ public class BetInterface extends JPanel{
 		initializeRunnersArray();
 		comboRunner=new JComboBox<RunnerObj>(runners);
 		
-		this.setLayout(new GridLayout(1, 5));
+		checkAuto=new JCheckBox("Auto",true);
+		
+		this.setLayout(new GridLayout(1, 6));
 		
 		this.add(checkProcess);
 		this.add(comboOdd);
 		this.add(comboStake);
 		this.add(comboBackLay);
 		this.add(comboRunner);
+		this.add(checkAuto);
 	
 	}
 	
@@ -84,6 +89,11 @@ public class BetInterface extends JPanel{
 		return checkProcess.isSelected();
 	}
 	
+	public boolean isAuto()
+	{
+		return checkAuto.isSelected();
+	}
+	
 	public Runner getRunner()
 	{
 		return ((RunnerObj)comboRunner.getSelectedItem()).getRunner();
@@ -102,6 +112,22 @@ public class BetInterface extends JPanel{
 	public void setOdd(double odd)
 	{
 		comboOdd.setSelectedItem(Utils.getOddObjByOdd(odd));
+		this.repaint();
+	}
+	
+	public void setRunner(int id)
+	{
+		for(int i =0;i<runners.length;i++)
+			if(id==runners[i].getRunner().getSelectionId())
+			{
+			//	System.out.println("detectou :" + runners[i].getRunner().getName());
+				comboRunner.setSelectedIndex(i);
+				this.repaint();
+				return;
+			}
+		//System.out.println("chamou :"+runners.length);
+		comboRunner.setSelectedIndex(16);
+		this.repaint();
 	}
 	
 	public void setBackLay(String bl)
@@ -110,6 +136,8 @@ public class BetInterface extends JPanel{
 			comboBackLay.setSelectedItem(backLay[0]);
 		if(bl.equals(backLay[1]))
 			comboBackLay.setSelectedItem(backLay[1]);
+		
+		this.repaint();
 	}
 	
 	public String getBackLay()
