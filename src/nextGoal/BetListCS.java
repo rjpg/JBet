@@ -30,6 +30,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import nextGoal.NextGoalPanel.MarketThread;
 
@@ -125,6 +126,7 @@ public class BetListCS extends JFrame{
 					BetListCS.this.msjf.dispose();
 					logout();
 					stopPolling();
+					System.out.println("X:"+BetListCS.this.getWidth()+"Y:"+BetListCS.this.getHeight());
 			 }
 		}
 		);
@@ -139,8 +141,15 @@ public class BetListCS extends JFrame{
 			north.add(betInterface[i]);
 		}
 		
+		JScrollPane jsp = new JScrollPane();
+		jsp.setViewportView(north);
+		jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		this.getContentPane().add(north,BorderLayout.NORTH);
+		
+		
+
+	    // Add scroll pane to the content pane.
 		
 		msjf=new MessageJFrame("x");
 		msjf.setVisible(false);
@@ -237,7 +246,8 @@ public class BetListCS extends JFrame{
 		
 		this.repaint();
 		
-		this.setSize(640,400);
+		//this.setSize(820,620);
+		this.setSize(820,370);
 		
 		this.setAlwaysOnTop(true);
 		
@@ -302,6 +312,7 @@ public class BetListCS extends JFrame{
 		if(((String)comboTeam.getSelectedItem()).equals("A"))
 		{
 			//1-0
+			if(NUMBER_OF_BETS<2) return;
 			Runner rn=getRunnerByScore(actualScore.getNextScoreA());
 			if(betInterface[1].isAuto())
 				if(rn==null)
@@ -309,6 +320,7 @@ public class BetListCS extends JFrame{
 				else
 					betInterface[1].setRunner(rn.getSelectionId());
 			//2-0
+			if(NUMBER_OF_BETS<3) return;
 			if(betInterface[2].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA());
@@ -318,6 +330,7 @@ public class BetListCS extends JFrame{
 					betInterface[2].setRunner(rn.getSelectionId());
 			}
 			//3-0
+			if(NUMBER_OF_BETS<4) return;
 			if(betInterface[3].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreA());
@@ -328,6 +341,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//1-1
+			if(NUMBER_OF_BETS<5) return;
 			if(betInterface[4].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
@@ -338,6 +352,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//2-1
+			if(NUMBER_OF_BETS<6) return;
 			if(betInterface[5].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
@@ -348,6 +363,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//1-2
+			if(NUMBER_OF_BETS<7) return;
 			if(betInterface[6].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
@@ -359,6 +375,7 @@ public class BetListCS extends JFrame{
 			
 			
 			//0-1
+			if(NUMBER_OF_BETS<8) return;
 			rn=getRunnerByScore(actualScore.getNextScoreB());
 			if(betInterface[7].isAuto())
 				if(rn==null)
@@ -366,6 +383,7 @@ public class BetListCS extends JFrame{
 				else
 					betInterface[7].setRunner(rn.getSelectionId());
 			//0-2
+			if(NUMBER_OF_BETS<9) return;
 			if(betInterface[8].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB());
@@ -375,6 +393,7 @@ public class BetListCS extends JFrame{
 					betInterface[8].setRunner(rn.getSelectionId());
 			}
 			//0-3
+			if(NUMBER_OF_BETS<10) return;
 			if(betInterface[9].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB().getNextScoreB());
@@ -384,17 +403,83 @@ public class BetListCS extends JFrame{
 					betInterface[9].setRunner(rn.getSelectionId());
 			}
 			
+			//1-0
+			if(NUMBER_OF_BETS<11) return;
+			if(NUMBER_OF_BETS<10) return;
+			rn=getRunnerByScore(actualScore.getNextScoreA());
+			if(betInterface[10].isAuto())
+				if(rn==null)
+					betInterface[10].setRunner(-1);
+				else
+					betInterface[10].setRunner(rn.getSelectionId());
+			//2-0
+			if(NUMBER_OF_BETS<12) return;
+			if(betInterface[11].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[11].setRunner(-1);
+				else
+					betInterface[11].setRunner(rn.getSelectionId());
+			}
+			
+			//3-0
+			if(NUMBER_OF_BETS<13) return;
+			if(betInterface[12].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreA());
+				if(rn==null)
+					betInterface[12].setRunner(-1);
+				else
+					betInterface[12].setRunner(rn.getSelectionId());
+			}
+			
+			//1-1
+			if(NUMBER_OF_BETS<14) return;
+			if(betInterface[13].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[13].setRunner(-1);
+				else
+					betInterface[13].setRunner(rn.getSelectionId());
+			}
+			
+			//2-1
+			if(NUMBER_OF_BETS<15) return;
+			if(betInterface[14].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[14].setRunner(-1);
+				else
+					betInterface[14].setRunner(rn.getSelectionId());
+			}
+			
+			//1-2
+			if(NUMBER_OF_BETS<16) return;
+			if(betInterface[15].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[15].setRunner(-1);
+				else
+					betInterface[15].setRunner(rn.getSelectionId());
+			}
+			
 		}
 		else
 		{
 			//0-1
 			Runner rn=getRunnerByScore(actualScore.getNextScoreB());
+			if(NUMBER_OF_BETS<2) return;
 			if(betInterface[1].isAuto())
 				if(rn==null)
 					betInterface[1].setRunner(-1);
 				else
 					betInterface[1].setRunner(rn.getSelectionId());
 			//0-2
+			if(NUMBER_OF_BETS<3) return;
 			if(betInterface[2].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB());
@@ -404,6 +489,7 @@ public class BetListCS extends JFrame{
 					betInterface[2].setRunner(rn.getSelectionId());
 			}
 			//0-3
+			if(NUMBER_OF_BETS<4) return;
 			if(betInterface[3].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB().getNextScoreB());
@@ -414,6 +500,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//1-1
+			if(NUMBER_OF_BETS<5) return;
 			if(betInterface[4].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
@@ -424,6 +511,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//1-2
+			if(NUMBER_OF_BETS<6) return;
 			if(betInterface[5].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
@@ -434,6 +522,7 @@ public class BetListCS extends JFrame{
 			}
 			
 			//2-1
+			if(NUMBER_OF_BETS<7) return;
 			if(betInterface[6].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
@@ -445,6 +534,7 @@ public class BetListCS extends JFrame{
 			
 			
 			//1-0
+			if(NUMBER_OF_BETS<8) return;
 			rn=getRunnerByScore(actualScore.getNextScoreA());
 			if(betInterface[7].isAuto())
 				if(rn==null)
@@ -452,6 +542,7 @@ public class BetListCS extends JFrame{
 				else
 					betInterface[7].setRunner(rn.getSelectionId());
 			//2-0
+			if(NUMBER_OF_BETS<9) return;
 			if(betInterface[8].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA());
@@ -461,6 +552,7 @@ public class BetListCS extends JFrame{
 					betInterface[8].setRunner(rn.getSelectionId());
 			}
 			//3-0
+			if(NUMBER_OF_BETS<10) return;
 			if(betInterface[9].isAuto())
 			{
 				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreA());
@@ -470,11 +562,71 @@ public class BetListCS extends JFrame{
 					betInterface[9].setRunner(rn.getSelectionId());
 			}
 			
+			//0-1
+			if(NUMBER_OF_BETS<11) return;
+			rn=getRunnerByScore(actualScore.getNextScoreB());
+			if(betInterface[10].isAuto())
+				if(rn==null)
+					betInterface[10].setRunner(-1);
+				else
+					betInterface[10].setRunner(rn.getSelectionId());
+			//0-2
+			if(NUMBER_OF_BETS<12) return;
+			if(betInterface[11].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[11].setRunner(-1);
+				else
+					betInterface[11].setRunner(rn.getSelectionId());
+			}
+
+			//0-3
+			if(NUMBER_OF_BETS<13) return;
+			if(betInterface[12].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreB().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[12].setRunner(-1);
+				else
+					betInterface[12].setRunner(rn.getSelectionId());
+			}
+			
+			//1-1
+			if(NUMBER_OF_BETS<14) return;
+			if(betInterface[13].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[13].setRunner(-1);
+				else
+					betInterface[13].setRunner(rn.getSelectionId());
+			}
+			
+			//1-2
+			if(NUMBER_OF_BETS<15) return;
+			if(betInterface[14].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreB().getNextScoreB());
+				if(rn==null)
+					betInterface[14].setRunner(-1);
+				else
+					betInterface[14].setRunner(rn.getSelectionId());
+			}
+			
+			//2-1
+			if(NUMBER_OF_BETS<16) return;
+			if(betInterface[15].isAuto())
+			{
+				rn=getRunnerByScore(actualScore.getNextScoreA().getNextScoreA().getNextScoreB());
+				if(rn==null)
+					betInterface[15].setRunner(-1);
+				else
+					betInterface[15].setRunner(rn.getSelectionId());
+			}
+
 			
 		}
-		
-		
-		
 	}
 	
 	public void computeOdds()
@@ -517,7 +669,8 @@ public class BetListCS extends JFrame{
 					
 				}
 				else{
-					msjf.writeMessageText("Market is not active",Color.RED);
+					msjf.writeMessageText("Market is not active - Auto compute odds OFF",Color.RED);
+					checkAutoUpdate.setSelected(false);
 					return;
 				}				
 			}
@@ -565,16 +718,30 @@ public class BetListCS extends JFrame{
 				
 				msjf.writeMessageText(bi.getRunner().getName()+"("+selectedOdd+") -> Odd Reference "+refScore+"("+getOddBack(prices, getRunnerByScore(refScore).getSelectionId())+")",Color.BLACK);
 				
-				if(refOdd<=selectedOdd) //back
+				if(bi.isAutoBackLay())
 				{
-					bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)+5));
-					bi.setBackLay("B");
+					if(refOdd<=selectedOdd) //back
+					{
+						bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)+bi.getBackOffset()));
+						bi.setBackLay("B");
+					}
+					else
+					{
+						bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)-bi.getLayOffset()));
+						bi.setBackLay("L");
+					}
 				}
 				else
 				{
-					bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)-7));
-					bi.setBackLay("L");
-				}	
+					if(bi.getBackLay().equals("B"))
+					{
+						bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)+bi.getBackOffset()));
+					}
+					else
+					{
+						bi.setOdd(Utils.indexToOdd(Utils.oddToIndex(refOdd)-bi.getLayOffset()));
+					}
+				}
 					
 				
 			}
