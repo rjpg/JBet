@@ -13,7 +13,13 @@ import generated.exchange.BFExchangeServiceStub.Runner;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+
+import com.sun.codemodel.JSwitch;
 
 import DataRepository.OddObj;
 import DataRepository.RunnerObj;
@@ -35,6 +41,10 @@ public class BetInterface extends JPanel{
 	public JCheckBox checkProcess;
 	
 	public JCheckBox checkAuto;
+	public JCheckBox checkAutoBackLay;
+	
+	public JSpinner backOffset;
+	public JSpinner layOffset;
 
 	public static Market market = null;
 	
@@ -60,16 +70,47 @@ public class BetInterface extends JPanel{
 		comboRunner=new JComboBox<RunnerObj>(runners);
 		
 		checkAuto=new JCheckBox("Auto",true);
+		checkAutoBackLay=new JCheckBox("AutoBL",true);
 		
-		this.setLayout(new GridLayout(1, 6));
+		SpinnerModel modelB =
+	        new SpinnerNumberModel(0, //initial value
+	                                - 100, //min
+	                                + 100, //max
+	                               1);                //step
+		
+		SpinnerModel modelL =
+	        new SpinnerNumberModel(0, //initial value
+	                                - 100, //min
+	                                + 100, //max
+	                               1);                //step
+		
+		
+		backOffset=new JSpinner(modelB);
+		layOffset=new JSpinner(modelL);
+
+		backOffset.setValue(5);
+		layOffset.setValue(7);
+		
+		JLabel bOff=new JLabel("B offset");
+		JLabel lOff=new JLabel("L offset");
+		
+		bOff.setHorizontalAlignment(JLabel.RIGHT);
+		lOff.setHorizontalAlignment(JLabel.RIGHT);
+		
+		this.setLayout(new GridLayout(1, 10));
 		
 		this.add(checkProcess);
 		this.add(comboOdd);
+		this.add(checkAuto);
 		this.add(comboStake);
 		this.add(comboBackLay);
+		this.add(checkAutoBackLay);
 		this.add(comboRunner);
-		this.add(checkAuto);
-	
+		this.add(bOff);
+		this.add(backOffset);
+		this.add(lOff);
+		this.add(layOffset);
+		
 	}
 	
 	public void initializeRunnersArray()
@@ -93,6 +134,12 @@ public class BetInterface extends JPanel{
 	{
 		return checkAuto.isSelected();
 	}
+	
+	public boolean isAutoBackLay()
+	{
+		return checkAutoBackLay.isSelected();
+	}
+	
 	
 	public Runner getRunner()
 	{
@@ -164,5 +211,15 @@ public class BetInterface extends JPanel{
 		//bet.setSize(2);
 		
 		return bet;
+	}
+	
+	public int getBackOffset()
+	{
+		return (Integer) backOffset.getValue();
+	}
+	
+	public int getLayOffset()
+	{
+		return (Integer) layOffset.getValue();
 	}
 }
