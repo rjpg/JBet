@@ -30,7 +30,7 @@ public class LoaderNormalizeRawData {
 		//for(int i =0 ; i<CategoriesManeger.getCategoriesSize();i++)
 		int i=16; //16
 		{
-			ProcessThreshold pt=new ProcessThreshold(16, 98);
+			ProcessThreshold pt=new ProcessThreshold(i, 98);
 			
 			String catDir=CategoriesManeger.getDirectory(i);
 			System.out.println("---------------------------------------------------");
@@ -59,6 +59,8 @@ public class LoaderNormalizeRawData {
 			
 			
 			norm.setProduceOutputHeaders(false);
+			
+			
 			
 			norm.normalize(targetFile);
 			System.out.println("Normalization Complete.");
