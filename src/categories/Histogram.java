@@ -103,7 +103,7 @@ public class Histogram {
 			System.out.println("v["+i+"]="+h.getIntervals()[i]);
 		}
 		
-		System.out.println(h.getMinFiltred(88));
+		System.out.println(h.getMinFiltred(85));
 		
 	}
 	
