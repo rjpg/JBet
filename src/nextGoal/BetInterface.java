@@ -27,7 +27,7 @@ import DataRepository.Utils;
 
 public class BetInterface extends JPanel{
 	
-	public static Double[] stakes={2.00,5.00,7.00,10.00,20.00,50.00,100.00,200.00,500.00,1000.00};
+	public static Double[] stakes={10.00,2.00,5.00,7.00,20.00,50.00,100.00,200.00,500.00,1000.00};
 	
 	public static String[] backLay={"L","B"};
 	
