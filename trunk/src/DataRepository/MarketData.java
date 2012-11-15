@@ -51,6 +51,7 @@ import main.loader;
 
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
+import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedCompleteMarketPrices;
 import demo.util.RunnerTradedVolumeCompressed;
@@ -100,6 +101,7 @@ public class MarketData {
 	//public String exchange;
 	
 	
+	private APIContext apiContext;
 	private Market selectedMarket; 
 	private Exchange selectedExchange;
 	//------------------------
@@ -127,11 +129,13 @@ public class MarketData {
 	private int volumeCapCurrentRunner=0;
 	
 	
-	public MarketData(Market selectedMarketA, Exchange selectedExchangeA)
+	public MarketData(Market selectedMarketA, Exchange selectedExchangeA,APIContext apiContextA)
 	{
 		
 		selectedMarket=selectedMarketA ; 
 		selectedExchange=selectedExchangeA;
+		apiContext=apiContextA;
+		
 		calendarFpsAux=Calendar.getInstance();
 		
 		if(selectedMarket!=null)
@@ -198,7 +202,7 @@ public class MarketData {
 		while (prices==null)
 		{
 			try {
-				prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
+				prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, apiContext, selectedMarket.getMarketId());
 			} catch (Exception e) {
 				System.out.println("Error Reading InflatedCompleteMarketPrices in initializing");
 				// TODO Auto-generated catch block
@@ -279,7 +283,7 @@ public class MarketData {
 					
 					volInfo = ExchangeAPI.getMarketTradedVolume(	
 							selectedExchange,
-							Manager.apiContext,
+							apiContext,
 							selectedMarket.getMarketId(),
 							rd.getId());
 				} catch (Exception e) {
@@ -327,7 +331,7 @@ public class MarketData {
 		
 		InflatedCompleteMarketPrices prices=null;
 		try {
-			prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
+			prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange,apiContext, selectedMarket.getMarketId());
 		//	prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
 		//	MUBet[] bets=ExchangeAPI.getMUBets(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
 		//	bets=ExchangeAPI.getMUBets(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
@@ -610,7 +614,7 @@ public class MarketData {
 		try {
 				volInfo = ExchangeAPI.getMarketTradedVolume(	
 					selectedExchange,
-					Manager.apiContext,
+					apiContext,
 					selectedMarket.getMarketId(),
 					rd.getId());
 		} catch (Exception e) {
@@ -638,7 +642,7 @@ public class MarketData {
 		Vector<RunnerTradedVolumeCompressed> ret=null;
 		try {
 			ret=ExchangeAPI.getMarketTradedVolumeCompressed(selectedExchange,
-					Manager.apiContext, selectedMarket.getMarketId());
+					apiContext, selectedMarket.getMarketId());
 		} catch (Exception e) {
 			System.out
 					.println("Error Reading getMarketTradedVolume in refreshCompleteVolume");
@@ -901,6 +905,11 @@ public class MarketData {
 	public Exchange getSelectedExchange() {
 		return selectedExchange;
 	}
+	
+	public APIContext getApiContext() {
+		return apiContext;
+	}
+
 
 	public void setSelectedMarket(Market selectedMarket) {
 		

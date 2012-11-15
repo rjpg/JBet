@@ -128,7 +128,7 @@ public class Manager  implements MarketChangeListener{
 				Display.showException("*** Failed to log in", e);
 				System.exit(1);
 			}
-			md = new MarketData(selectedMarket, selectedExchange);
+			md = new MarketData(selectedMarket, selectedExchange,apiContext);
 			
 			JFrame close = getCloseFrame();
 			close.setVisible(true);
@@ -185,7 +185,7 @@ public class Manager  implements MarketChangeListener{
 
 			
 		} else {
-			MarketData md = new MarketData(null, Exchange.UK);
+			MarketData md = new MarketData(null, Exchange.UK,null);
 			
 			md.addMarketChangeListener(this);
 			JFrame close = getCloseFrame();
