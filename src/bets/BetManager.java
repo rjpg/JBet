@@ -43,7 +43,7 @@ public class BetManager {
 		if(!isBetsToProcess())
 			return;
 		
-		boolean betsInProgress=isBetsInProgress();
+		
 		
 		MUBet[] betsbf=null;
 		try {
@@ -70,8 +70,8 @@ public class BetManager {
 				BetData bdAux=getBetById(mubet.getBetId());
 				if(bdAux==null)
 				{
-					// If there are bets in progress and not pressed yet in this refresh
-					if( betsInProgress && getBetById(mubet.getBetId(), possibleBetsInProgress)==null)
+					// If this bet was not processed yet in this refresh
+					if(getBetById(mubet.getBetId(), possibleBetsInProgress)==null)
 					{
 						BetData bd=getBetFromAPI(mubet.getBetId());
 						if(bd!=null)
