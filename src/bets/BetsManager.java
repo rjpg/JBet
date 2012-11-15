@@ -220,7 +220,7 @@ public class BetsManager  {
 				if(bdAux.getOddMached()==-1)
 				{
 					bdAux.setMatchedAmount(mubet.getSize());
-					bdAux.setOddMached(mubet.getPrice());
+					bdAux.setOddMached(mubet.getPrice());  
 				}
 				else
 				{

@@ -16,7 +16,6 @@ public class BetData {
 	
 	public BetPersistenceTypeEnum persistenceType = BetPersistenceTypeEnum.NONE;
 	
-	
 	public double oddRequested;
 	public double amount=0;
 	
@@ -50,6 +49,11 @@ public class BetData {
 	
 	
 	public Long BetID=null; // given from from betfair after placed 
+	
+	//Simulation
+	public double entryVolume=-1;
+	public double entryAmount=-1;
+	
 	
 	public BetData (BetListener tmA, RunnersData rdA, double  amountA,double  oddA, int typeA, Calendar time)
 	{

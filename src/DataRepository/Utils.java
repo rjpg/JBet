@@ -230,7 +230,7 @@ public class Utils {
 		//System.out.println("AVG ODD:"+(totalBets/totalStake));
 	
 		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dá muito edge
-		// não fazer ner mas sim erredondar para 2 casas
+		// não fazer near mas sim erredondar para 2 casas
 		if(totalStake==0)
 			return 0.00;
 		else
