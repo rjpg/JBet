@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 import categories.Category;
 
 import main.Parameters;
@@ -387,7 +387,7 @@ public class NeuralDataBot extends Bot{
 		System.out.println(s);
 		*/
 		
-		CategoriesManeger.writeTrainDataIntoCSVCat(cat,inputValues,predictValue);
+		CategoriesManager.writeTrainDataIntoCSVCat(cat,inputValues,predictValue);
 		
 		
 		updateGraphicalInterface();
@@ -404,7 +404,7 @@ public class NeuralDataBot extends Bot{
 		{
 			if(!processed10)
 			{
-				Category catAux=CategoriesManeger.getCategory(rd);
+				Category catAux=CategoriesManager.getCategory(rd);
 				if(catAux==null)
 					return;
 				
@@ -418,9 +418,9 @@ public class NeuralDataBot extends Bot{
 					else
 						rdNeighbour=Utils.getNeighbour(getMd(), rd);
 					
-					writeMsg(CategoriesManeger.getNumber(cat)+":"+cat.getNumberInputValues()+":"+CategoriesManeger.getDirectory(catAux), Color.BLUE);
+					writeMsg(CategoriesManager.getNumber(cat)+":"+cat.getNumberInputValues()+":"+CategoriesManager.getDirectory(catAux), Color.BLUE);
 					writeMsg("Neighbour:"+rdNeighbour.getName(), Color.BLUE);
-					CategoriesManeger.printCategory(catAux);
+					CategoriesManager.printCategory(catAux);
 					//System.out.println("ahead:"+cat.getAhead());
 					activateNNData();
 					
@@ -430,7 +430,7 @@ public class NeuralDataBot extends Bot{
 			{
 				if(!processed2)
 				{
-					if(CategoriesManeger.getNumber(cat)==16) //16 use if if you want to process only one cat
+					if(CategoriesManager.getNumber(cat)==16) //16 use if if you want to process only one cat
 						updateNNData();
 				}
 			}
@@ -439,7 +439,7 @@ public class NeuralDataBot extends Bot{
 			{
 				// para não estar sempre a calcular ver o tempo 
 				
-				Category catAux=CategoriesManeger.getCategory(rd);
+				Category catAux=CategoriesManager.getCategory(rd);
 				if(catAux==null)
 					return;
 				
@@ -452,9 +452,9 @@ public class NeuralDataBot extends Bot{
 						rdNeighbour=Utils.getFavorite(getMd());
 					else
 						rdNeighbour=Utils.getNeighbour(getMd(), rd);
-					writeMsg(CategoriesManeger.getNumber(cat)+":"+CategoriesManeger.getDirectory(catAux), Color.BLUE);
+					writeMsg(CategoriesManager.getNumber(cat)+":"+CategoriesManager.getDirectory(catAux), Color.BLUE);
 					writeMsg("Neighbour:"+rdNeighbour.getName(), Color.BLUE);
-					CategoriesManeger.printCategory(catAux);
+					CategoriesManager.printCategory(catAux);
 					activateNNData();
 				}
 			}

@@ -1,6 +1,6 @@
 package main;
 
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 import statistics.Statistics;
 import DataRepository.Utils;
 
@@ -10,9 +10,9 @@ public class LoaderGenerateRawDataCSV {
 	Utils.init();
 	Statistics.init();
 	
-	CategoriesManeger.init();
-	CategoriesManeger.loadRawAMFromFile();
-	CategoriesManeger.processAMCatIntervals();
+	CategoriesManager.init();
+	CategoriesManager.loadRawAMFromFile();
+	CategoriesManager.processAMCatIntervals();
 		
 	Parameters.log=false;  // Log or not to Log when not in replay
 	Parameters.replay=true; // replay or read from file

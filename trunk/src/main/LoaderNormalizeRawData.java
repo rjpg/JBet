@@ -14,7 +14,7 @@ import org.encog.util.simple.EncogUtility;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 import categories.ProcessThreshold;
 
 public class LoaderNormalizeRawData {
@@ -22,9 +22,9 @@ public class LoaderNormalizeRawData {
 		Utils.init();
 		Statistics.init();
 		
-		CategoriesManeger.init();
-		CategoriesManeger.loadRawAMFromFile();
-		CategoriesManeger.processAMCatIntervals();
+		CategoriesManager.init();
+		CategoriesManager.loadRawAMFromFile();
+		CategoriesManager.processAMCatIntervals();
 
 		
 		//for(int i =0 ; i<CategoriesManeger.getCategoriesSize();i++)
@@ -32,7 +32,7 @@ public class LoaderNormalizeRawData {
 		{
 			ProcessThreshold pt=new ProcessThreshold(i, 98);
 			
-			String catDir=CategoriesManeger.getDirectory(i);
+			String catDir=CategoriesManager.getDirectory(i);
 			System.out.println("---------------------------------------------------");
 			System.out.println("Processing : "+catDir);
 			//File sourceFile=new File(catDir+"/nn-raw-data.csv");
@@ -42,8 +42,8 @@ public class LoaderNormalizeRawData {
 			System.out.println("Analyzing "+catDir+"/nn-raw-data-threshold.csv ...");
 			EncogAnalyst analyst = new EncogAnalyst();
 			AnalystWizard wizard = new AnalystWizard(analyst);
-			wizard.setTargetField("field:"+(CategoriesManeger.getCategory(i).getNumberInputValues()+1));
-			System.out.println("Target field: \"field:"+(CategoriesManeger.getCategory(i).getNumberInputValues()+1)+"\"");
+			wizard.setTargetField("field:"+(CategoriesManager.getCategory(i).getNumberInputValues()+1));
+			System.out.println("Target field: \"field:"+(CategoriesManager.getCategory(i).getNumberInputValues()+1)+"\"");
 			wizard.wizard(sourceFile, false, AnalystFileFormat.DECPNT_COMMA);
 
 //			File statsFile=new File(catDir+"/nn-stats.ega");
@@ -73,7 +73,7 @@ public class LoaderNormalizeRawData {
 			System.out.println("Writing binary Encog training to "+catDir+"/nn-train-data.egb");
 			File normalizaedCVSFile=new File(catDir+"/nn-normalized-data.csv");
 			File targetEGBFile=new File(catDir+"/nn-train-data.egb");
-			CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), CategoriesManeger.getCategory(i).getNumberInputValues(), 1, false);
+			CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), CategoriesManager.getCategory(i).getNumberInputValues(), 1, false);
 			EncogUtility.saveEGB(targetEGBFile, csvnds);
 			System.out.println("Write Complete.");
 		}

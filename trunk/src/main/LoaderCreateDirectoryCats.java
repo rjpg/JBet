@@ -6,25 +6,25 @@ import org.encog.util.arrayutil.NormalizeArray;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 
 public class LoaderCreateDirectoryCats {
 	public static void main(String[] args)  throws Exception {
 		Utils.init();
 		Statistics.init();
 		
-		CategoriesManeger.init();
-		CategoriesManeger.loadRawAMFromFile();
-		CategoriesManeger.processAMCatIntervals();
+		CategoriesManager.init();
+		CategoriesManager.loadRawAMFromFile();
+		CategoriesManager.processAMCatIntervals();
 		
-		for (int i=0;i<CategoriesManeger.getCategoriesSize();i++)
+		for (int i=0;i<CategoriesManager.getCategoriesSize();i++)
 		{
-			System.out.println(i+":"+CategoriesManeger.getDirectory(i));
+			System.out.println(i+":"+CategoriesManager.getDirectory(i));
 			try{ 
-				boolean success = (new File(CategoriesManeger.getDirectory(i))).mkdirs();
+				boolean success = (new File(CategoriesManager.getDirectory(i))).mkdirs();
 				  if (success) {
 					  System.out.println("Directories: " 
-							  + CategoriesManeger.getDirectory(i) + " created");
+							  + CategoriesManager.getDirectory(i) + " created");
 				  }
 
 			  }catch (Exception e){//Catch exception if any

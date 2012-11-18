@@ -19,7 +19,7 @@ import DataRepository.MarketData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 
-public class CategoriesManeger {
+public class CategoriesManager {
 	
 	public static double[] oddCat={2.00,5.00,10.00,15.00};
 	
@@ -48,14 +48,14 @@ public class CategoriesManeger {
 	public static void writeTrainDataIntoCSVCat(Category cat,double input[],double output)
 	{
 		try {
-			out = new BufferedWriter(new FileWriter(CategoriesManeger.getDirectory(cat)+"/nn-raw-data.csv", true));
+			out = new BufferedWriter(new FileWriter(CategoriesManager.getDirectory(cat)+"/nn-raw-data.csv", true));
 			} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Error Open "+CategoriesManeger.getDirectory(cat)+"/nn-raw-data.csv for writing");
+			System.out.println("Error Open "+CategoriesManager.getDirectory(cat)+"/nn-raw-data.csv for writing");
 			}
 		if(out==null)
 		{
-			System.err.println("could not open "+CategoriesManeger.getDirectory(cat)+"/nn-raw-data.csv" );
+			System.err.println("could not open "+CategoriesManager.getDirectory(cat)+"/nn-raw-data.csv" );
 			return;
 		}
 		//System.out.println("File : "+CategoriesManeger.getDirectory(cat)+"/nn-raw-data.csv");
@@ -222,7 +222,7 @@ public class CategoriesManeger {
 		
 		if(minute>8 && minute<=9 )
 		{
-			double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManeger.AVGAmountFrames, 0);
+			double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManager.AVGAmountFrames, 0);
 			if(amtAvg>0)
 			{	
 				boolean fav=isRaceFavorite(md);
@@ -255,7 +255,7 @@ public class CategoriesManeger {
 		
 		if(minute>1 && minute<=2 )
 		{
-			double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManeger.AVGAmountFrames, 0);
+			double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManager.AVGAmountFrames, 0);
 			if(amtAvg>0)
 			{	
 				boolean fav=isRaceFavorite(md);
@@ -645,7 +645,7 @@ public class CategoriesManeger {
 	public static BasicNetwork getNN(Category cat)
 	{
 		BasicNetwork ret=null;
-		File networkFile=new File(CategoriesManeger.getDirectory(cat),"nn.eg");
+		File networkFile=new File(CategoriesManager.getDirectory(cat),"nn.eg");
 		if (!networkFile.exists())
 			return null;
 		
@@ -658,7 +658,7 @@ public class CategoriesManeger {
 	public static EncogAnalyst  getStats(Category cat)
 	{
 		EncogAnalyst analyst=null;
-		File statsFile=new File(CategoriesManeger.getDirectory(cat)+"/nn-stats.ega");
+		File statsFile=new File(CategoriesManager.getDirectory(cat)+"/nn-stats.ega");
 		
 		
 		if (!statsFile.exists())
@@ -676,7 +676,7 @@ public class CategoriesManeger {
 	
 	public static void printCategory(Category cat)
 	{
-		System.out.println("id:"+CategoriesManeger.getNumber(cat)+" Time:"+cat.isTime10m()+" Odd cat:"+cat.getOddCat()+" Fav:"+cat.isFavorite()+" Am Cat:"+cat.getAm());
+		System.out.println("id:"+CategoriesManager.getNumber(cat)+" Time:"+cat.isTime10m()+" Odd cat:"+cat.getOddCat()+" Fav:"+cat.isFavorite()+" Am Cat:"+cat.getAm());
 	}
 	
 	public static int getCategoriesSize()
@@ -692,9 +692,9 @@ public class CategoriesManeger {
 	public static void main(String[] args)
 	{
 		Utils.init();
-		CategoriesManeger.init();
-		CategoriesManeger.loadRawAMFromFile();
-		CategoriesManeger.processAMCatIntervals();
+		CategoriesManager.init();
+		CategoriesManager.loadRawAMFromFile();
+		CategoriesManager.processAMCatIntervals();
 		
 		int x=0;
 		for(int i=0;i<oddCat.length;i++)

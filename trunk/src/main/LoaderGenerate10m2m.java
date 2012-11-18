@@ -2,7 +2,7 @@ package main;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 
 public class LoaderGenerate10m2m {
 
