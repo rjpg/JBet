@@ -38,12 +38,10 @@ public class BetManager {
 		
 	}
 	
-	public void refresh()
+	private void refresh()
 	{
 		if(!isBetsToProcess())
 			return;
-		
-		
 		
 		MUBet[] betsbf=null;
 		try {
@@ -57,50 +55,113 @@ public class BetManager {
 			return;
 		
 		// processar normal 
-		
+		processBetsNormal(betsbf);
 		
 		
 		// processar bets in progress
 		if(isBetsInProgress())
 		{
-			Vector<BetData> possibleBetsInProgress=new Vector<BetData>();
-			
-			for(MUBet mubet:betsbf)
-			{
-				BetData bdAux=getBetById(mubet.getBetId());
-				if(bdAux==null)
-				{
-					// If this bet was not processed yet in this refresh
-					if(getBetById(mubet.getBetId(), possibleBetsInProgress)==null)
-					{
-						BetData bd=getBetFromAPI(mubet.getBetId());
-						if(bd!=null)
-							possibleBetsInProgress.add(getBetFromAPI(mubet.getBetId()));
-					}
-				}
-			}
-			
-			assignBetsInProgress(possibleBetsInProgress);
-			
-			updateBetsInProgress();
+			processBetsInProgress(betsbf);
 		}
 		
 	}
-	
-	public boolean isBetsToProcess()
+		
+	private boolean isBetsToProcess()
 	{
 		boolean ret=false;
 		for(BetData b:bets)
 		{
 			if(b.getState()==BetData.UNMATHED || 
-					b.getState()==BetData.PARCIAL_MACHED || 
+					b.getState()==BetData.PARTIAL_MACHED || 
 					b.getState()==BetData.BET_IN_PROGRESS)
 				ret=true;
 		}
 		return ret;
 	}
 	
-	public boolean isBetsInProgress()
+	// --------------- bets normal --------------------
+	private void processBetsNormal(MUBet[] betsbf)
+	{
+		for(BetData bd:bets)
+		{
+			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATHED)
+			{
+				Vector<MUBet> matched=new Vector<MUBet>();
+				Vector<MUBet> unmatched=new Vector<MUBet>();
+				
+				for(MUBet mubet:betsbf)
+				{
+					if(mubet.getBetId()==bd.getBetID())
+					{
+						if(mubet.getBetStatus()==BetStatusEnum.U)
+						{
+							unmatched.add(mubet);
+						}
+						else
+						{
+							matched.add(mubet);
+						}
+					}
+				}
+				
+				if(matched.size()==0 && unmatched.size()==0) //external cancel
+				{
+					bd.setState(BetData.CANCELED);
+				}
+				else if(matched.size()==0) // unmached
+				{
+					// does not do nothing 
+					bd.setState(BetData.UNMATHED);
+				}
+				else if(unmatched.size()==0) // matched or external partial canceled 
+				{
+					//if(mu.Matched < bd.amount)
+						//caneled 
+						//else
+							//matched
+					bd.setState(BetData.MATHED);
+				}
+				else // partial matched
+				{
+					bd.setState(BetData.PARTIAL_MACHED);
+				}
+			}
+		}
+	}
+	
+	
+	// --------------- bets normal end -----------------
+	
+	// --------------- bets in progress --------------------
+	
+	private void processBetsInProgress(MUBet[] betsbf)
+	{
+		Vector<BetData> possibleBetsInProgress=new Vector<BetData>();
+		
+		for(MUBet mubet:betsbf)
+		{
+			BetData bdAux=getBetById(mubet.getBetId());
+			if(bdAux==null)
+			{
+				// If this bet was not processed yet in this refresh
+				if(getBetById(mubet.getBetId(), possibleBetsInProgress)==null)
+				{
+					if(isPossibleBetInProgress(mubet))
+					{
+						BetData bd=getBetFromAPI(mubet.getBetId());
+						if(bd!=null)
+							possibleBetsInProgress.add(bd);
+					}
+				}
+			}
+		}
+		
+		assignBetsInProgress(possibleBetsInProgress);
+		
+		updateBetsInProgress();
+	}
+	
+	private boolean isBetsInProgress()
 	{
 		boolean ret=false;
 		for(BetData b:bets)
@@ -111,7 +172,7 @@ public class BetManager {
 		return ret;
 	}
 	
-	public boolean isPossibleBetInProgress(MUBet mubet)
+	private boolean isPossibleBetInProgress(MUBet mubet)
 	{
 		boolean ret=false;
 		
@@ -130,13 +191,30 @@ public class BetManager {
 		return ret;
 	}
 	
+	//Change bets
 	private void assignBetsInProgress(Vector<BetData> externalPossibleBets)
 	{
 		for(BetData bd:bets)
 		{
-			
+			for(BetData bdPossible:externalPossibleBets)
+			{
+				if(bd.getRd().getId()==bdPossible.getRd().getId()
+						&& bd.getOddRequested()==bdPossible.getOddRequested()
+						&& bd.getAmount()==bdPossible.getAmount()
+						&& bd.getType()==bdPossible.getType())
+				{
+					bd.setBetID(bdPossible.getBetID());
+					
+					bd.setState(bdPossible.getState());
+					bd.setMatchedAmount(bdPossible.getMatchedAmount());
+					bd.setOddMached(bdPossible.getOddMached());
+					
+				}
+			}
 		}
 	}
+	
+	
 	
 	private void updateBetsInProgress()
 	{
@@ -149,6 +227,9 @@ public class BetManager {
 				bd.setState(BetData.PLACING_ERROR);
 		}
 	}
+	
+	// --------------- bets in progress end --------------------
+	
 	
 	private BetData getBetById(long ID,Vector<BetData> betsVector)
 	{
@@ -185,6 +266,8 @@ public class BetManager {
 		return createBetData(gb);
 	}
 	
+	
+	/// passar esta função para utils 
 	public BetData createBetData(Bet bet)
 	{
 		
@@ -208,7 +291,7 @@ public class BetManager {
 			ret.setState(BetData.MATHED);
 		
 		if(bet.getBetStatus()==BetStatusEnum.MU)
-			ret.setState(BetData.PARCIAL_MACHED);
+			ret.setState(BetData.PARTIAL_MACHED);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
 			ret.setState(BetData.CANCELED);
@@ -220,7 +303,7 @@ public class BetManager {
 		return ret;
 	}
 	
-	public void writeError(String s)
+	private void writeError(String s)
 	{
 		System.out.println("Error : "+s);
 	}
@@ -237,7 +320,7 @@ public class BetManager {
 			while (!stopRequested) {
 				try {
 					
-					refresh(); /// connect and get the data prices
+					refresh(); /// connect and get the data 
 					
 				
 					//	refreshBets();
@@ -293,8 +376,8 @@ public class BetManager {
 	
 	public static void main(String[] args)  throws Exception {
 		Vector<BetData> possibleBetsInProgress=new Vector<BetData>();
-		 possibleBetsInProgress.add(null);
-		 possibleBetsInProgress.add(null);
+		// possibleBetsInProgress.add(null);
+		// possibleBetsInProgress.add(null);
 		 System.out.println( possibleBetsInProgress.size());
 	}
 }
