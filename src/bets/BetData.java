@@ -43,12 +43,12 @@ public class BetData {
 	public static final int NOT_PLACED = 0;          // before placed 
 	public static final int BET_IN_PROGRESS = 1;     // waiting 
 	public static final int UNMATHED = 2;            //
-	public static final int PARCIAL_MACHED = 3;
+	public static final int PARTIAL_MACHED = 3;
 	public static final int MATHED =  4;
 	public static final int CANCELED = 5;
 	
 	
-	public Long BetID=null; // given from from betfair after placed 
+	public Long BetID=null; // given from betfair after placed 
 	
 	//Simulation
 	public double entryVolume=-1;

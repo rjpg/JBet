@@ -111,7 +111,7 @@ public class BetsManager  {
 						if(Utils.convertAmountToBF(bds[i].getAmount())==bds[i].getMatchedAmount())
 							bds[i].setState(BetData.MATHED);
 						else
-							bds[i].setState(BetData.PARCIAL_MACHED);
+							bds[i].setState(BetData.PARTIAL_MACHED);
 					}
 					bets.add(bds[i]);
 				}
@@ -260,7 +260,7 @@ public class BetsManager  {
 						else if(bdAux2.getAmount()==0)//if(Utils.convertAmountToBF(bdAux.getAmount())==bdAux.getMatchedAmount())
 							bdAux.setState(BetData.MATHED);
 						else
-							bdAux.setState(BetData.PARCIAL_MACHED);
+							bdAux.setState(BetData.PARTIAL_MACHED);
 					}
 				}
 			}
@@ -302,7 +302,7 @@ public class BetsManager  {
 								if(bd.getMatchedAmount()==0)
 									bd.setState(BetData.UNMATHED);
 								else
-									bd.setState(BetData.PARCIAL_MACHED);
+									bd.setState(BetData.PARTIAL_MACHED);
 								
 								bdaux.updatesBetInProgress=-1;  //assigned recovered 
 								
