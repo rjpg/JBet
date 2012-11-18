@@ -24,13 +24,13 @@ public class ProcessThreshold {
 			catIndex=catIndexA;
 			percentFilter=percentFilterA;
 			
-			Category cat=CategoriesManeger.getCategory(catIndex);
+			Category cat=CategoriesManager.getCategory(catIndex);
 			
 			mins=new double[cat.getNumberInputValues()];
 			maxs=new double[cat.getNumberInputValues()];
 			
 			System.out.println("1st pass to find mins/maxs ...");
-			File f=new File(CategoriesManeger.getDirectory(catIndex)+"/nn-raw-data.csv");
+			File f=new File(CategoriesManager.getDirectory(catIndex)+"/nn-raw-data.csv");
 			BufferedReader input=getBufferedReader(f);
 			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
 			String s=null;
@@ -43,7 +43,7 @@ public class ProcessThreshold {
 			
 			if(s==null)
 			{
-				System.out.println("File"+CategoriesManeger.getDirectory(catIndex)+"/nn-raw-data.csv is empty");
+				System.out.println("File"+CategoriesManager.getDirectory(catIndex)+"/nn-raw-data.csv is empty");
 			}
 			
 			String [] fields=s.split(",");
@@ -96,7 +96,7 @@ public class ProcessThreshold {
 			}
 			
 			
-			f=new File(CategoriesManeger.getDirectory(catIndex)+"/nn-raw-data.csv");
+			f=new File(CategoriesManager.getDirectory(catIndex)+"/nn-raw-data.csv");
 			input=getBufferedReader(f);
 			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
 			s=null;
@@ -221,9 +221,9 @@ public class ProcessThreshold {
 			Utils.init();
 			Statistics.init();
 			
-			CategoriesManeger.init();
-			CategoriesManeger.loadRawAMFromFile();
-			CategoriesManeger.processAMCatIntervals();
+			CategoriesManager.init();
+			CategoriesManager.loadRawAMFromFile();
+			CategoriesManager.processAMCatIntervals();
 
 			ProcessThreshold pt=new ProcessThreshold(16, 85.0);
 			

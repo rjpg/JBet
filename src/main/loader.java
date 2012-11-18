@@ -1,6 +1,6 @@
 package main;
 
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 import statistics.Statistics;
 import demo.handler.ExchangeAPI.Exchange;
 import generated.exchange.BFExchangeServiceStub.Market;
@@ -21,9 +21,9 @@ public class loader {
 		Statistics.init();
 		
 		
-		CategoriesManeger.init();
-		CategoriesManeger.loadRawAMFromFile();
-		CategoriesManeger.processAMCatIntervals();
+		CategoriesManager.init();
+		CategoriesManager.loadRawAMFromFile();
+		CategoriesManager.processAMCatIntervals();
 		
 		
 		new Manager();

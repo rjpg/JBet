@@ -10,22 +10,22 @@ import org.encog.util.simple.EncogUtility;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 
 public class LoaderNormalizeRawDataTest {
 	public static void main(String[] args)  throws Exception {
 		Utils.init();
 		Statistics.init();
 		
-		CategoriesManeger.init();
-		CategoriesManeger.loadRawAMFromFile();
-		CategoriesManeger.processAMCatIntervals();
+		CategoriesManager.init();
+		CategoriesManager.loadRawAMFromFile();
+		CategoriesManager.processAMCatIntervals();
 
 		
 		//for(int i =0 ; i<CategoriesManeger.getCategoriesSize();i++)
 		int i=29;
 		{
-			String catDir=CategoriesManeger.getDirectory(i);
+			String catDir=CategoriesManager.getDirectory(i);
 			System.out.println("---------------------------------------------------");
 			System.out.println("Processing : "+catDir);
 			File sourceFile=new File(catDir+"/nn-raw-data-test.csv");
@@ -59,7 +59,7 @@ public class LoaderNormalizeRawDataTest {
 			System.out.println("Writing binary Encog training to "+catDir+"/nn-train-data.egb");
 			File normalizaedCVSFile=new File(catDir+"/nn-normalized-data-test.csv");
 			File targetEGBFile=new File(catDir+"/nn-train-data-test.egb");
-			CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), CategoriesManeger.getCategory(i).getNumberInputValues(), 1, false);
+			CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), CategoriesManager.getCategory(i).getNumberInputValues(), 1, false);
 			EncogUtility.saveEGB(targetEGBFile, csvnds);
 			System.out.println("Write Complete.");
 		}

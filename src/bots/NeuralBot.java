@@ -22,7 +22,7 @@ import org.encog.neural.networks.BasicNetwork;
 
 import statistics.Statistics;
 
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 import categories.Category;
 
 import main.Parameters;
@@ -282,24 +282,24 @@ public class NeuralBot extends Bot{
 			 activateGraphicalInterface();
 		}
 		
-		analyst=CategoriesManeger.getStats(cat);
+		analyst=CategoriesManager.getStats(cat);
 		if(analyst==null)
 		{
-			writeMsg("Stats not loaded from File (category:"+CategoriesManeger.getNumber(cat)+")", Color.RED);
+			writeMsg("Stats not loaded from File (category:"+CategoriesManager.getNumber(cat)+")", Color.RED);
 		}
 		else
 		{
-			writeMsg("Stats loaded from File (category:"+CategoriesManeger.getNumber(cat)+")", Color.GREEN);
+			writeMsg("Stats loaded from File (category:"+CategoriesManager.getNumber(cat)+")", Color.GREEN);
 		}
 		
-		network=CategoriesManeger.getNN(cat);
+		network=CategoriesManager.getNN(cat);
 		if(network==null)
 		{
-			writeMsg("NN not loaded from File (category:"+CategoriesManeger.getNumber(cat)+")", Color.RED);
+			writeMsg("NN not loaded from File (category:"+CategoriesManager.getNumber(cat)+")", Color.RED);
 		}
 		else
 		{
-			writeMsg("NN loaded from File (category:"+CategoriesManeger.getNumber(cat)+")", Color.GREEN);
+			writeMsg("NN loaded from File (category:"+CategoriesManager.getNumber(cat)+")", Color.GREEN);
 			rd.getMarketData().pause=true;
 			System.out.println("See bot :"+getName());
 		}
@@ -701,7 +701,7 @@ public class NeuralBot extends Bot{
 		{
 			if(!processed10)
 			{
-				Category catAux=CategoriesManeger.getCategory(rd);
+				Category catAux=CategoriesManager.getCategory(rd);
 				if(catAux==null)
 					return;
 				
@@ -715,9 +715,9 @@ public class NeuralBot extends Bot{
 					else
 						rdNeighbour=Utils.getNeighbour(getMd(), rd);
 					
-					writeMsg(CategoriesManeger.getNumber(cat)+":"+cat.getNumberInputValues()+":"+CategoriesManeger.getDirectory(catAux), Color.BLUE);
+					writeMsg(CategoriesManager.getNumber(cat)+":"+cat.getNumberInputValues()+":"+CategoriesManager.getDirectory(catAux), Color.BLUE);
 					writeMsg("Neighbour:"+rdNeighbour.getName(), Color.BLUE);
-					CategoriesManeger.printCategory(catAux);
+					CategoriesManager.printCategory(catAux);
 					activateNNData();
 				}
 			}
@@ -725,7 +725,7 @@ public class NeuralBot extends Bot{
 			{
 				if(!processed2)
 				{
-					if(CategoriesManeger.getNumber(cat)==16) // filter cat
+					if(CategoriesManager.getNumber(cat)==16) // filter cat
 						updateNNData();
 				}
 			}
@@ -734,7 +734,7 @@ public class NeuralBot extends Bot{
 			{
 				// para não estar sempre a calcular ver o tempo 
 				
-				Category catAux=CategoriesManeger.getCategory(rd);
+				Category catAux=CategoriesManager.getCategory(rd);
 				if(catAux==null)
 					return;
 				
@@ -747,9 +747,9 @@ public class NeuralBot extends Bot{
 						rdNeighbour=Utils.getFavorite(getMd());
 					else
 						rdNeighbour=Utils.getNeighbour(getMd(), rd);
-					writeMsg(CategoriesManeger.getNumber(cat)+":"+CategoriesManeger.getDirectory(catAux), Color.BLUE);
+					writeMsg(CategoriesManager.getNumber(cat)+":"+CategoriesManager.getDirectory(catAux), Color.BLUE);
 					writeMsg("Neighbour:"+rdNeighbour.getName(), Color.BLUE);
-					CategoriesManeger.printCategory(catAux);
+					CategoriesManager.printCategory(catAux);
 					activateNNData();
 				}
 			}

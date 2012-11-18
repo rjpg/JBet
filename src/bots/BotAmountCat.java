@@ -6,7 +6,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 
 import main.Parameters;
 import correctscore.MessageJFrame;
@@ -19,7 +19,7 @@ import DataRepository.Utils;
 public class BotAmountCat extends Bot{
 
 	static public double LOWER_BOUND_ODD = 1.0;
-	static public double UPPER_BOUND_ODD = CategoriesManeger.oddCat[CategoriesManeger.oddCat.length-1];
+	static public double UPPER_BOUND_ODD = CategoriesManager.oddCat[CategoriesManager.oddCat.length-1];
 	public boolean clearFavorite=false;
 	
 	public int oddinterval=0;
@@ -168,24 +168,24 @@ public class BotAmountCat extends Bot{
 		{
 			if(getMinutesToStart()>8 && getMinutesToStart()<=9 && !processed10)
 			{
-				double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManeger.AVGAmountFrames, 0);
+				double amtAvg=Utils.getMatchedAmountAVG(rd, CategoriesManager.AVGAmountFrames, 0);
 				if(amtAvg>0)
 				{	
 					processed10=true;
-					writeMsg("Amount AVG in "+ CategoriesManeger.AVGAmountFrames+" frames at "+ getMinutesToStart()+"m :"+amtAvg+" Odd Cat:"+CategoriesManeger.getOddCat(rd)+" Favorite:"+isRaceFavorite(), Color.BLUE);
-					writeFile10m(getMinutesToStart(),CategoriesManeger.getOddCat(rd),isRaceFavorite(),amtAvg);
+					writeMsg("Amount AVG in "+ CategoriesManager.AVGAmountFrames+" frames at "+ getMinutesToStart()+"m :"+amtAvg+" Odd Cat:"+CategoriesManager.getOddCat(rd)+" Favorite:"+isRaceFavorite(), Color.BLUE);
+					writeFile10m(getMinutesToStart(),CategoriesManager.getOddCat(rd),isRaceFavorite(),amtAvg);
 				}
 			}
 			
 			if(getMinutesToStart()>1 && getMinutesToStart()<=2 && !processed2)
 			{
-				double amtAvg=Utils.getMatchedAmountAVG(rd,  CategoriesManeger.AVGAmountFrames, 0);
+				double amtAvg=Utils.getMatchedAmountAVG(rd,  CategoriesManager.AVGAmountFrames, 0);
 				if(amtAvg>0)
 				{	
 					processed2=true;
 					//writeMsg("Amount AVG in"+  CategoriesManeger.AVGAmountFrames+" frames at "+ getMinutesToStart()+"m :"+amtAvg, Color.BLUE);
-					writeMsg("Amount AVG in "+ CategoriesManeger.AVGAmountFrames+" frames at "+ getMinutesToStart()+"m :"+amtAvg+" Odd Cat:"+CategoriesManeger.getOddCat(rd)+" Favorite:"+isRaceFavorite(), Color.BLUE);
-					writeFile2m(getMinutesToStart(),CategoriesManeger.getOddCat(rd),isRaceFavorite(),amtAvg);
+					writeMsg("Amount AVG in "+ CategoriesManager.AVGAmountFrames+" frames at "+ getMinutesToStart()+"m :"+amtAvg+" Odd Cat:"+CategoriesManager.getOddCat(rd)+" Favorite:"+isRaceFavorite(), Color.BLUE);
+					writeFile2m(getMinutesToStart(),CategoriesManager.getOddCat(rd),isRaceFavorite(),amtAvg);
 				}
 			}
 		}

@@ -2,7 +2,7 @@ package main;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManeger;
+import categories.CategoriesManager;
 
 public class LoaderTestNeuralBot {
 
@@ -10,9 +10,9 @@ public class LoaderTestNeuralBot {
 	Utils.init();
 	Statistics.init();
 	
-	CategoriesManeger.init();
-	CategoriesManeger.loadRawAMFromFile();
-	CategoriesManeger.processAMCatIntervals();
+	CategoriesManager.init();
+	CategoriesManager.loadRawAMFromFile();
+	CategoriesManager.processAMCatIntervals();
 		
 	Parameters.log=false;  // Log or not to Log when not in replay
 	Parameters.replay=true; // replay or read from file
