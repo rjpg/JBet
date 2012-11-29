@@ -13,6 +13,7 @@ import main.Manager;
 import demo.handler.ExchangeAPI;
 
 import DataRepository.MarketData;
+import DataRepository.Utils;
 import bets.BetsManager.BetsManagerThread;
 
 public class BetManager {
@@ -115,14 +116,62 @@ public class BetManager {
 				}
 				else if(unmatched.size()==0) // matched or external partial canceled 
 				{
-					//if(mu.Matched < bd.amount)
-						//caneled 
-						//else
-							//matched
-					bd.setState(BetData.MATHED);
+					double msizes[]=new double[matched.size()];
+					double modds[]=new double[matched.size()];
+					
+					double oddAvg=0.;
+					double totalSize=0.;
+					for(int i=0;i<matched.size();i++)
+					{
+						msizes[i]=matched.get(i).getSize();
+						
+						totalSize+=matched.get(i).getSize();
+						
+						modds[i]=matched.get(i).getPrice();
+						
+					}
+					
+					oddAvg=Utils.calculateOddAverage(modds,msizes);
+					
+					totalSize=Utils.convertAmountToBF(totalSize);
+					
+					if(totalSize < bd.amount) //caneled 
+					{
+						bd.setMatchedAmount(totalSize);
+						bd.setOddMached(oddAvg);
+						bd.setState(BetData.CANCELED);
+					}
+					else //matched
+					{
+						bd.setMatchedAmount(totalSize);
+						bd.setOddMached(oddAvg);
+						bd.setState(BetData.MATHED);
+					}
+					
 				}
 				else // partial matched
 				{
+					double msizes[]=new double[matched.size()];
+					double modds[]=new double[matched.size()];
+					
+					double oddAvg=0.;
+					double totalSize=0.;
+					for(int i=0;i<matched.size();i++)
+					{
+						msizes[i]=matched.get(i).getSize();
+						
+						totalSize+=matched.get(i).getSize();
+						
+						modds[i]=matched.get(i).getPrice();
+						
+					}
+					
+					oddAvg=Utils.calculateOddAverage(modds,msizes);
+					
+					totalSize=Utils.convertAmountToBF(totalSize);
+					
+					bd.setMatchedAmount(totalSize);
+					bd.setOddMached(oddAvg);
 					bd.setState(BetData.PARTIAL_MACHED);
 				}
 			}
