@@ -3,18 +3,18 @@ package bets;
 import generated.exchange.BFExchangeServiceStub.Bet;
 import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
-import generated.exchange.BFExchangeServiceStub.GetMarket;
 import generated.exchange.BFExchangeServiceStub.MUBet;
+import generated.exchange.BFExchangeServiceStub.PlaceBets;
+import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
+import generated.exchange.BFExchangeServiceStub.PlaceBetsResultEnum;
 
-import java.awt.Color;
 import java.util.Vector;
 
 import main.Manager;
-import demo.handler.ExchangeAPI;
 
 import DataRepository.MarketData;
 import DataRepository.Utils;
-import bets.BetsManager.BetsManagerThread;
+import demo.handler.ExchangeAPI;
 
 public class BetManager {
 	
@@ -313,8 +313,121 @@ public class BetManager {
 		}
 		
 		return createBetData(gb);
+	
 	}
 	
+	public int placeBets(Vector<BetData> place)
+	{
+		PlaceBets[] betsAPI=new PlaceBets[place.size()];
+		
+		BetData[] bds=place.toArray(new BetData[]{});
+		for(int i=0;i<bds.length;i++)
+			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
+		
+		PlaceBetsResult[] betResult=null;
+		
+		try {
+			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
+		} catch (Exception e) {
+			e.printStackTrace();		
+		}
+		
+		if(betResult==null)
+		{
+			for(int i=0;i<bds.length;i++)
+			{
+				bds[i].setState(BetData.PLACING_ERROR);
+				bets.add(bds[i]);
+			}
+			return -1;
+		}
+		
+		
+			
+		return 0;
+	}
+
+	public MarketData getMd() {
+		return md;
+	}
+
+	
+	public BetData[] placeBets(BetData[] bds)
+	{
+		PlaceBets[] betsAPI=new PlaceBets[bds.length];
+		
+		for(int i=0;i<bds.length;i++)
+			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
+		
+		PlaceBetsResult[] betResult=null;
+		
+		try {
+			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
+		} catch (Exception e) {
+			e.printStackTrace();		
+		}
+		
+		if(betResult==null)
+		{
+			for(int i=0;i<bds.length;i++)
+			{
+				bds[i].setState(BetData.PLACING_ERROR);
+				bets.add(bds[i]);
+			}
+			return bds;
+		}
+		
+		for(int i=0;i<bds.length;i++)
+		{
+			if (betResult[i].getSuccess()) {
+				
+				if(betResult[i].getSuccess()==true)
+				{
+					bds[i].setBetID(betResult[i].getBetId());
+				
+					bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+					bds[i].setOddMached(betResult[i].getAveragePriceMatched());
+				
+					if( betResult[i].getSizeMatched()>0)
+					{
+						
+						if(Utils.convertAmountToBF(bds[i].getAmount())==bds[i].getMatchedAmount())
+							bds[i].setState(BetData.MATHED);
+						else
+							bds[i].setState(BetData.PARTIAL_MACHED);
+					}
+					else
+					{
+						bds[i].setState(BetData.UNMATHED);
+					}
+					bets.add(bds[i]);
+				}
+				else
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bets.add(bds[i]);
+				}	
+			} 
+			else
+			{
+				if(betResult[i].getResultCode()==PlaceBetsResultEnum.BET_IN_PROGRESS)
+				{
+					bds[i].setState(BetData.BET_IN_PROGRESS);
+					//betsInProgress.add(bds[i]);
+					bets.add(bds[i]);
+				}
+				else
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+				}
+			}
+			
+			
+		}
+		
+		return bds;
+	}
+
 	
 	/// passar esta função para utils 
 	public BetData createBetData(Bet bet)
