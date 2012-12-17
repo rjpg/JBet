@@ -54,6 +54,10 @@ public class BetData {
 	public double entryVolume=-1;
 	public double entryAmount=-1;
 	
+	public double getEntryVolume() {
+		return entryVolume;
+	}
+
 	
 	public BetData (BetListener tmA, RunnersData rdA, double  amountA,double  oddA, int typeA, Calendar time)
 	{
@@ -159,6 +163,18 @@ public class BetData {
 
 	public void setKeepInPlay(boolean keepInPlay) {
 		this.keepInPlay = keepInPlay;
+	}
+
+	public void setEntryVolume(double entryVolume) {
+		this.entryVolume = entryVolume;
+	}
+	
+	public double getEntryAmount() {
+		return entryAmount;
+	}
+
+	public void setEntryAmount(double entryAmount) {
+		this.entryAmount = entryAmount;
 	}
 
 }

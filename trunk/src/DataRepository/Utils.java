@@ -762,9 +762,38 @@ public class Utils {
 		return rd.getDataFrames().get(rd.getDataFrames().size()-1-frame).getAmountBack();
 	}
 	
+	
 	public static double getAmountLayFrame(RunnersData rd,int frame)
 	{
 		return rd.getDataFrames().get(rd.getDataFrames().size()-1-frame).getAmountLay();
+	}
+	
+	// TESTAR !!!
+	public static double getAmountBackOddFrame(RunnersData rd, double odd,int pastFrame)
+	{
+		if(getOddBackFrame(rd, pastFrame)<odd)
+		{
+			if(getOddLayFrame(rd, pastFrame)>odd)
+				return 0;
+			else
+			{
+				double ret=0;
+				Vector<OddData> oddsL=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getLayPrices();
+				for (OddData od:oddsL)
+				{
+					if(od.getOdd()<=odd)
+						ret+=od.getAmount();
+				}
+			}
+		}
+		return 0;
+	}
+	
+	// TESTAR !!!
+	public static double getAmountLayOddFrame(RunnersData rd, double odd,int pastFrame)
+	{
+		
+		return 0;
 	}
 	
 	public static boolean isAmountBackGoingUp(RunnersData rd,int windowSize,int pastFrame)
