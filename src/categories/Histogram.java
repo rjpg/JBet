@@ -25,21 +25,15 @@ public class Histogram {
 		intervals = new int[size+1];
 		
 		norma=((max-min));
-	
+		
+		System.out.println("Size:"+(size+1));
 	}
 	
 	public void addValue(double v)
 	{
 		//System.out.println((((v-min)*sizeDouble)/norma));
 		int index=(int) Math.round(((v-min)*sizeDouble)/norma);
-		if(index==11)
-		{
-			if(v<=max)
-			{
-				intervals[index]++;
-				nvalues++;
-			}
-		}
+
 		if(index<intervals.length && index>=0)
 		{
 			intervals[index]++;

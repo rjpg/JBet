@@ -322,14 +322,23 @@ public class BetManager {
 		
 		BetData[] bds=place.toArray(new BetData[]{});
 		for(int i=0;i<bds.length;i++)
+		{
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
+			//bds[i].setEntryAmount(Utils.getAmountLayFrameBackPivot(rd, frame, depth))
+		}
 		
 		PlaceBetsResult[] betResult=null;
 		
 		try {
 			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
 		} catch (Exception e) {
-			e.printStackTrace();		
+			e.printStackTrace();
+			for(int i=0;i<bds.length;i++)
+			{
+				bds[i].setState(BetData.PLACING_ERROR);
+				bets.add(bds[i]);
+			}
+			return -1;
 		}
 		
 		if(betResult==null)
@@ -340,6 +349,14 @@ public class BetManager {
 				bets.add(bds[i]);
 			}
 			return -1;
+		}
+		
+		for(int i=0;i<bds.length;i++)
+		{
+			if(betResult[i].getSuccess()==true)
+			{
+				
+			}
 		}
 		
 		
