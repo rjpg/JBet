@@ -771,29 +771,60 @@ public class Utils {
 	// TESTAR !!!
 	public static double getAmountBackOddFrame(RunnersData rd, double odd,int pastFrame)
 	{
-		if(getOddBackFrame(rd, pastFrame)<odd)
+		double ret=0;
+			
+		if(getOddLayFrame(rd, pastFrame)>odd)
 		{
-			if(getOddLayFrame(rd, pastFrame)>odd)
-				return 0;
-			else
+			Vector<OddData> oddsB=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getBackPrices();
+			for (OddData od:oddsB)
 			{
-				double ret=0;
-				Vector<OddData> oddsL=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getLayPrices();
-				for (OddData od:oddsL)
-				{
-					if(od.getOdd()<=odd)
-						ret+=od.getAmount();
-				}
+				if(od.getOdd()==odd)
+					return od.getAmount();
 			}
 		}
-		return 0;
+		else
+		{
+			
+			Vector<OddData> oddsL=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getLayPrices();
+			for (OddData od:oddsL)
+			{
+				if(od.getOdd()<=odd)
+					ret+=od.getAmount();
+			}
+			ret*=-1;
+		}
+	
+		return ret;
 	}
 	
 	// TESTAR !!!
 	public static double getAmountLayOddFrame(RunnersData rd, double odd,int pastFrame)
 	{
 		
-		return 0;
+		double ret=0;
+		
+		if(getOddBackFrame(rd, pastFrame)<odd)
+		{
+			Vector<OddData> oddsL=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getLayPrices();
+			for (OddData od:oddsL)
+			{
+				if(od.getOdd()==odd)
+					return od.getAmount();
+			}
+		}
+		else
+		{
+			
+			Vector<OddData> oddsB=rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getBackPrices();
+			for (OddData od:oddsB)
+			{
+				if(od.getOdd()>=odd)
+					ret+=od.getAmount();
+			}
+			ret*=-1;
+		}
+	
+		return ret;
 	}
 	
 	public static boolean isAmountBackGoingUp(RunnersData rd,int windowSize,int pastFrame)
