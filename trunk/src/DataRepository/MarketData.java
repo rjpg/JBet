@@ -146,7 +146,9 @@ public class MarketData {
 			eventName=selectedMarket.getMenuPath().split("\\\\")[2];
 			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
 			//initializeData();
-			initializeBetManager();
+			
+			
+			//initializeBetManager();
 			
 		}
 		else
@@ -882,6 +884,7 @@ public class MarketData {
 			try {
 				for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
 					mcl.MarketChange(this, MarketChangeListener.MarketUpdate);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -943,8 +946,8 @@ public class MarketData {
 		// if logging print header market
 		//initializeData();
 		logWritteHeaderMarket();
-		finalizeBetManager();
-		initializeBetManager();
+		//finalizeBetManager();
+		//initializeBetManager();
 		
 	}
 
@@ -1051,8 +1054,9 @@ public class MarketData {
 					refresh(); /// connect and get the data prices
 					
 					//refreshCompleteVolume(); // get volumes 
+					
 					cloneVolumeFromPreviousFrame();
-					refreshCompressedVolume();
+					refreshCompressedVolume();       
 					
 					logLastFrame(); // log if the flag is on 
 					//	refreshBets();

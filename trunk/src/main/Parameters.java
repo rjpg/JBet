@@ -4,8 +4,8 @@ public class Parameters {
 	
 	static public boolean log=false;  // Log or not to Log when not in replay
 	static public boolean replay=false; // replay or read from file
-	static public boolean replay_file_list=true; // replay or read from file
-	static public boolean replay_file_list_test=true; // replay or read from file
+	static public boolean replay_file_list=false; // replay or read from file
+	static public boolean replay_file_list_test=false; // replay or read from file
 	
 	static public boolean jump_to_the_next_race=true; //not go inplay ? 
 	
@@ -16,8 +16,9 @@ public class Parameters {
 	
 	static public boolean graphicalInterface=true; // replay or read from file
 	
-	static public boolean graphicalInterfaceBots=false; // replay or read from file
+	static public boolean graphicalInterfaceBots=true; // replay or read from file
 		
+	
 	static public boolean amountBot=false;  // see the amounts
 	static public boolean manualBot=false; // manual bot
 	static public boolean mecanicBot=false; // manual bot
@@ -27,7 +28,7 @@ public class Parameters {
 	static public boolean womNeighboursBot=false;
 	static public boolean neighboursCorrelationBot=false;
 	static public boolean influenceBot=false;
-	static public boolean baseOfBot=false;
+	static public boolean baseOfBot=true; // dummy bot for test
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	

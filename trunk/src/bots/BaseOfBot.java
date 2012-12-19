@@ -36,7 +36,7 @@ public int number=5;
 	
 	public BaseOfBot(MarketData md) {
 		super(md,"NeighboursCorrelationBot - ");
-		
+		System.out.println("BASE OF BOT ACTIVATED");
 		initialize();
 	}
 	
@@ -186,6 +186,12 @@ public int number=5;
 						swing.updateState();
 					}
 				}
+				
+				double odd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(getMd().getRunners().get(0), 0))-2);
+				writeMsg("Odd for runner 0 is:"+odd, Color.BLUE);
+				
+				writeMsg("amount Back"+Utils.getAmountBackOddFrame(getMd().getRunners().get(0),odd,0),Color.BLUE);
+				writeMsg("amount Lay"+Utils.getAmountLayOddFrame(getMd().getRunners().get(0),odd,0),Color.BLUE);
 		}
 		
 		

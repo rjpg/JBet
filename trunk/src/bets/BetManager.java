@@ -321,6 +321,8 @@ public class BetManager {
 		PlaceBets[] betsAPI=new PlaceBets[place.size()];
 		
 		BetData[] bds=place.toArray(new BetData[]{});
+		
+		
 		for(int i=0;i<bds.length;i++)
 		{
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
@@ -351,7 +353,7 @@ public class BetManager {
 			return -1;
 		}
 		
-		for(int i=0;i<bds.length;i++)
+		for(int i=0;i<betResult.length;i++)
 		{
 			if(betResult[i].getSuccess()==true)
 			{
