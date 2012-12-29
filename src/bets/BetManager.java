@@ -318,6 +318,8 @@ public class BetManager {
 	
 	public int placeBets(Vector<BetData> place)
 	{
+		int ret=0;
+		
 		PlaceBets[] betsAPI=new PlaceBets[place.size()];
 		
 		BetData[] bds=place.toArray(new BetData[]{});
@@ -326,7 +328,15 @@ public class BetManager {
 		for(int i=0;i<bds.length;i++)
 		{
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
-			//bds[i].setEntryAmount(Utils.getAmountLayFrameBackPivot(rd, frame, depth))
+			bets.add(bds[i]);
+			
+			if(bds[i].getType()==BetData.BACK)
+				bds[i].setEntryAmount(Utils.getAmountLayOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
+			else
+				bds[i].setEntryAmount(Utils.getAmountBackOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
+			
+			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
+			
 		}
 		
 		PlaceBetsResult[] betResult=null;
@@ -338,7 +348,6 @@ public class BetManager {
 			for(int i=0;i<bds.length;i++)
 			{
 				bds[i].setState(BetData.PLACING_ERROR);
-				bets.add(bds[i]);
 			}
 			return -1;
 		}
@@ -348,7 +357,6 @@ public class BetManager {
 			for(int i=0;i<bds.length;i++)
 			{
 				bds[i].setState(BetData.PLACING_ERROR);
-				bets.add(bds[i]);
 			}
 			return -1;
 		}
@@ -357,13 +365,43 @@ public class BetManager {
 		{
 			if(betResult[i].getSuccess()==true)
 			{
+				bds[i].setBetID(betResult[i].getBetId());
 				
+				bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+				bds[i].setOddMached(betResult[i].getAveragePriceMatched());
+			
+				if( betResult[i].getSizeMatched()>0)
+				{
+					
+					if(Utils.convertAmountToBF(bds[i].getAmount())<=bds[i].getMatchedAmount())
+						bds[i].setState(BetData.MATHED);
+					else
+						bds[i].setState(BetData.PARTIAL_MACHED);
+				}
+				else
+				{
+					bds[i].setState(BetData.UNMATHED);
+				}
+				
+			
+			}
+			else
+			{
+				if(betResult[i].getResultCode()==PlaceBetsResultEnum.BET_IN_PROGRESS)
+				{
+					bds[i].setState(BetData.BET_IN_PROGRESS);
+					//betsInProgress.add(bds[i]);
+					
+				}
+				else
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					ret=-2;
+				}
 			}
 		}
 		
-		
-			
-		return 0;
+		return ret;
 	}
 
 	public MarketData getMd() {

@@ -29,7 +29,7 @@ public class BetData {
 	
 	public boolean keepInPlay=false;
 	
-	public int type=1;
+	public int type=BetData.BACK;
 	
 	public static final int BACK = 1;
 	public static final int LAY = 2;
