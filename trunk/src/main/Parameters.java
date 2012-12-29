@@ -28,7 +28,7 @@ public class Parameters {
 	static public boolean womNeighboursBot=false;
 	static public boolean neighboursCorrelationBot=false;
 	static public boolean influenceBot=false;
-	static public boolean baseOfBot=true; // dummy bot for test
+	static public boolean baseOfBot=false; // dummy bot for test
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
