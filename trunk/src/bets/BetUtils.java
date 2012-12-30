@@ -201,4 +201,42 @@ public class BetUtils {
 		return bet;
 	}
 	
+	public static String printBet(BetData bd)
+	{
+		String ret="";
+		ret+="--- Bet Id: "+bd.getBetID()+" ---\n";
+		
+		if(bd.getRd()==null)
+			ret+="Runner: null\n";
+		else
+			ret+="Runner: "+bd.getRd().getName()+"\n";
+		
+		if(bd.getType()==BetData.LAY)
+			ret+="Type : LAY\n";
+		else
+			ret+="Type : BACK\n";
+		
+		ret+="Request: "+ bd.getAmount()+" @ "+bd.getOddRequested()+"\n";
+		
+		if(bd.getState()==BetData.NOT_PLACED)
+			ret+="State: NOT_PLACED \n";
+		else if(bd.getState()==BetData.UNMATHED)
+			ret+="State: UNMATHED \n";
+		else if(bd.getState()==BetData.PARTIAL_MACHED)
+			ret+="State: PARTIAL_MACHED \n";
+		else if(bd.getState()==BetData.MATHED)
+			ret+="State: MACHED \n";
+		else if(bd.getState()==BetData.CANCELED)
+			ret+="State: CANCELED \n";
+		else if(bd.getState()==BetData.PLACING_ERROR)
+			ret+="State: PLACING_ERROR \n";
+
+		ret+="Entry Queue Amount: "+bd.entryAmount+"\n";
+		ret+="Entry Volume: "+bd.entryVolume+"\n";
+		ret+="Matched: "+bd.getMatchedAmount()+" @ "+bd.getOddMached()+"\n";
+		ret+=" --- --- \n";
+		
+		return ret;
+	}
+	
 }

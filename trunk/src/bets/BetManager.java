@@ -39,6 +39,11 @@ public class BetManager {
 		
 	}
 	
+	public MarketData getMd() {
+		return md;
+	}
+
+	
 	private void refresh()
 	{
 		if(!isBetsToProcess())
@@ -316,6 +321,13 @@ public class BetManager {
 	
 	}
 	
+	public int placeBet(BetData bet)
+	{
+		Vector<BetData> place=new Vector<BetData>();
+		place.add(bet);
+		return placeBets(place);
+	}
+	
 	public int placeBets(Vector<BetData> place)
 	{
 		int ret=0;
@@ -328,7 +340,7 @@ public class BetManager {
 		for(int i=0;i<bds.length;i++)
 		{
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
-			bets.add(bds[i]);
+			
 			
 			if(bds[i].getType()==BetData.BACK)
 				bds[i].setEntryAmount(Utils.getAmountLayOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
@@ -336,6 +348,8 @@ public class BetManager {
 				bds[i].setEntryAmount(Utils.getAmountBackOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
 			
 			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
+			
+			bets.add(bds[i]);
 			
 		}
 		
@@ -404,88 +418,14 @@ public class BetManager {
 		return ret;
 	}
 
-	public MarketData getMd() {
-		return md;
-	}
-
-	
-	public BetData[] placeBets(BetData[] bds)
+	public int cancelBets(Vector<BetData> cancel)
 	{
-		PlaceBets[] betsAPI=new PlaceBets[bds.length];
 		
-		for(int i=0;i<bds.length;i++)
-			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
-		
-		PlaceBetsResult[] betResult=null;
-		
-		try {
-			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
-		} catch (Exception e) {
-			e.printStackTrace();		
-		}
-		
-		if(betResult==null)
-		{
-			for(int i=0;i<bds.length;i++)
-			{
-				bds[i].setState(BetData.PLACING_ERROR);
-				bets.add(bds[i]);
-			}
-			return bds;
-		}
-		
-		for(int i=0;i<bds.length;i++)
-		{
-			if (betResult[i].getSuccess()) {
-				
-				if(betResult[i].getSuccess()==true)
-				{
-					bds[i].setBetID(betResult[i].getBetId());
-				
-					bds[i].setMatchedAmount(betResult[i].getSizeMatched());
-					bds[i].setOddMached(betResult[i].getAveragePriceMatched());
-				
-					if( betResult[i].getSizeMatched()>0)
-					{
-						
-						if(Utils.convertAmountToBF(bds[i].getAmount())==bds[i].getMatchedAmount())
-							bds[i].setState(BetData.MATHED);
-						else
-							bds[i].setState(BetData.PARTIAL_MACHED);
-					}
-					else
-					{
-						bds[i].setState(BetData.UNMATHED);
-					}
-					bets.add(bds[i]);
-				}
-				else
-				{
-					bds[i].setState(BetData.PLACING_ERROR);
-					bets.add(bds[i]);
-				}	
-			} 
-			else
-			{
-				if(betResult[i].getResultCode()==PlaceBetsResultEnum.BET_IN_PROGRESS)
-				{
-					bds[i].setState(BetData.BET_IN_PROGRESS);
-					//betsInProgress.add(bds[i]);
-					bets.add(bds[i]);
-				}
-				else
-				{
-					bds[i].setState(BetData.PLACING_ERROR);
-				}
-			}
-			
-			
-		}
-		
-		return bds;
+		return 0;
 	}
-
 	
+	
+
 	/// passar esta função para utils 
 	public BetData createBetData(Bet bet)
 	{
@@ -597,6 +537,10 @@ public class BetManager {
 		Vector<BetData> possibleBetsInProgress=new Vector<BetData>();
 		// possibleBetsInProgress.add(null);
 		// possibleBetsInProgress.add(null);
-		 System.out.println( possibleBetsInProgress.size());
+		
+ 		System.out.println( possibleBetsInProgress.size());
+ 		
+ 		BetData bd=new BetData(null, null, 100, 4.5, BetData.LAY, null);
+ 		System.out.println(BetUtils.printBet(bd));
 	}
 }
