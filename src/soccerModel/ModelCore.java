@@ -1,15 +1,12 @@
 package soccerModel;
 
-import nextGoal.BFDataInit;
-import nextGoal.BetListCS;
-import DataRepository.Utils;
 
 public class ModelCore {
 	
 	public static int TABLE_MAX_GOALS=12;
 		
-	double AH;
-	double home,away;
+	//double AH;
+	//double home,away;
 	
 	//global Table
 	double table[][];
@@ -29,15 +26,36 @@ public class ModelCore {
 	double goalsSumOverUnder[];
 	double goalsAVGScale[];
 	
-		
+	//Model Inputs
+	double goalLine=2.5;
+	double asianHcap=0;
+	
+	double gLineOver=1.8;
+	double gLineUnder=1.8;
+	
+	double aHcapHome=1.8;
+	double aHcapAway=1.8;
+	
+	double desAH=0;
+	double desGL=0;
+	
+	
 	public ModelCore() {
 	
-		initTable(1.0,2.5,1);
+		initTable(2.5,2.5,1);
 		
 		calculateHandicap();
 		
 		calculateTotalGoals();
+		/*
+		System.out.println(cumputeNearHcap(1.0,2.5));
+		System.out.println(cumputeNearTG(1.0,2.5));*/
+		
+		supremacy();
+		
 	}
+	
+	
 	
 	public double poisson(int k,double l)
 	{
@@ -58,7 +76,85 @@ public class ModelCore {
 			return x/(double)kfac;
 	}
 	
+	public void supremacy()
+	{
+		desAH=aHcapHome*(1/aHcapHome+1/aHcapAway);
+		desGL=gLineOver*(1/gLineOver+1/gLineUnder);
+		
+		double sup=0;
+		double tg=2.5;
+		
+		double nearHcap=cumputeNearHcap(hcapAVGScale[0],tg);
+		int neari=0;
+		double nearHcapaux=0;
+		
+		for(int i=1;i<hcapAVGScale.length;i++)
+		{
+			if(Math.abs(hcapAVGScale[i])<=tg)
+			{
+				nearHcapaux=cumputeNearHcap(hcapAVGScale[i],tg);
+				double diff1=Math.abs(nearHcap-desAH);
+				double diff2=Math.abs(nearHcapaux-desAH);
+				if (diff1>diff2)
+				{
+					nearHcap=nearHcapaux;
+					neari=i;
+				}
+			}
+		}
+		
+		sup=hcapAVGScale[neari];
+		
+		System.out.println("sup found : "+sup);		
+	}
 	
+	
+	public double cumputeNearHcap(double sup,double totalGoals)
+	{
+		initTable(sup,totalGoals,1);
+		
+		calculateHandicap();
+		
+		//calculateTotalGoals();
+		
+		int indexMin=0;
+		
+		
+		for(int i=0;i<hcapSumHomeAway.length;i++)
+		{
+			if(hcapSumHomeAway[i]<hcapSumHomeAway[indexMin])
+			{
+				indexMin=i;
+			}
+		}
+		System.out.println("minimo sumHomeAway["+indexMin+"]="+hcapSumHomeAway[indexMin]);
+		return hcapHome[indexMin];
+		
+	}
+	
+	public double cumputeNearTG(double sup,double totalGoals)
+	{
+		initTable(sup,totalGoals,1);
+		
+		calculateHandicap();
+		
+		calculateTotalGoals();
+		
+		int indexMin=0;
+		
+		
+		for(int i=0;i<goalsSumOverUnder.length;i++)
+		{
+			if(goalsSumOverUnder[i]<goalsSumOverUnder[indexMin])
+			{
+				indexMin=i;
+			}
+		}
+		
+		System.out.println("minimo goalsSumOverUnder["+indexMin+"]="+goalsSumOverUnder[indexMin]);
+		return goalsOver[indexMin];
+		
+	}
 	
 	public void initTable(double sup,double totalGoals, double drawFactor)
 	{
@@ -79,6 +175,9 @@ public class ModelCore {
 		}
 		
 		String s="";
+		
+		totalTable=0;
+		
 		for(int l=0;l<TABLE_MAX_GOALS;l++)
 		{
 			for(int c=0;c<TABLE_MAX_GOALS;c++)
@@ -98,7 +197,7 @@ public class ModelCore {
 		
 		
 		System.out.println(s);
-		System.out.println("Ttal Table : "+totalTable);
+		System.out.println("Total Table : "+totalTable);
 	}
 	
 	public void calculateTotalGoals()
@@ -140,7 +239,7 @@ public class ModelCore {
 			ret[MAX_GOALS]+=ret[i];
 		}
 		
-		ret[MAX_GOALS]-=totalTable;
+		ret[MAX_GOALS]=totalTable-ret[MAX_GOALS];
 		
 		ret[MAX_GOALS]/=totalTable;
 		
@@ -168,6 +267,7 @@ public class ModelCore {
 		for(int i=0;i<21;i++)
 			System.out.println("scale1["+i+"]="+scale1[i]+"scale2["+i+"]="+scale2[i]);
 		
+		
 		goalsAVGScale=new double[21];
 		
 		for(int i=0;i<scale1.length;i++)
@@ -177,6 +277,69 @@ public class ModelCore {
 		}
 		
 		
+		double auxA[]=new double[21];
+		
+		double auxB[]=new double[21];
+		
+		
+		for(int i=0;i<auxA.length;i++)
+		{
+			double acum1A=0;
+			double acum2A=0;
+			
+			double acum1B=0;
+			double acum2B=0;
+			
+			for(int x=0;x<=MAX_GOALS;x++)
+			{
+				if(x>scale1[i])
+				{
+					acum1A+=ret[x];
+					//System.out.println("somou ret["+x+"]="+ret[x]);
+				}
+				
+				if(x>scale2[i])
+				{
+					acum2A+=ret[x];
+				}
+				
+			}
+			
+			for(int x=0;x<=MAX_GOALS;x++)
+			{
+				if(x<scale1[i])
+				{
+					acum1B+=ret[x];
+					//System.out.println("somou ret["+x+"]="+ret[x]);
+				}
+				
+				if(x<scale2[i])
+				{
+					acum2B+=ret[x];
+				}
+				
+			}
+
+			
+			auxA[i]=(acum1A+acum2A)/2;
+			auxB[i]=(acum1B+acum2B)/2;
+			
+			System.out.println("auxA["+i+"]="+auxA[i]+"        auxB["+i+"]="+auxB[i]);
+		}
+		
+		goalsOver=new double[21];
+		goalsUnder=new double[21];
+		goalsSumOverUnder=new double[21];
+		
+		for(int i=0;i<goalsOver.length;i++)
+		{
+			goalsOver[i]=(auxB[i]/auxA[i])+1;
+			goalsUnder[i]=(auxA[i]/auxB[i])+1;
+			
+			goalsSumOverUnder[i]=goalsOver[i]+goalsUnder[i];
+			
+			System.out.println("goalsAVGScale["+i+"]="+goalsAVGScale[i]+"     goalsOver["+i+"]="+goalsOver[i]+"        goalsUnder["+i+"]="+goalsUnder[i]+"    goalsSumOverUnder["+i+"]="+goalsSumOverUnder[i]);
+		}
 		
 		
 	}
