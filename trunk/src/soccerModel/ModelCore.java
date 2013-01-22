@@ -289,7 +289,7 @@ public class ModelCore {
 			
 		}
 		
-		System.out.println("sup found : "+sup+" home: "+nearHcap+" desAH: "+desAH);	
+		System.out.println("sup found : "+sup+" home: "+nearHcap+" desAH: "+desAH+"      tg found : "+tg+" goalsOver"+nearGL+" desGL: "+desGL);	
 		}
 		
 		System.out.println("FINAL sup found : "+sup+"      tg found : "+tg);

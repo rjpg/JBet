@@ -34,8 +34,16 @@ public class BetData {
 	public static final int BACK = 1;
 	public static final int LAY = 2;
 
+	public int errorType=BetData.ERROR_NONE;
 	
+	public static final int ERROR_NONE = 0;
+	public static final int ERROR_MARKET_SUSPENDED = 1;
+	public static final int ERROR_MARKET_CLOSED = 2;
+	public static final int ERROR_BALANCE_EXCEEDED=3;
+	public static final int ERROR_BET_IN_PROGRESS=4;
+	public static final int ERROR_UNKNOWN = 5;
 	
+
 	//public boolean PLACED = false; // true if the bet was placed on betfair
 	public int updatesBetInProgress=0;
 	
@@ -175,6 +183,14 @@ public class BetData {
 
 	public void setEntryAmount(double entryAmount) {
 		this.entryAmount = entryAmount;
+	}
+	public int getErrorType() {
+		return errorType;
+	}
+
+
+	public void setErrorType(int errorType) {
+		this.errorType = errorType;
 	}
 
 }
