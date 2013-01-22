@@ -278,7 +278,10 @@ public class BetManager {
 				bd.updatesBetInProgress++;
 			
 			if(bd.updatesBetInProgress>BIP_ERROR_UPDATES)
+			{
 				bd.setState(BetData.PLACING_ERROR);
+				bd.setErrorType(BetData.ERROR_BET_IN_PROGRESS);
+			}
 		}
 	}
 	
@@ -336,7 +339,7 @@ public class BetManager {
 		
 		BetData[] bds=place.toArray(new BetData[]{});
 		
-		
+		// initiate
 		for(int i=0;i<bds.length;i++)
 		{
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
@@ -359,11 +362,42 @@ public class BetManager {
 			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
 		} catch (Exception e) {
 			e.printStackTrace();
-			for(int i=0;i<bds.length;i++)
+			
+			if(e.getMessage().contains(new String("EVENT_SUSPENDED")))
 			{
-				bds[i].setState(BetData.PLACING_ERROR);
+				for(int i=0;i<bds.length;i++)
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_MARKET_SUSPENDED);
+				}
 			}
-			return -1;
+			else if(e.getMessage().contains(new String("EVENT_CLOSED")))
+			{
+				for(int i=0;i<bds.length;i++)
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_MARKET_CLOSED);
+				}
+				return -1;
+			}
+			else if(e.getMessage().contains(new String("BET_IN_PROGRESS")))
+			{
+				for(int i=0;i<bds.length;i++)
+				{
+					bds[i].setState(BetData.BET_IN_PROGRESS);
+				}
+				return 0;
+			}
+			else
+			{
+				for(int i=0;i<bds.length;i++)
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_UNKNOWN);
+				}
+				return -1;
+			}
+			
 		}
 		
 		if(betResult==null)
@@ -371,6 +405,7 @@ public class BetManager {
 			for(int i=0;i<bds.length;i++)
 			{
 				bds[i].setState(BetData.PLACING_ERROR);
+				bds[i].setErrorType(BetData.ERROR_UNKNOWN);
 			}
 			return -1;
 		}
@@ -407,9 +442,22 @@ public class BetManager {
 					//betsInProgress.add(bds[i]);
 					
 				}
-				else
+				else if(betResult[i].getResultCode()==PlaceBetsResultEnum.EVENT_CLOSED)
 				{
 					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_MARKET_CLOSED);
+					ret=-2;
+				}
+				else if(betResult[i].getResultCode()==PlaceBetsResultEnum.EXPOSURE_OR_AVAILABLE_BALANCE_EXCEEDED)
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_BALANCE_EXCEEDED);
+					ret=-2;
+				}
+				else 
+				{
+					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setErrorType(BetData.ERROR_UNKNOWN);
 					ret=-2;
 				}
 			}
