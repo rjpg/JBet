@@ -3,11 +3,15 @@ package bets;
 import generated.exchange.BFExchangeServiceStub.Bet;
 import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
+import generated.exchange.BFExchangeServiceStub.CancelBets;
+import generated.exchange.BFExchangeServiceStub.CancelBetsResult;
+import generated.exchange.BFExchangeServiceStub.CancelBetsResultEnum;
 import generated.exchange.BFExchangeServiceStub.MUBet;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsResultEnum;
 
+import java.awt.Color;
 import java.util.Vector;
 
 import main.Manager;
@@ -43,6 +47,33 @@ public class BetManager {
 		return md;
 	}
 
+	public int refreshBet(BetData bd)
+	{
+		Bet gb=null;
+		int attempts = 0;
+		while (attempts < 3 && gb == null) {
+			try {
+				gb =ExchangeAPI.getBet(getMd().getSelectedExchange(), getMd().getApiContext(),bd.getBetID());
+			} catch (Exception e) {
+				//writeMessageText(e.getMessage(), Color.RED);
+				if(e.getMessage().contains(new String("EVENT_SUSPENDED"))  || e.getMessage().contains(new String("BET_IN_PROGRESS")) )
+				{
+					//writeMessageText("ExchangeAPI.getBet Returned NULL: Market is supended | Bet in progress",Color.BLUE);
+					attempts--;
+				}				
+				//writeMessageText("ExchangeAPI.getBet Returned NULL:Attempt :"+attempts, Color.RED);
+			}
+			attempts++;
+		}
+		if(gb==null)
+		{
+			//writeMessageText("Failed to get Bet: ExchangeAPI.getBet return null ",Color.RED);
+			return -1;
+		}
+		
+		return 0;
+		//return gb;
+	}
 	
 	private void refresh()
 	{
@@ -51,7 +82,7 @@ public class BetManager {
 		
 		MUBet[] betsbf=null;
 		try {
-			betsbf = ExchangeAPI.getMUBets(md.getSelectedExchange(), md.getApiContext(), md.getSelectedMarket().getMarketId());
+			betsbf = ExchangeAPI.getMUBets(getMd().getSelectedExchange(), getMd().getApiContext(), getMd().getSelectedMarket().getMarketId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			writeError(e.getMessage());
@@ -110,7 +141,7 @@ public class BetManager {
 					}
 				}
 				
-				if(matched.size()==0 && unmatched.size()==0) //external cancel
+				if(matched.size()==0 && unmatched.size()==0) //external cancel (without any match)
 				{
 					bd.setState(BetData.CANCELED);
 				}
@@ -119,7 +150,7 @@ public class BetManager {
 					// does not do nothing 
 					bd.setState(BetData.UNMATHED);
 				}
-				else if(unmatched.size()==0) // matched or external partial canceled 
+				else if(unmatched.size()==0) // matched or external partial canceled (parcial matched but impossible to match the rest)
 				{
 					double msizes[]=new double[matched.size()];
 					double modds[]=new double[matched.size()];
@@ -140,17 +171,17 @@ public class BetManager {
 					
 					totalSize=Utils.convertAmountToBF(totalSize);
 					
-					if(totalSize < bd.amount) //caneled 
+					if(totalSize < bd.amount) //caneled external
 					{
 						bd.setMatchedAmount(totalSize);
 						bd.setOddMached(oddAvg);
-						bd.setState(BetData.CANCELED);
+						bd.setState(BetData.PARCIAL_CANCELED);
 					}
 					else //matched
 					{
 						bd.setMatchedAmount(totalSize);
 						bd.setOddMached(oddAvg);
-						bd.setState(BetData.MATHED);
+						bd.setState(BetData.MATCHED);
 					}
 					
 				}
@@ -423,7 +454,7 @@ public class BetManager {
 				{
 					
 					if(Utils.convertAmountToBF(bds[i].getAmount())<=bds[i].getMatchedAmount())
-						bds[i].setState(BetData.MATHED);
+						bds[i].setState(BetData.MATCHED);
 					else
 						bds[i].setState(BetData.PARTIAL_MACHED);
 				}
@@ -466,8 +497,29 @@ public class BetManager {
 		return ret;
 	}
 
-	public int cancelBets(Vector<BetData> cancel)
+	public int cancelBets(Vector<BetData> cancelBets)
 	{
+		CancelBets canc[] = new CancelBets[cancelBets.size()];
+		
+		BetData[] bds=cancelBets.toArray(new BetData[]{});
+		
+		for(int i=0;i<bds.length;i++)
+		{
+			canc[i]= new CancelBets();
+			canc[i].setBetId(bds[i].getBetID());
+			
+		}
+		
+		CancelBetsResult betResult[]=null;
+		
+		try {
+			betResult = ExchangeAPI.cancelBets(getMd().getSelectedExchange(),getMd().getApiContext(), canc);
+		} catch (Exception e) {
+			if(e.getMessage().contains(new String("BET_NOT_CANCELLED")))  
+			{
+				
+			}
+		}
 		
 		return 0;
 	}
@@ -495,7 +547,7 @@ public class BetManager {
 			ret.setState(BetData.UNMATHED);
 		
 		if(bet.getBetStatus()==BetStatusEnum.M)
-			ret.setState(BetData.MATHED);
+			ret.setState(BetData.MATCHED);
 		
 		if(bet.getBetStatus()==BetStatusEnum.MU)
 			ret.setState(BetData.PARTIAL_MACHED);

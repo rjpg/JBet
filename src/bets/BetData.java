@@ -19,11 +19,11 @@ public class BetData {
 	public double oddRequested;
 	public double amount=0;
 	
-	//dynamic change variables 
+	//--dynamic change variables-- 
 	public double oddMached=-1;
 	public double matchedAmount=0;
 	public int state=BetData.NOT_PLACED;
-	
+	//----------------------------
 	
 	public Calendar timestamp=null;
 	
@@ -34,26 +34,33 @@ public class BetData {
 	public static final int BACK = 1;
 	public static final int LAY = 2;
 
+	// Error processing
 	public int errorType=BetData.ERROR_NONE;
-	
+	// place erros 
 	public static final int ERROR_NONE = 0;
 	public static final int ERROR_MARKET_SUSPENDED = 1;
 	public static final int ERROR_MARKET_CLOSED = 2;
 	public static final int ERROR_BALANCE_EXCEEDED=3;
 	public static final int ERROR_BET_IN_PROGRESS=4;
-	public static final int ERROR_UNKNOWN = 5;
+	// cancel errors
+	//public static final int ERROR_TAKEN_OR_LAPSED = 5;
+	//public static final int ERROR_NOT_CANCELED= 5;
+	// generic error
+	public static final int ERROR_UNKNOWN = 6;
 	
 
 	//public boolean PLACED = false; // true if the bet was placed on betfair
 	public int updatesBetInProgress=0;
 	
-	public static final int PLACING_ERROR = -1;      // after placed error
+	//public static final int CANCEL_ERROR = -2;	 	 // after cancel error  (check error)
+	public static final int PLACING_ERROR = -1;      // after placed error (check error)
 	public static final int NOT_PLACED = 0;          // before placed 
 	public static final int BET_IN_PROGRESS = 1;     // waiting 
 	public static final int UNMATHED = 2;            //
 	public static final int PARTIAL_MACHED = 3;
-	public static final int MATHED =  4;
+	public static final int MATCHED =  4;
 	public static final int CANCELED = 5;
+	public static final int PARCIAL_CANCELED = 6;
 	
 	
 	public Long BetID=null; // given from betfair after placed 
@@ -62,10 +69,7 @@ public class BetData {
 	public double entryVolume=-1;
 	public double entryAmount=-1;
 	
-	public double getEntryVolume() {
-		return entryVolume;
-	}
-
+	
 	
 	public BetData (BetListener tmA, RunnersData rdA, double  amountA,double  oddA, int typeA, Calendar time)
 	{
@@ -177,17 +181,20 @@ public class BetData {
 		this.entryVolume = entryVolume;
 	}
 	
+	public double getEntryVolume() {
+		return entryVolume;
+	}
+
 	public double getEntryAmount() {
 		return entryAmount;
 	}
-
+	
 	public void setEntryAmount(double entryAmount) {
 		this.entryAmount = entryAmount;
 	}
 	public int getErrorType() {
 		return errorType;
 	}
-
 
 	public void setErrorType(int errorType) {
 		this.errorType = errorType;

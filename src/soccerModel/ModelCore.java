@@ -192,7 +192,7 @@ public class ModelCore {
 			{
 				stepTG/=2;
 				dir*=-1;
-				System.out.println("###################################################");
+				//System.out.println("###################################################");
 			}
 			
 		}
@@ -560,7 +560,7 @@ public class ModelCore {
 			
 			goalsSumOverUnder[i]=goalsOver[i]+goalsUnder[i];
 			
-			System.out.println("goalsAVGScale["+i+"]="+goalsAVGScale[i]+"     goalsOver["+i+"]="+goalsOver[i]+"        goalsUnder["+i+"]="+goalsUnder[i]+"    goalsSumOverUnder["+i+"]="+goalsSumOverUnder[i]);
+			//System.out.println("goalsAVGScale["+i+"]="+goalsAVGScale[i]+"     goalsOver["+i+"]="+goalsOver[i]+"        goalsUnder["+i+"]="+goalsUnder[i]+"    goalsSumOverUnder["+i+"]="+goalsSumOverUnder[i]);
 		}
 		
 		
@@ -730,7 +730,7 @@ public class ModelCore {
 			
 			hcapSumHomeAway[i]=hcapHome[i]+hcapAway[i];
 			
-			System.out.println("hcapAVGScale["+i+"]="+hcapAVGScale[i]+"     home["+i+"]="+hcapHome[i]+ "  away["+i+"]="+hcapAway[i]+"    sumHomeAway["+i+"]="+hcapSumHomeAway[i]);
+		//	System.out.println("hcapAVGScale["+i+"]="+hcapAVGScale[i]+"     home["+i+"]="+hcapHome[i]+ "  away["+i+"]="+hcapAway[i]+"    sumHomeAway["+i+"]="+hcapSumHomeAway[i]);
 		}
 		
 	}

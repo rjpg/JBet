@@ -2,6 +2,8 @@ package bets;
 
 import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
+import generated.exchange.BFExchangeServiceStub.CancelBets;
+import generated.exchange.BFExchangeServiceStub.CancelBetsResult;
 import generated.exchange.BFExchangeServiceStub.MUBet;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsErrorEnum;
@@ -81,7 +83,7 @@ public class BetsManager  {
 		PlaceBetsResult[] betResult=null;
 		
 		try {
-			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  Manager.apiContext, betsAPI);
+			betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  getMd().getApiContext(), betsAPI);
 		} catch (Exception e) {
 			e.printStackTrace();		
 		}
@@ -109,7 +111,7 @@ public class BetsManager  {
 						bds[i].setMatchedAmount(betResult[i].getSizeMatched());
 						bds[i].setOddMached(betResult[i].getAveragePriceMatched());
 						if(Utils.convertAmountToBF(bds[i].getAmount())==bds[i].getMatchedAmount())
-							bds[i].setState(BetData.MATHED);
+							bds[i].setState(BetData.MATCHED);
 						else
 							bds[i].setState(BetData.PARTIAL_MACHED);
 					}
@@ -142,6 +144,17 @@ public class BetsManager  {
 	
 	public int cancelBet(BetData bd)
 	{
+		CancelBets canc = new CancelBets();
+		canc.setBetId(bd.getBetID());
+		
+		CancelBetsResult betResult=null;
+		
+		try {
+			betResult = ExchangeAPI.cancelBets(getMd().getSelectedExchange(),getMd().getApiContext(), new CancelBets[] {canc})[0];
+		} catch (Exception e) {
+			
+		}
+		
 		return 0;
 	}
 	
@@ -258,7 +271,7 @@ public class BetsManager  {
 						if(bdAux.getMatchedAmount()==0)
 							bdAux.setState(BetData.UNMATHED);
 						else if(bdAux2.getAmount()==0)//if(Utils.convertAmountToBF(bdAux.getAmount())==bdAux.getMatchedAmount())
-							bdAux.setState(BetData.MATHED);
+							bdAux.setState(BetData.MATCHED);
 						else
 							bdAux.setState(BetData.PARTIAL_MACHED);
 					}
@@ -314,7 +327,7 @@ public class BetsManager  {
 							{
 								bd.setMatchedAmount(bdaux.getMatchedAmount());
 								bd.setOddMached(bdaux.getOddMached());
-								bd.setState(BetData.MATHED);
+								bd.setState(BetData.MATCHED);
 								
 								bdaux.updatesBetInProgress=-1;  //assigned recovered 
 								
