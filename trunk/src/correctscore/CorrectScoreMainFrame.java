@@ -333,7 +333,7 @@ public class CorrectScoreMainFrame  implements UpdateScoresListener{
 		}
 		*/
 	
-		this.setUsername("username");
+		this.setUsername("user");
 		this.setPassword("xxx");
 		
 		

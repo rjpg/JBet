@@ -224,7 +224,7 @@ public class BetUtils {
 			ret+="State: UNMATHED \n";
 		else if(bd.getState()==BetData.PARTIAL_MACHED)
 			ret+="State: PARTIAL_MACHED \n";
-		else if(bd.getState()==BetData.MATHED)
+		else if(bd.getState()==BetData.MATCHED)
 			ret+="State: MACHED \n";
 		else if(bd.getState()==BetData.CANCELED)
 			ret+="State: CANCELED \n";
