@@ -49,8 +49,10 @@ public class BetManager {
 
 	public int refreshBet(BetData bd)
 	{
+		
 		Bet gb=null;
 		int attempts = 0;
+		
 		while (attempts < 3 && gb == null) {
 			try {
 				gb =ExchangeAPI.getBet(getMd().getSelectedExchange(), getMd().getApiContext(),bd.getBetID());
@@ -70,7 +72,7 @@ public class BetManager {
 			//writeMessageText("Failed to get Bet: ExchangeAPI.getBet return null ",Color.RED);
 			return -1;
 		}
-		
+		//gb.getBetStatus()
 		return 0;
 		//return gb;
 	}
