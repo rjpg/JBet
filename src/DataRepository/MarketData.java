@@ -1,30 +1,21 @@
 package DataRepository;
 
-import generated.exchange.BFExchangeServiceStub.GetBet;
-import generated.exchange.BFExchangeServiceStub.GetBetReq;
-import generated.exchange.BFExchangeServiceStub.MUBet;
 import generated.exchange.BFExchangeServiceStub.Market;
-import generated.exchange.BFExchangeServiceStub.MarketStatusEnum;
 import generated.exchange.BFExchangeServiceStub.Runner;
 import generated.exchange.BFExchangeServiceStub.VolumeInfo;
-import generated.global.BFGlobalServiceStub.EventType;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -33,33 +24,18 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.text.html.HTMLDocument.RunElement;
 
-import bets.BetData;
-import bets.BetsManager;
-import bots.Bot;
-
-import correctscore.CorrectScoreMainFrame;
-
-import main.Manager;
 import main.Parameters;
-import main.loader;
-
-
-
-
-
+import bets.BetData;
+import bets.BetManager;
+import bots.Bot;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
-import demo.util.Display;
 import demo.util.InflatedCompleteMarketPrices;
-import demo.util.RunnerTradedVolumeCompressed;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompletePrice;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompleteRunner;
-import demo.util.InflatedMarketPrices;
-import demo.util.InflatedMarketPrices.InflatedPrice;
-import demo.util.InflatedMarketPrices.InflatedRunner;
+import demo.util.RunnerTradedVolumeCompressed;
 
 public class MarketData {
 	
@@ -72,7 +48,7 @@ public class MarketData {
 	//-----------Trade -------------
 	public Vector<Bot> botsTrading=new Vector<Bot>();
 	
-	public BetsManager betManager=null;
+	public BetManager betManager=null;
 	
 	//true if it is in tradding process 
 	//public boolean inTrade=false;
@@ -148,7 +124,7 @@ public class MarketData {
 			//initializeData();
 			
 			
-			//initializeBetManager();
+			initializeBetManager();
 			
 		}
 		else
@@ -159,7 +135,7 @@ public class MarketData {
 	
 	public void initializeBetManager()
 	{
-		betManager=new BetsManager(this);
+		betManager=new BetManager(this);
 		betManager.startPolling();
 	}
 	
@@ -946,8 +922,8 @@ public class MarketData {
 		// if logging print header market
 		//initializeData();
 		logWritteHeaderMarket();
-		//finalizeBetManager();
-		//initializeBetManager();
+		finalizeBetManager();
+		initializeBetManager();
 		
 	}
 
@@ -1838,7 +1814,7 @@ public class MarketData {
 		return false;
 	}
 	
-	public BetsManager getBetManager() {
+	public BetManager getBetManager() {
 		return betManager;
 	}
 

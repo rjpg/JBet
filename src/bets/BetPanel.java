@@ -1,4 +1,4 @@
-package nextGoal;
+package bets;
 
 import generated.exchange.BFExchangeServiceStub.BetCategoryTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
@@ -22,8 +22,8 @@ import DataRepository.OddObj;
 import DataRepository.RunnerObj;
 import DataRepository.Utils;
 
-public class BetInterface extends JPanel{
-	
+public class BetPanel extends JPanel{
+
 	public static Double[] stakes={10.00,2.00,5.00,7.00,20.00,50.00,100.00,200.00,500.00,1000.00};
 	
 	public static String[] backLay={"L","B"};
@@ -35,34 +35,23 @@ public class BetInterface extends JPanel{
 	public JComboBox<String> comboBackLay;
 	public JComboBox<RunnerObj> comboRunner;
 	
-	public JCheckBox checkProcess;
+	public JCheckBox checkIP;
 	
-	public JCheckBox checkAuto;
-	public JCheckBox checkAutoBackLay;
-	
-	public JSpinner backOffset;
-	public JSpinner layOffset;
 
 	public Market market = null;
-	public MarketData MD =null;
+	public MarketData md =null;
 	
-	public BetInterface(Market marketA) {
+	public BetPanel(MarketData MDa) {
 		super();
-		market=marketA;
-		initialize();
-	}
-	
-	public BetInterface(MarketData MDa) {
-		super();
-		MD=MDa;
-		market=MD.getSelectedMarket();
+		md=MDa;
+		market=md.getSelectedMarket();
 		initialize();
 	}
 	
 	public void initialize()
 	{
 		
-		checkProcess=new JCheckBox("Process",false);
+		
 		
 		comboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
 		comboOdd.setMaximumRowCount(30);
@@ -74,47 +63,15 @@ public class BetInterface extends JPanel{
 		initializeRunnersArray();
 		comboRunner=new JComboBox<RunnerObj>(runners);
 		
-		checkAuto=new JCheckBox("Auto",true);
-		checkAutoBackLay=new JCheckBox("AutoBL",true);
+		checkIP=new JCheckBox("IP",false);
 		
-		SpinnerModel modelB =
-	        new SpinnerNumberModel(0, //initial value
-	                                - 100, //min
-	                                + 100, //max
-	                               1);                //step
+		this.setLayout(new GridLayout(1, 4));
 		
-		SpinnerModel modelL =
-	        new SpinnerNumberModel(0, //initial value
-	                                - 100, //min
-	                                + 100, //max
-	                               1);                //step
-		
-		
-		backOffset=new JSpinner(modelB);
-		layOffset=new JSpinner(modelL);
-
-		backOffset.setValue(5);
-		layOffset.setValue(7);
-		
-		JLabel bOff=new JLabel("B offset");
-		JLabel lOff=new JLabel("L offset");
-		
-		bOff.setHorizontalAlignment(JLabel.RIGHT);
-		lOff.setHorizontalAlignment(JLabel.RIGHT);
-		
-		this.setLayout(new GridLayout(1, 10));
-		
-		this.add(checkProcess);
 		this.add(comboOdd);
-		this.add(checkAuto);
 		this.add(comboStake);
 		this.add(comboBackLay);
-		this.add(checkAutoBackLay);
 		this.add(comboRunner);
-		this.add(bOff);
-		this.add(backOffset);
-		this.add(lOff);
-		this.add(layOffset);
+		this.add(checkIP);
 		
 	}
 	
@@ -130,21 +87,18 @@ public class BetInterface extends JPanel{
 			
 	}
 	
-	public boolean isActive()
-	{
-		return checkProcess.isSelected();
-	}
+	public void reset(MarketData MDa) {
 	
-	public boolean isAuto()
-	{
-		return checkAuto.isSelected();
+		md=MDa;
+		market=md.getSelectedMarket();
+		initializeRunnersArray();
+		comboRunner.removeAllItems();
+		
+		for(int i=0;i<runners.length;i++)
+		{
+			comboRunner.addItem(runners[i]);
+		}
 	}
-	
-	public boolean isAutoBackLay()
-	{
-		return checkAutoBackLay.isSelected();
-	}
-	
 	
 	public Runner getRunner()
 	{
@@ -197,7 +151,7 @@ public class BetInterface extends JPanel{
 		return (String)comboBackLay.getSelectedItem();
 	}
 	
-	public PlaceBets createBet()
+	public PlaceBets createPlaceBet()
 	{
 		PlaceBets bet = new PlaceBets();
 		bet.setMarketId(market.getMarketId());
@@ -205,7 +159,11 @@ public class BetInterface extends JPanel{
 		//bet.setSelectionId(prevSelectionId);
 		
 		bet.setBetCategoryType(BetCategoryTypeEnum.E);
-		bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
+		
+		if(checkIP.isSelected())
+			bet.setBetPersistenceType(BetPersistenceTypeEnum.IP);
+		else
+			bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
 		
 		bet.setBetType(BetTypeEnum.Factory.fromValue(getBackLay()));
 		//bet.setBetType(BetTypeEnum.Factory.fromValue("B"));
@@ -218,13 +176,19 @@ public class BetInterface extends JPanel{
 		return bet;
 	}
 	
-	public int getBackOffset()
+	public BetData createBetData()
 	{
-		return (Integer) backOffset.getValue();
+		BetData ret=null;
+		if(getBackLay().equals(backLay[0]))
+			ret=new BetData(md.getRunnersById(getRunner().getSelectionId()),getStake(),getOdd(),BetData.LAY,false);
+		else // Is B or L
+			ret=new BetData(md.getRunnersById(getRunner().getSelectionId()),getStake(),getOdd(),BetData.BACK,false);
+		
+		if(checkIP.isSelected())
+			ret.setKeepInPlay(true);
+		
+		return ret;
 	}
 	
-	public int getLayOffset()
-	{
-		return (Integer) layOffset.getValue();
-	}
+
 }

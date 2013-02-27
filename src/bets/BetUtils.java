@@ -1,7 +1,9 @@
 package bets;
 
+import generated.exchange.BFExchangeServiceStub.Bet;
 import generated.exchange.BFExchangeServiceStub.BetCategoryTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
+import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
 import generated.exchange.BFExchangeServiceStub.CancelBets;
 import generated.exchange.BFExchangeServiceStub.CancelBetsResult;
@@ -10,6 +12,8 @@ import generated.exchange.BFExchangeServiceStub.UpdateBets;
 import generated.exchange.BFExchangeServiceStub.UpdateBetsResult;
 
 import java.awt.Color;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
@@ -163,21 +167,43 @@ public class BetUtils {
 		return betResult.getBetId();
 	}
 	
-	public static PlaceBets createPlaceBet(double odd,double size, int type,  TradeMecanism tm ,MarketData marketData, RunnersData rd)
+	
+	public static  BetData createBetData(Bet bet,MarketData md)
 	{
-		tm.writeMsgTM("Create Back PLACE BETS:"+size+"@"+odd, Color.BLUE);
-		PlaceBets bet = new PlaceBets();
-		bet.setMarketId(marketData.getSelectedMarket().getMarketId());
-		bet.setSelectionId(rd.getId());
-		bet.setBetCategoryType(BetCategoryTypeEnum.E);
-		bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
-		if(type==BetData.BACK)
-			bet.setBetType(BetTypeEnum.Factory.fromValue("B"));
-		else
-			bet.setBetType(BetTypeEnum.Factory.fromValue("L"));
-		bet.setPrice(odd);
-		bet.setSize(size);
-		return bet;
+		
+		if(bet==null)
+			return null;
+		
+		BetData ret=null;
+		if(bet.getBetType()==BetTypeEnum.B)
+			ret=new BetData(md.getRunnersById(bet.getSelectionId()),bet.getRequestedSize(),bet.getPrice(),BetData.BACK,false);
+		else // Is B or L
+			ret=new BetData(md.getRunnersById(bet.getSelectionId()),bet.getRequestedSize(),bet.getPrice(),BetData.LAY,false);
+		
+		ret.setBetID(bet.getBetId());
+		ret.setMatchedAmount(bet.getMatchedSize());
+		ret.setOddMached(bet.getAvgPrice());
+		
+		if(bet.getBetStatus()==BetStatusEnum.U)
+			ret.setState(BetData.UNMATHED,BetData.SYSTEM);
+		
+		if(bet.getBetStatus()==BetStatusEnum.M)
+			ret.setState(BetData.MATCHED,BetData.SYSTEM);
+		
+		if(bet.getBetStatus()==BetStatusEnum.MU)
+			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
+		
+		if(bet.getBetStatus()==BetStatusEnum.C)
+			ret.setState(BetData.CANCELED,BetData.SYSTEM);
+		
+		if(bet.getBetStatus()==BetStatusEnum.V) //Voided (?)
+			ret.setState(BetData.CANCELED,BetData.SYSTEM);
+		//testar os voideds quando o mercado fica suspenso para ver se fica estado Cancelado "C" ou voided "V"
+		
+		if(bet.getBetPersistenceType()==BetPersistenceTypeEnum.IP)
+			ret.setKeepInPlay(true);
+		
+		return ret;
 	}
 	
 	public static PlaceBets createPlaceBet(BetData bd)
@@ -186,7 +212,7 @@ public class BetUtils {
 		bet.setMarketId(bd.getRd().getMarketData().getSelectedMarket().getMarketId());
 		bet.setSelectionId(bd.getRd().getId());
 		bet.setBetCategoryType(BetCategoryTypeEnum.E);
-		bet.setBetPersistenceType(bd.getPersistenceType());
+	
 		if(bd.getType()==BetData.BACK)
 			bet.setBetType(BetTypeEnum.Factory.fromValue("B"));
 		else
@@ -197,13 +223,13 @@ public class BetUtils {
 			bet.setBetPersistenceType(BetPersistenceTypeEnum.IP);
 		else
 			bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
-		
+				
 		return bet;
 	}
 	
 	public static String printBet(BetData bd)
 	{
-		String ret="";
+		String ret="\n";
 		ret+="--- Bet Id: "+bd.getBetID()+" ---\n";
 		
 		if(bd.getRd()==null)
@@ -230,13 +256,62 @@ public class BetUtils {
 			ret+="State: CANCELED \n";
 		else if(bd.getState()==BetData.PLACING_ERROR)
 			ret+="State: PLACING_ERROR \n";
+		
+		if(bd.getLastState()==BetData.NOT_PLACED)
+			ret+="Last State: NOT_PLACED \n";
+		else if(bd.getLastState()==BetData.UNMATHED)
+			ret+="Last State: UNMATHED \n";
+		else if(bd.getLastState()==BetData.PARTIAL_MACHED)
+			ret+="Last State: PARTIAL_MACHED \n";
+		else if(bd.getLastState()==BetData.MATCHED)
+			ret+="Last State: MACHED \n";
+		else if(bd.getLastState()==BetData.CANCELED)
+			ret+="Last State: CANCELED \n";
+		else if(bd.getLastState()==BetData.PLACING_ERROR)
+			ret+="Last State: PLACING_ERROR \n";
 
+		if(bd.getTransition()==BetData.SYSTEM)
+			ret+="Transition: SYSTEM \n";
+		else if(bd.getTransition()==BetData.PLACE)
+			ret+="Transition: PLACE \n";
+		else if(bd.getTransition()==BetData.CANCEL)
+			ret+="Transition: CANCEL \n";
+		
 		ret+="Entry Queue Amount: "+bd.entryAmount+"\n";
 		ret+="Entry Volume: "+bd.entryVolume+"\n";
 		ret+="Matched: "+bd.getMatchedAmount()+" @ "+bd.getOddMached()+"\n";
+		
+		ret+="Keep IP: "+bd.isKeepInPlay()+"\n";
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss,SSS");
+		
+		
+		if(bd.getTimestampPlace()==null)
+			ret+="Place Time : NULL\n";
+		else
+			ret+="Place Time : "+dateFormat.format(new Date(bd.getTimestampPlace().getTimeInMillis()))+"\n";
+		
+		if(bd.getTimestampFinalState()==null)
+			ret+="Final State Time : NULL\n";
+		else
+			ret+="Final State Time : "+dateFormat.format(new Date(bd.getTimestampFinalState().getTimeInMillis()))+"\n";
+		
+		if(bd.getTimestampCancel()==null)
+			ret+="Final State Time : NULL\n";
+		else
+			ret+="Final State Time : "+dateFormat.format(new Date(bd.getTimestampCancel().getTimeInMillis()))+"\n";
+		
+		
 		ret+=" --- --- \n";
 		
 		return ret;
 	}
 	
+	public static boolean isBetFinalState(int state)
+	{
+		if(state==BetData.MATCHED || state==BetData.PARCIAL_CANCELED || state==BetData.CANCELED || state==BetData.PLACING_ERROR)
+			return true;
+		else
+			return false;
+	}
 }

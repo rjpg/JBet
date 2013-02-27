@@ -10,11 +10,7 @@ import bots.Bot;
 
 public class BetData {
 	
-	public BetListener owner=null;
-	
 	public RunnersData rd;
-	
-	public BetPersistenceTypeEnum persistenceType = BetPersistenceTypeEnum.NONE;
 	
 	public double oddRequested;
 	public double amount=0;
@@ -23,11 +19,21 @@ public class BetData {
 	public double oddMached=-1;
 	public double matchedAmount=0;
 	public int state=BetData.NOT_PLACED;
+	
+	public int lastState=BetData.NOT_PLACED;
+	public int transition=BetData.SYSTEM;
 	//----------------------------
+
+	// Transitions
+	public static final int SYSTEM = 0;
+	public static final int PLACE = 1;
+	public static final int CANCEL = 1;
 	
-	public Calendar timestamp=null;
+	public Calendar timestampPlace=null;
+	public Calendar timestampCancel=null;
+	public Calendar timestampFinalState=null;
 	
-	public boolean keepInPlay=false;
+	public boolean keepInPlay=false;   // BetPersistenceType (IP)
 	
 	public int type=BetData.BACK;
 	
@@ -71,14 +77,15 @@ public class BetData {
 	
 	
 	
-	public BetData (BetListener tmA, RunnersData rdA, double  amountA,double  oddA, int typeA, Calendar time)
+	public BetData (RunnersData rdA, double  amountA,double  oddA, int typeA,boolean IPA)
 	{
-		this.owner=tmA;
+		//this.owner=tmA;
 		this.rd=rdA;
 		this.amount=amountA;
 		this.oddRequested=oddA;
 		this.type=typeA;
-		this.timestamp=time;
+		this.keepInPlay=IPA;
+		
 	}
 	
 	public int getType() {
@@ -109,8 +116,13 @@ public class BetData {
 		return state;
 	}
 
-	public void setState(int state) {
-		this.state = state;
+	public void setState(int stateA,int transitionA) {
+		this.lastState=this.state;
+		this.state = stateA;
+		this.transition=transitionA;
+		
+		if(BetUtils.isBetFinalState(this.state))
+			setTimestampFinalState(Calendar.getInstance());
 	}
 
 	public Long getBetID() {
@@ -121,13 +133,30 @@ public class BetData {
 		BetID = betID;
 	}
 	
-	public Calendar getTimestamp() {
-		return timestamp;
+	public Calendar getTimestampPlace() {
+		return timestampPlace;
 	}
 
-	public void setTimestamp(Calendar timestamp) {
-		this.timestamp = timestamp;
+	public void setTimestampPlace(Calendar timestamp) {
+		this.timestampPlace = timestamp;
 	}
+
+	public Calendar getTimestampCancel() {
+		return timestampCancel;
+	}
+
+	public void setTimestampCancel(Calendar timestampCancel) {
+		this.timestampCancel = timestampCancel;
+	}
+
+	public Calendar getTimestampFinalState() {
+		return timestampFinalState;
+	}
+
+	public void setTimestampFinalState(Calendar timestampFinalState) {
+		this.timestampFinalState = timestampFinalState;
+	}
+
 	
 	public RunnersData getRd() {
 		return rd;
@@ -137,14 +166,6 @@ public class BetData {
 		this.rd = rd;
 	}
 
-	public BetPersistenceTypeEnum getPersistenceType() {
-		return persistenceType;
-	}
-
-	public void setPersistenceType(BetPersistenceTypeEnum betPersistenceType) {
-		this.persistenceType = betPersistenceType;
-	}
-	
 	public double getOddRequested() {
 		return oddRequested;
 	}
@@ -161,13 +182,7 @@ public class BetData {
 		this.oddMached = oddMached;
 	}
 	
-	public BetListener getOwner() {
-		return owner;
-	}
-
-	public void setOwner(BetListener owner) {
-		this.owner = owner;
-	}
+	
 	
 	public boolean isKeepInPlay() {
 		return keepInPlay;
@@ -200,4 +215,11 @@ public class BetData {
 		this.errorType = errorType;
 	}
 
+	public int getLastState() {
+		return lastState;
+	}
+
+	public int getTransition() {
+		return transition;
+	}
 }

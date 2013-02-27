@@ -1,6 +1,7 @@
 package bets;
 
 import generated.exchange.BFExchangeServiceStub.Bet;
+import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
 import generated.exchange.BFExchangeServiceStub.CancelBets;
@@ -12,6 +13,7 @@ import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsResultEnum;
 
 import java.awt.Color;
+import java.util.Calendar;
 import java.util.Vector;
 
 import main.Manager;
@@ -47,38 +49,10 @@ public class BetManager {
 		return md;
 	}
 
-	public int refreshBet(BetData bd)
-	{
-		
-		Bet gb=null;
-		int attempts = 0;
-		
-		while (attempts < 3 && gb == null) {
-			try {
-				gb =ExchangeAPI.getBet(getMd().getSelectedExchange(), getMd().getApiContext(),bd.getBetID());
-			} catch (Exception e) {
-				//writeMessageText(e.getMessage(), Color.RED);
-				if(e.getMessage().contains(new String("EVENT_SUSPENDED"))  || e.getMessage().contains(new String("BET_IN_PROGRESS")) )
-				{
-					//writeMessageText("ExchangeAPI.getBet Returned NULL: Market is supended | Bet in progress",Color.BLUE);
-					attempts--;
-				}				
-				//writeMessageText("ExchangeAPI.getBet Returned NULL:Attempt :"+attempts, Color.RED);
-			}
-			attempts++;
-		}
-		if(gb==null)
-		{
-			//writeMessageText("Failed to get Bet: ExchangeAPI.getBet return null ",Color.RED);
-			return -1;
-		}
-		//gb.getBetStatus()
-		return 0;
-		//return gb;
-	}
 	
 	private void refresh()
 	{
+		//System.out.println("processing");
 		if(!isBetsToProcess())
 			return;
 		
@@ -88,6 +62,7 @@ public class BetManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 			writeError(e.getMessage());
+			return;
 		}
 		
 		if(betsbf==null)
@@ -145,12 +120,12 @@ public class BetManager {
 				
 				if(matched.size()==0 && unmatched.size()==0) //external cancel (without any match)
 				{
-					bd.setState(BetData.CANCELED);
+					bd.setState(BetData.CANCELED,BetData.SYSTEM);
 				}
 				else if(matched.size()==0) // unmached
 				{
 					// does not do nothing 
-					bd.setState(BetData.UNMATHED);
+					bd.setState(BetData.UNMATHED,BetData.SYSTEM);
 				}
 				else if(unmatched.size()==0) // matched or external partial canceled (parcial matched but impossible to match the rest)
 				{
@@ -177,13 +152,13 @@ public class BetManager {
 					{
 						bd.setMatchedAmount(totalSize);
 						bd.setOddMached(oddAvg);
-						bd.setState(BetData.PARCIAL_CANCELED);
+						bd.setState(BetData.PARCIAL_CANCELED,BetData.SYSTEM);
 					}
 					else //matched
 					{
 						bd.setMatchedAmount(totalSize);
 						bd.setOddMached(oddAvg);
-						bd.setState(BetData.MATCHED);
+						bd.setState(BetData.MATCHED,BetData.SYSTEM);
 					}
 					
 				}
@@ -210,7 +185,7 @@ public class BetManager {
 					
 					bd.setMatchedAmount(totalSize);
 					bd.setOddMached(oddAvg);
-					bd.setState(BetData.PARTIAL_MACHED);
+					bd.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
 				}
 			}
 		}
@@ -292,7 +267,7 @@ public class BetManager {
 				{
 					bd.setBetID(bdPossible.getBetID());
 					
-					bd.setState(bdPossible.getState());
+					bd.setState(bdPossible.getState(),BetData.SYSTEM);
 					bd.setMatchedAmount(bdPossible.getMatchedAmount());
 					bd.setOddMached(bdPossible.getOddMached());
 					
@@ -312,7 +287,7 @@ public class BetManager {
 			
 			if(bd.updatesBetInProgress>BIP_ERROR_UPDATES)
 			{
-				bd.setState(BetData.PLACING_ERROR);
+				bd.setState(BetData.PLACING_ERROR,BetData.SYSTEM);
 				bd.setErrorType(BetData.ERROR_BET_IN_PROGRESS);
 			}
 		}
@@ -353,7 +328,7 @@ public class BetManager {
 			return null;
 		}
 		
-		return createBetData(gb);
+		return BetUtils.createBetData(gb,getMd());
 	
 	}
 	
@@ -378,6 +353,7 @@ public class BetManager {
 			betsAPI[i]=BetUtils.createPlaceBet(bds[i]);
 			
 			
+			
 			if(bds[i].getType()==BetData.BACK)
 				bds[i].setEntryAmount(Utils.getAmountLayOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
 			else
@@ -386,6 +362,7 @@ public class BetManager {
 			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 			
 			bets.add(bds[i]);
+			bds[i].setTimestampPlace(Calendar.getInstance());
 			
 		}
 		
@@ -400,7 +377,7 @@ public class BetManager {
 			{
 				for(int i=0;i<bds.length;i++)
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_MARKET_SUSPENDED);
 				}
 			}
@@ -408,7 +385,7 @@ public class BetManager {
 			{
 				for(int i=0;i<bds.length;i++)
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_MARKET_CLOSED);
 				}
 				return -1;
@@ -417,7 +394,7 @@ public class BetManager {
 			{
 				for(int i=0;i<bds.length;i++)
 				{
-					bds[i].setState(BetData.BET_IN_PROGRESS);
+					bds[i].setState(BetData.BET_IN_PROGRESS,BetData.PLACE);
 				}
 				return 0;
 			}
@@ -425,7 +402,7 @@ public class BetManager {
 			{
 				for(int i=0;i<bds.length;i++)
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_UNKNOWN);
 				}
 				return -1;
@@ -437,7 +414,7 @@ public class BetManager {
 		{
 			for(int i=0;i<bds.length;i++)
 			{
-				bds[i].setState(BetData.PLACING_ERROR);
+				bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 				bds[i].setErrorType(BetData.ERROR_UNKNOWN);
 			}
 			return -1;
@@ -456,13 +433,13 @@ public class BetManager {
 				{
 					
 					if(Utils.convertAmountToBF(bds[i].getAmount())<=bds[i].getMatchedAmount())
-						bds[i].setState(BetData.MATCHED);
+						bds[i].setState(BetData.MATCHED,BetData.PLACE);
 					else
-						bds[i].setState(BetData.PARTIAL_MACHED);
+						bds[i].setState(BetData.PARTIAL_MACHED,BetData.PLACE);
 				}
 				else
 				{
-					bds[i].setState(BetData.UNMATHED);
+					bds[i].setState(BetData.UNMATHED,BetData.PLACE);
 				}
 				
 			
@@ -471,25 +448,25 @@ public class BetManager {
 			{
 				if(betResult[i].getResultCode()==PlaceBetsResultEnum.BET_IN_PROGRESS)
 				{
-					bds[i].setState(BetData.BET_IN_PROGRESS);
+					bds[i].setState(BetData.BET_IN_PROGRESS,BetData.PLACE);
 					//betsInProgress.add(bds[i]);
 					
 				}
 				else if(betResult[i].getResultCode()==PlaceBetsResultEnum.EVENT_CLOSED)
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_MARKET_CLOSED);
 					ret=-2;
 				}
 				else if(betResult[i].getResultCode()==PlaceBetsResultEnum.EXPOSURE_OR_AVAILABLE_BALANCE_EXCEEDED)
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_BALANCE_EXCEEDED);
 					ret=-2;
 				}
 				else 
 				{
-					bds[i].setState(BetData.PLACING_ERROR);
+					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_UNKNOWN);
 					ret=-2;
 				}
@@ -510,6 +487,7 @@ public class BetManager {
 			canc[i]= new CancelBets();
 			canc[i].setBetId(bds[i].getBetID());
 			
+			bds[i].setTimestampPlace(Calendar.getInstance());
 		}
 		
 		CancelBetsResult betResult[]=null;
@@ -528,41 +506,6 @@ public class BetManager {
 	
 	
 
-	/// passar esta função para utils 
-	public BetData createBetData(Bet bet)
-	{
-		
-		if(bet==null)
-			return null;
-		
-		BetData ret=null;
-		if(bet.getBetType()==BetTypeEnum.B)
-			ret=new BetData(null,md.getRunnersById(bet.getSelectionId()),bet.getRequestedSize(),bet.getPrice(),BetData.BACK,null);
-		else // Is B or L
-			ret=new BetData(null,md.getRunnersById(bet.getSelectionId()),bet.getRequestedSize(),bet.getPrice(),BetData.LAY,null);
-		
-		ret.setBetID(bet.getBetId());
-		ret.setMatchedAmount(bet.getMatchedSize());
-		ret.setOddMached(bet.getAvgPrice());
-		
-		if(bet.getBetStatus()==BetStatusEnum.U)
-			ret.setState(BetData.UNMATHED);
-		
-		if(bet.getBetStatus()==BetStatusEnum.M)
-			ret.setState(BetData.MATCHED);
-		
-		if(bet.getBetStatus()==BetStatusEnum.MU)
-			ret.setState(BetData.PARTIAL_MACHED);
-		
-		if(bet.getBetStatus()==BetStatusEnum.C)
-			ret.setState(BetData.CANCELED);
-		
-		if(bet.getBetStatus()==BetStatusEnum.V) //Voided (?)
-			ret.setState(BetData.CANCELED);
-		//testar os voideds quando o mercado fica suspenso para ver se fica estado Cancelado "C" ou voided "V"
-		
-		return ret;
-	}
 	
 	private void writeError(String s)
 	{
@@ -632,7 +575,9 @@ public class BetManager {
 	}
 	public void clean()
 	{
-		
+		bets.clear();
+		bets=null;
+		md=null;
 	}
 	
 	public static void main(String[] args)  throws Exception {
@@ -642,7 +587,7 @@ public class BetManager {
 		
  		System.out.println( possibleBetsInProgress.size());
  		
- 		BetData bd=new BetData(null, null, 100, 4.5, BetData.LAY, null);
+ 		BetData bd=new BetData( null, 100, 4.5, BetData.LAY,false);
  		System.out.println(BetUtils.printBet(bd));
 	}
 }
