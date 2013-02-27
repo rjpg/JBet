@@ -32,6 +32,7 @@ import bots.BotDutching;
 import bots.BotSaveFavoriteToFile;
 import bots.InfluenceBot;
 import bots.ManualBot;
+import bots.ManualPlaceBetBot;
 import bots.MecanicBot;
 import bots.NeighboursCorrelationBot;
 import bots.NeuralBot;
@@ -152,6 +153,11 @@ public class Manager  implements MarketChangeListener{
 				new ManualBot(md,this);
 				new ManualBot(md,this);
 			
+			}
+			
+			if(Parameters.manualPlaceBetBot)
+			{
+				new ManualPlaceBetBot(md,this);
 			}
 			
 			if(Parameters.mecanicBot)
