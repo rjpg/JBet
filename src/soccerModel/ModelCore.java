@@ -1,6 +1,13 @@
 package soccerModel;
 
+import java.awt.Color;
+import java.awt.GridLayout;
+
+import javax.swing.JFrame;
+
 import org.apache.axis2.jaxws.description.xml.handler.HomeType;
+
+import GUI.MyChart2D;
 
 
 public class ModelCore {
@@ -31,18 +38,40 @@ public class ModelCore {
 	double goalsAVGScale[];
 	
 	//Model Inputs
-	double goalLine=2.75;
+	double goalLine=2.5;
 	double asianHcap=-0.5;
 	
-	double gLineOver=1.7;
-	double gLineUnder=2.15;
+	double gLineOver=2.0;
+	double gLineUnder=2.0;
 	
-	double aHcapHome=1.8;
-	double aHcapAway=2.05;
+	double aHcapHome=2.0;
+	double aHcapAway=2.0;
 	
 	double desAH=0;
 	double desGL=0;
 	
+	
+	
+	//------------------------
+	
+	double totalGoals=0;
+	double supremacy=0;
+	
+	int segments=90; 
+	
+	
+	
+	//Model parameters 
+	
+	
+	double halfTimeFactor1Parmeter=0.45;
+	
+	double totalGoalsSegments[]=new double[segments*2+1];
+	double supremacySegments[]=new double[segments*2+1];
+	
+	double halfTimeFactor1rates[]=new double[segments];
+	
+	double halfTimeFactor2rates[]=new double[segments];
 	
 	public ModelCore() {
 	
@@ -57,6 +86,16 @@ public class ModelCore {
 		
 		supremacy();
 		
+		calculateHalfTimeRates1();
+		calculateHalfTimeRates2();
+		
+		printMatchOdds();
+		
+		calculateTotalGoalsSegments();
+		
+		calculateSupremacySegments();
+		
+		printMatchOddsSegments();
 	}
 	
 	
@@ -79,6 +118,88 @@ public class ModelCore {
 		else
 			return x/(double)kfac;
 	}
+	
+	
+	
+	
+	public void calculateHalfTimeRates1()
+	{
+		
+		double rate=Math.pow((halfTimeFactor1Parmeter/0.001),(1./89.));
+		System.out.println("Rate="+rate);
+		halfTimeFactor1rates[0]=0.001;
+		System.out.println("halfTimeFactor1rates["+0+"]="+halfTimeFactor1rates[0]);
+		for(int i=1;i<segments;i++)
+		{
+			
+			halfTimeFactor1rates[i]=halfTimeFactor1rates[i-1]*rate;
+			System.out.println("halfTimeFactor1rates["+i+"]="+halfTimeFactor1rates[i]);
+		}
+		
+		
+	}
+	
+	public void calculateHalfTimeRates2()
+	{
+		
+		double rate=1./Math.pow(halfTimeFactor1Parmeter,(1./90.));
+		System.out.println("Rate2="+rate);
+		halfTimeFactor2rates[0]=halfTimeFactor1rates[segments-1]*rate;
+		System.out.println("halfTimeFactor2rates[0]="+halfTimeFactor2rates[0]);
+		for(int i=1;i<segments;i++)
+		{
+			
+			halfTimeFactor2rates[i]=halfTimeFactor2rates[i-1]*rate;
+			System.out.println("halfTimeFactor2rates["+i+"]="+halfTimeFactor2rates[i]);
+		}
+		
+		System.out.println("halfTimeFactor2rates[90]="+halfTimeFactor2rates[segments-1]*rate);
+	}
+	
+	public void calculateTotalGoalsSegments()
+	{
+		totalGoalsSegments[0]=totalGoals;
+		
+		System.out.println("totalGoalsSegments[0]="+totalGoalsSegments[0]);
+		
+		for(int i=1;i<segments+1;i++)
+		{
+			totalGoalsSegments[i]=totalGoals*(1.-halfTimeFactor1rates[i-1]);
+			System.out.println("totalGoalsSegments["+i+"]="+totalGoalsSegments[i] +"   ("+totalGoals+"*(1-"+halfTimeFactor1rates[i-1]+"))");
+			
+		}	
+		
+		System.out.println("--------------------");
+		
+		for(int i=0;i<segments;i++)
+		{
+			totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
+			System.out.println("totalGoalsSegments["+(i+segments+1)+"]="+totalGoalsSegments[i+segments+1]+ "   ("+totalGoals+"*(1-"+halfTimeFactor2rates[i]+"))");
+		}	
+	}
+	
+	public void calculateSupremacySegments()
+	{
+		supremacySegments[0]=supremacy;
+		
+		System.out.println("supremacySegments[0]="+supremacySegments[0]);
+		
+		for(int i=1;i<segments+1;i++)
+		{
+			supremacySegments[i]=supremacy*(1.-halfTimeFactor1rates[i-1]);
+			System.out.println("supremacySegments[0]="+supremacySegments[i]+ "   ("+supremacy+"*(1-"+halfTimeFactor1rates[i-1]+"))");
+		}	
+		
+		System.out.println("--------------------");
+		
+		for(int i=0;i<segments;i++)
+		{
+			supremacySegments[i+segments+1]=supremacy*(1.-halfTimeFactor2rates[i]);
+			System.out.println("supremacySegments["+(i+segments+1)+"]="+supremacySegments[i+segments+1]+ "   ("+supremacy+"*(1-"+halfTimeFactor2rates[i]+"))");
+		}	
+	}
+	
+	
 	
 	public void supremacy()
 	{
@@ -294,9 +415,13 @@ public class ModelCore {
 		
 		System.out.println("FINAL sup found : "+sup+"      tg found : "+tg);
 		
-		initTable(sup,tg,drawFactor);
+		supremacy=sup;
+		totalGoals=tg;
+		
+		initTable(supremacy,totalGoals,drawFactor);
 		
 		printTable();
+		
 		
 	}
 	
@@ -376,9 +501,105 @@ public class ModelCore {
 		System.out.println("Total Table : "+totalTable2);
 	}
 	
+	
+	public void printMatchOddsSegments()
+	{
+		
+		JFrame frame=new JFrame();
+		
+		MyChart2D chart=new MyChart2D();
+		
+		frame.setSize(500,500);
+		
+		frame.setContentPane(chart);
+		frame.setVisible(true);
+		
+		for(int i=0;i<segments+1;i++)
+		{
+			
+			initTable(supremacySegments[i],totalGoalsSegments[i],drawFactor);
+			System.out.println("Segment :"+i);
+			printMatchOdds();
+			
+			chart.addValue("A", i, sumA, Color.RED);
+			chart.addValue("D", i, sumDraw, Color.GREEN);
+			chart.addValue("B", i, sumB, Color.BLUE);
+			
+		}	
+		
+		System.out.println("--------------------");
+		
+		for(int i=0;i<segments;i++)
+		{
+			initTable(supremacySegments[i+segments+1],totalGoalsSegments[i+segments+1],drawFactor);
+			//totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
+			System.out.println("Segment :"+i+segments+1);
+			printMatchOdds();
+			chart.addValue("A", i+segments+1, sumA, Color.RED);
+			chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
+			chart.addValue("B", i+segments+1, sumB, Color.BLUE);
+		}	
+		
+		for(int i=0;i<segments;i++)
+		{
+			chart.addValue("X", i, 0.7, Color.CYAN);
+		}
+		
+		
+		
+	}
+	
+	double sumB=0;
+	double sumDraw=0;
+	double sumA=0;
+	public void printMatchOdds()
+	{
+		sumB=0;
+		sumDraw=0;
+		sumA=0;
+		//double sumB=0;
+		for(int l=1;l<TABLE_MAX_GOALS;l++)
+		{
+			for(int c=0;c<l;c++)
+			{
+				
+				sumB+=table[c][l];
+			}
+		
+		}
+		
+	
+		
+		//double sumDraw=0;
+		for(int l=0;l<TABLE_MAX_GOALS;l++)
+		{
+			sumDraw+=table[l][l];
+			//System.out.println("sumDraw:"+table[l][l]);
+		}
+		
+		
+		
+		//double sumA=0;
+		for(int l=0;l<TABLE_MAX_GOALS-1;l++)
+		{
+			for(int c=l+1;c<TABLE_MAX_GOALS;c++)
+			{
+				
+				sumA+=table[c][l];
+			}
+		
+		}
+		
+		System.out.println("A:"+sumA);
+		System.out.println("Draw:"+sumDraw);
+		System.out.println("B:"+sumB);
+		
+	}
+	
 	public void initTable(double sup,double totalGoals, double drawFactor)
 	{
-		System.err.println("TABLE sup: "+sup+"   tg:"+totalGoals);
+		//System.err.println("TABLE sup: "+sup+"   tg:"+totalGoals);
+		
 		
 		table=new double[TABLE_MAX_GOALS][TABLE_MAX_GOALS];
 		

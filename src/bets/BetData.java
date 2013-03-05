@@ -1,12 +1,8 @@
 package bets;
 
-import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
-
 import java.util.Calendar;
 
 import DataRepository.RunnersData;
-import DataRepository.TradeMecanism;
-import bots.Bot;
 
 public class BetData {
 	
@@ -54,8 +50,6 @@ public class BetData {
 	// generic error
 	public static final int ERROR_UNKNOWN = 6;
 	
-
-	//public boolean PLACED = false; // true if the bet was placed on betfair
 	public int updatesBetInProgress=0;
 	
 	//public static final int CANCEL_ERROR = -2;	 	 // after cancel error  (check error)
@@ -79,13 +73,11 @@ public class BetData {
 	
 	public BetData (RunnersData rdA, double  amountA,double  oddA, int typeA,boolean IPA)
 	{
-		//this.owner=tmA;
 		this.rd=rdA;
 		this.amount=amountA;
 		this.oddRequested=oddA;
 		this.type=typeA;
 		this.keepInPlay=IPA;
-		
 	}
 	
 	public int getType() {
@@ -181,8 +173,6 @@ public class BetData {
 	public void setOddMached(double oddMached) {
 		this.oddMached = oddMached;
 	}
-	
-	
 	
 	public boolean isKeepInPlay() {
 		return keepInPlay;
