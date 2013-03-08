@@ -106,6 +106,7 @@ public class ManualPlaceBetBot extends Bot{
 					
 					msgjf.writeMessageText("Place pressed",Color.BLUE);
 					bet=betPanel.createBetData();
+					getMd().getBetManager().placeBet(bet);
 				}
 			});
 		}
@@ -167,7 +168,12 @@ public class ManualPlaceBetBot extends Bot{
 		}
 		
 		if(bet!=null)
+		{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
+			if(BetUtils.isBetFinalState(bet.getState()))
+				bet=null;
+		}
+		
 		
 	}
 

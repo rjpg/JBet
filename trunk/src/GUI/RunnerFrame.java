@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.text.html.HTMLDocument.RunElement;
 
+import bets.BetData;
+
 import main.Parameters;
 
 import aw.gui.chart.ITrace2D;
@@ -66,10 +68,21 @@ public class RunnerFrame extends JFrame{
 	JLabel[] ladderLayAmount=new JLabel[ODDSDEPTHS];
 	JLabel[] ladderVolume=new JLabel[ODDSDEPTHS];
 	
+	JLabel[] ladderUnMatchedLayAmount=new JLabel[ODDSDEPTHS];
+	JLabel[] ladderUnMatchedBackAmount=new JLabel[ODDSDEPTHS];
+	
+	JLabel[] ladderMatchedLayAmount=new JLabel[ODDSDEPTHS];
+	JLabel[] ladderMatchedBackAmount=new JLabel[ODDSDEPTHS];
+	
 	JPanel back;
 	JPanel odd;
 	JPanel lay;
 	JPanel volume;
+	JPanel unMatchedBack;
+	JPanel unMatchedLay;
+	
+	JPanel matchedBack;
+	JPanel matchedLay;
 	
 	private JPanel labelsPanel;
 	
@@ -142,10 +155,14 @@ public class RunnerFrame extends JFrame{
 	    jScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	    
 		JPanel aux=new JPanel();
-		aux.setLayout(new GridLayout(0,4));
+		aux.setLayout(new GridLayout(0,8));
+		aux.add(getMatchedBackAmount());
+		aux.add(getUnMatchedBackAmount());
 		aux.add(getBack());
 		aux.add(getOdds());
 		aux.add(getLay());
+		aux.add(getUnMatchedLayAmount());
+		aux.add(getMatchedLayAmount());
 		aux.add(getVolume());
 		jScrollPane.setViewportView(aux);
 		
@@ -209,6 +226,75 @@ public class RunnerFrame extends JFrame{
 			}
 		}
 		return lay;
+	}
+	
+	public JPanel getMatchedBackAmount() {
+		if(matchedBack==null)
+		{
+			matchedBack=new JPanel();
+			matchedBack.setLayout(new GridLayout(ODDSDEPTHS,1));
+			matchedBack.setMinimumSize(new Dimension(150, 300));
+			matchedBack.setBorder(BorderFactory.createLineBorder(Color.GREEN.brighter()));
+			for(int i=ODDSDEPTHS-1;i>=0;i--)
+			{
+				ladderMatchedBackAmount[i]=new JLabel();
+				ladderMatchedBackAmount[i].setBorder(BorderFactory.createLoweredBevelBorder());
+				matchedBack.add(ladderMatchedBackAmount[i]);				
+			}
+		}
+		return matchedBack;
+	}
+	
+	public JPanel getMatchedLayAmount() {
+		if(matchedLay==null)
+		{
+			matchedLay=new JPanel();
+			matchedLay.setLayout(new GridLayout(ODDSDEPTHS,1));
+			matchedLay.setMinimumSize(new Dimension(150, 300));
+			matchedLay.setBorder(BorderFactory.createLineBorder(Color.RED.brighter()));
+			for(int i=ODDSDEPTHS-1;i>=0;i--)
+			{
+				ladderMatchedLayAmount[i]=new JLabel();
+				ladderMatchedLayAmount[i].setBorder(BorderFactory.createLoweredBevelBorder());
+				matchedLay.add(ladderMatchedLayAmount[i]);				
+			}
+		}
+		return matchedLay;
+	}
+	
+	
+	public JPanel getUnMatchedBackAmount() {
+		if(unMatchedBack==null)
+		{
+			unMatchedBack=new JPanel();
+			unMatchedBack.setLayout(new GridLayout(ODDSDEPTHS,1));
+			unMatchedBack.setMinimumSize(new Dimension(150, 300));
+			unMatchedBack.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+			for(int i=ODDSDEPTHS-1;i>=0;i--)
+			{
+				ladderUnMatchedBackAmount[i]=new JLabel();
+				ladderUnMatchedBackAmount[i].setBorder(BorderFactory.createLoweredBevelBorder());
+				unMatchedBack.add(ladderUnMatchedBackAmount[i]);				
+			}
+		}
+		return unMatchedBack;
+	}
+	
+	public JPanel getUnMatchedLayAmount() {
+		if(unMatchedLay==null)
+		{
+			unMatchedLay=new JPanel();
+			unMatchedLay.setLayout(new GridLayout(ODDSDEPTHS,1));
+			unMatchedLay.setMinimumSize(new Dimension(150, 300));
+			unMatchedLay.setBorder(BorderFactory.createLineBorder(Color.RED));
+			for(int i=ODDSDEPTHS-1;i>=0;i--)
+			{
+				ladderUnMatchedLayAmount[i]=new JLabel();
+				ladderUnMatchedLayAmount[i].setBorder(BorderFactory.createLoweredBevelBorder());
+				unMatchedLay.add(ladderUnMatchedLayAmount[i]);				
+			}
+		}
+		return unMatchedLay;
 	}
 	
 	public JPanel getVolume() {
@@ -313,6 +399,73 @@ public class RunnerFrame extends JFrame{
 			else
 				ladderBackAmount[i].setText(amountValue+"");
 		}
+		
+		if(runnerData.getMarketData().getBetManager()!=null)
+		{
+			double unBackValues[]=new double[ODDSDEPTHS];
+			double unLayValues[]=new double[ODDSDEPTHS];
+			
+			double matchedBackValues[]=new double[ODDSDEPTHS];
+			double matchedLayValues[]=new double[ODDSDEPTHS];
+			
+			Vector<BetData> runnerBets=runnerData.getMarketData().getBetManager().getBetsByRunner(runnerData);
+			if(runnerBets!=null)
+			{
+				for(BetData bd:runnerBets)
+				{
+					if(bd.getState()==BetData.UNMATCHED)
+					{
+						if(bd.getType()==BetData.BACK)
+							unLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=bd.getAmount();
+						else
+							unBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=bd.getAmount();
+					}
+					
+					if(bd.getState()==BetData.MATCHED || bd.getState()==BetData.PARTIAL_CANCELED || bd.getState()==BetData.PARTIAL_MACHED)
+					{
+						if(bd.getType()==BetData.BACK)
+							matchedLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddMached()))]+=bd.getMatchedAmount();
+						else
+							matchedBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddMached()))]+=bd.getMatchedAmount();
+					}
+					
+					if(bd.getState()==BetData.PARTIAL_MACHED)
+					{
+						if(bd.getType()==BetData.BACK)
+							unLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=Utils.convertAmountToBF(bd.getAmount()-bd.getMatchedAmount());
+						else
+							unBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=Utils.convertAmountToBF(bd.getAmount()-bd.getMatchedAmount());
+					}
+					
+				}
+			}
+			
+			
+			for(int i=0;i<ODDSDEPTHS;i++)
+			{
+				if( unBackValues[i]==0)
+					ladderUnMatchedBackAmount[i].setText("");
+				else
+					ladderUnMatchedBackAmount[i].setText(unBackValues[i]+"");
+				
+				if( unLayValues[i]==0)
+					ladderUnMatchedLayAmount[i].setText("");
+				else
+					ladderUnMatchedLayAmount[i].setText(unLayValues[i]+"");
+				
+				if( matchedBackValues[i]==0)
+					ladderMatchedBackAmount[i].setText("");
+				else
+					ladderMatchedBackAmount[i].setText(matchedBackValues[i]+"");
+				
+				if( matchedLayValues[i]==0)
+					ladderMatchedLayAmount[i].setText("");
+				else
+					ladderMatchedLayAmount[i].setText(matchedLayValues[i]+"");
+					
+			}
+		}
+		
 		
 		Vector<OddData> oddsB=runnerData.getDataFrames().get(runnerData.getDataFrames().size()-1).getBackPrices();						 
 		Vector<OddData> oddsL=runnerData.getDataFrames().get(runnerData.getDataFrames().size()-1).getLayPrices();
