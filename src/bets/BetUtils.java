@@ -185,7 +185,7 @@ public class BetUtils {
 		ret.setOddMached(bet.getAvgPrice());
 		
 		if(bet.getBetStatus()==BetStatusEnum.U)
-			ret.setState(BetData.UNMATHED,BetData.SYSTEM);
+			ret.setState(BetData.UNMATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.M)
 			ret.setState(BetData.MATCHED,BetData.SYSTEM);
@@ -246,7 +246,7 @@ public class BetUtils {
 		
 		if(bd.getState()==BetData.NOT_PLACED)
 			ret+="State: NOT_PLACED \n";
-		else if(bd.getState()==BetData.UNMATHED)
+		else if(bd.getState()==BetData.UNMATCHED)
 			ret+="State: UNMATHED \n";
 		else if(bd.getState()==BetData.PARTIAL_MACHED)
 			ret+="State: PARTIAL_MACHED \n";
@@ -254,12 +254,14 @@ public class BetUtils {
 			ret+="State: MACHED \n";
 		else if(bd.getState()==BetData.CANCELED)
 			ret+="State: CANCELED \n";
+		else if(bd.getState()==BetData.PARTIAL_CANCELED)
+			ret+="State: PARTIAL_CANCELED \n";
 		else if(bd.getState()==BetData.PLACING_ERROR)
 			ret+="State: PLACING_ERROR \n";
 		
 		if(bd.getLastState()==BetData.NOT_PLACED)
 			ret+="Last State: NOT_PLACED \n";
-		else if(bd.getLastState()==BetData.UNMATHED)
+		else if(bd.getLastState()==BetData.UNMATCHED)
 			ret+="Last State: UNMATHED \n";
 		else if(bd.getLastState()==BetData.PARTIAL_MACHED)
 			ret+="Last State: PARTIAL_MACHED \n";
@@ -267,6 +269,8 @@ public class BetUtils {
 			ret+="Last State: MACHED \n";
 		else if(bd.getLastState()==BetData.CANCELED)
 			ret+="Last State: CANCELED \n";
+		else if(bd.getLastState()==BetData.PARTIAL_CANCELED)
+			ret+="Last State: PARTIAL_CANCELED \n";
 		else if(bd.getLastState()==BetData.PLACING_ERROR)
 			ret+="Last State: PLACING_ERROR \n";
 
@@ -297,9 +301,9 @@ public class BetUtils {
 			ret+="Final State Time : "+dateFormat.format(new Date(bd.getTimestampFinalState().getTimeInMillis()))+"\n";
 		
 		if(bd.getTimestampCancel()==null)
-			ret+="Final State Time : NULL\n";
+			ret+="Cancel State Time : NULL\n";
 		else
-			ret+="Final State Time : "+dateFormat.format(new Date(bd.getTimestampCancel().getTimeInMillis()))+"\n";
+			ret+="Cancel State Time : "+dateFormat.format(new Date(bd.getTimestampCancel().getTimeInMillis()))+"\n";
 		
 		
 		ret+=" --- --- \n";
@@ -309,7 +313,7 @@ public class BetUtils {
 	
 	public static boolean isBetFinalState(int state)
 	{
-		if(state==BetData.MATCHED || state==BetData.PARCIAL_CANCELED || state==BetData.CANCELED || state==BetData.PLACING_ERROR)
+		if(state==BetData.MATCHED || state==BetData.PARTIAL_CANCELED || state==BetData.CANCELED || state==BetData.PLACING_ERROR)
 			return true;
 		else
 			return false;

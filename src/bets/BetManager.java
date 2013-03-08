@@ -19,6 +19,7 @@ import java.util.Vector;
 import main.Manager;
 
 import DataRepository.MarketData;
+import DataRepository.RunnersData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
 
@@ -85,7 +86,7 @@ public class BetManager {
 		boolean ret=false;
 		for(BetData b:bets)
 		{
-			if(b.getState()==BetData.UNMATHED || 
+			if(b.getState()==BetData.UNMATCHED || 
 					b.getState()==BetData.PARTIAL_MACHED || 
 					b.getState()==BetData.BET_IN_PROGRESS)
 				ret=true;
@@ -98,7 +99,7 @@ public class BetManager {
 	{
 		for(BetData bd:bets)
 		{
-			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATHED)
+			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATCHED)
 			{
 				Vector<MUBet> matched=new Vector<MUBet>();
 				Vector<MUBet> unmatched=new Vector<MUBet>();
@@ -125,7 +126,7 @@ public class BetManager {
 				else if(matched.size()==0) // unmached
 				{
 					// does not do nothing 
-					bd.setState(BetData.UNMATHED,BetData.SYSTEM);
+					bd.setState(BetData.UNMATCHED,BetData.SYSTEM);
 				}
 				else if(unmatched.size()==0) // matched or external partial canceled (parcial matched but impossible to match the rest)
 				{
@@ -152,7 +153,7 @@ public class BetManager {
 					{
 						bd.setMatchedAmount(totalSize);
 						bd.setOddMached(oddAvg);
-						bd.setState(BetData.PARCIAL_CANCELED,BetData.SYSTEM);
+						bd.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM);
 					}
 					else //matched
 					{
@@ -439,7 +440,7 @@ public class BetManager {
 				}
 				else
 				{
-					bds[i].setState(BetData.UNMATHED,BetData.PLACE);
+					bds[i].setState(BetData.UNMATCHED,BetData.PLACE);
 				}
 				
 			
@@ -504,8 +505,22 @@ public class BetManager {
 		return 0;
 	}
 	
+		
+	public Vector<BetData> getBetsByRunner(RunnersData rd)
+	{
+		Vector<BetData> ret=new Vector<BetData>();
+		boolean found=false;
+		for(BetData bd:bets)
+		{
+			if(bd.getRd()==rd)
+			{
+				found=true;
+				ret.add(bd);
+			}
+		}
+		if(found) return ret; else return null;
+	}
 	
-
 	
 	private void writeError(String s)
 	{

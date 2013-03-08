@@ -21,7 +21,7 @@ public class ModelCore {
 	double table[][];
 	double totalTable=0;
 	
-	double drawFactor=1;
+	double drawFactor=1.0;
 	
 	//Handicap
 	double hcapHome[];
@@ -39,7 +39,7 @@ public class ModelCore {
 	
 	//Model Inputs
 	double goalLine=2.5;
-	double asianHcap=-0.5;
+	double asianHcap=0.0;
 	
 	double gLineOver=2.0;
 	double gLineUnder=2.0;
@@ -52,7 +52,7 @@ public class ModelCore {
 	
 	
 	
-	//------------------------
+	//------------------------ time
 	
 	double totalGoals=0;
 	double supremacy=0;
@@ -518,12 +518,13 @@ public class ModelCore {
 		{
 			
 			initTable(supremacySegments[i],totalGoalsSegments[i],drawFactor);
-			System.out.println("Segment :"+i);
+			System.out.println("Segment :"+i+"       (Minute :"+(i)/2.+")");
 			printMatchOdds();
 			
 			chart.addValue("A", i, sumA, Color.RED);
 			chart.addValue("D", i, sumDraw, Color.GREEN);
 			chart.addValue("B", i, sumB, Color.BLUE);
+			chart.addValue("Actual", i, actual, Color.YELLOW);
 			
 		}	
 		
@@ -533,11 +534,12 @@ public class ModelCore {
 		{
 			initTable(supremacySegments[i+segments+1],totalGoalsSegments[i+segments+1],drawFactor);
 			//totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
-			System.out.println("Segment :"+i+segments+1);
+			System.out.println("Segment :"+(i+segments+1)+"       (Minute :"+(i+segments+1)/2.+")");
 			printMatchOdds();
 			chart.addValue("A", i+segments+1, sumA, Color.RED);
 			chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
 			chart.addValue("B", i+segments+1, sumB, Color.BLUE);
+			chart.addValue("Actual", i+segments+1, actual, Color.YELLOW);
 		}	
 		
 		for(int i=0;i<segments;i++)
@@ -552,6 +554,8 @@ public class ModelCore {
 	double sumB=0;
 	double sumDraw=0;
 	double sumA=0;
+	
+	double actual=0;
 	public void printMatchOdds()
 	{
 		sumB=0;
@@ -589,10 +593,12 @@ public class ModelCore {
 			}
 		
 		}
+		actual = table[0][0];
 		
-		System.out.println("A:"+sumA);
-		System.out.println("Draw:"+sumDraw);
-		System.out.println("B:"+sumB);
+		System.out.println("A:"+1/sumA);
+		System.out.println("Draw:"+1/sumDraw);
+		System.out.println("B:"+1/sumB);
+		System.out.println("ACtual:"+(1/actual));
 		
 	}
 	
