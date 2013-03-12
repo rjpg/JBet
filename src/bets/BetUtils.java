@@ -184,11 +184,16 @@ public class BetUtils {
 		ret.setMatchedAmount(bet.getMatchedSize());
 		ret.setOddMached(bet.getAvgPrice());
 		
+		//System.out.println("Bet Status: "+bet.getBetStatus());
+		
 		if(bet.getBetStatus()==BetStatusEnum.U)
 			ret.setState(BetData.UNMATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.M)
-			ret.setState(BetData.MATCHED,BetData.SYSTEM);
+			if(bet.getRequestedSize()>bet.getMatchedSize())
+				ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
+			else
+				ret.setState(BetData.MATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.MU)
 			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
@@ -258,6 +263,8 @@ public class BetUtils {
 			ret+="State: PARTIAL_CANCELED \n";
 		else if(bd.getState()==BetData.PLACING_ERROR)
 			ret+="State: PLACING_ERROR \n";
+		else if(bd.getState()==BetData.BET_IN_PROGRESS)
+			ret+="State: BET_IN_PROGRESS \n";
 		
 		if(bd.getLastState()==BetData.NOT_PLACED)
 			ret+="Last State: NOT_PLACED \n";
@@ -273,6 +280,8 @@ public class BetUtils {
 			ret+="Last State: PARTIAL_CANCELED \n";
 		else if(bd.getLastState()==BetData.PLACING_ERROR)
 			ret+="Last State: PLACING_ERROR \n";
+		else if(bd.getLastState()==BetData.BET_IN_PROGRESS)
+			ret+="Last State: BET_IN_PROGRESS \n";
 
 		if(bd.getTransition()==BetData.SYSTEM)
 			ret+="Transition: SYSTEM \n";

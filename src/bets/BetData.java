@@ -109,6 +109,8 @@ public class BetData {
 	}
 
 	public void setState(int stateA,int transitionA) {
+		
+		if(stateA==this.state) return;
 		this.lastState=this.state;
 		this.state = stateA;
 		this.transition=transitionA;

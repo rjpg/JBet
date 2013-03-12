@@ -39,7 +39,7 @@ public class ModelCore {
 	
 	//Model Inputs
 	double goalLine=2.5;
-	double asianHcap=0.0;
+	double asianHcap=0.75;
 	
 	double gLineOver=2.0;
 	double gLineUnder=2.0;

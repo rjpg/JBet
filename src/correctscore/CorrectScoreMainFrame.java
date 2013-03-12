@@ -333,8 +333,8 @@ public class CorrectScoreMainFrame  implements UpdateScoresListener{
 		}
 		*/
 	
-		this.setUsername("user");
-		this.setPassword("xxx");
+		this.setUsername("birinhos");
+		this.setPassword("6mgprldi777");
 		
 		
 		// Perform the login before anything else.
