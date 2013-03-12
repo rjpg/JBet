@@ -259,19 +259,23 @@ public class BetManager {
 	{
 		for(BetData bd:bets)
 		{
-			for(BetData bdPossible:externalPossibleBets)
+			if(bd.getState()==BetData.BET_IN_PROGRESS)
 			{
-				if(bd.getRd().getId()==bdPossible.getRd().getId()
-						&& bd.getOddRequested()==bdPossible.getOddRequested()
-						&& bd.getAmount()==bdPossible.getAmount()
-						&& bd.getType()==bdPossible.getType())
+				for(BetData bdPossible:externalPossibleBets)
 				{
-					bd.setBetID(bdPossible.getBetID());
-					
-					bd.setState(bdPossible.getState(),BetData.SYSTEM);
-					bd.setMatchedAmount(bdPossible.getMatchedAmount());
-					bd.setOddMached(bdPossible.getOddMached());
-					
+					if(bd.getRd().getId()==bdPossible.getRd().getId()
+							&& bd.getOddRequested()==bdPossible.getOddRequested()
+							&& bd.getAmount()==bdPossible.getAmount()
+							&& bd.getType()==bdPossible.getType())
+					{
+						bd.setBetID(bdPossible.getBetID());
+						
+						bd.setState(bdPossible.getState(),BetData.SYSTEM);
+						bd.setMatchedAmount(bdPossible.getMatchedAmount());
+						bd.setOddMached(bdPossible.getOddMached());
+						
+						
+					}
 				}
 			}
 		}
@@ -308,8 +312,10 @@ public class BetManager {
 	private BetData getBetById(long ID)
 	{
 		for(BetData bd:bets)
-			if(bd.getBetID()==ID)
+		{
+			if(bd.getBetID()!=null && bd.getBetID()==ID)
 				return bd;
+		}
 		return null;
 	}
 	
@@ -344,6 +350,8 @@ public class BetManager {
 	{
 		int ret=0;
 		
+		
+		
 		PlaceBets[] betsAPI=new PlaceBets[place.size()];
 		
 		BetData[] bds=place.toArray(new BetData[]{});
@@ -367,6 +375,14 @@ public class BetManager {
 			
 		}
 		
+		for(int i=0;i<bds.length;i++)
+		{
+			bds[i].setState(BetData.BET_IN_PROGRESS,BetData.PLACE);
+		}
+		return 0;
+		
+		/*
+		
 		PlaceBetsResult[] betResult=null;
 		
 		try {
@@ -381,6 +397,7 @@ public class BetManager {
 					bds[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
 					bds[i].setErrorType(BetData.ERROR_MARKET_SUSPENDED);
 				}
+				return -1;
 			}
 			else if(e.getMessage().contains(new String("EVENT_CLOSED")))
 			{
@@ -475,6 +492,7 @@ public class BetManager {
 		}
 		
 		return ret;
+		*/
 	}
 
 	public int cancelBets(Vector<BetData> cancelBets)
