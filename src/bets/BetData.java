@@ -20,10 +20,11 @@ public class BetData {
 	public int transition=BetData.SYSTEM;
 	//----------------------------
 
+	
 	// Transitions
 	public static final int SYSTEM = 0;
 	public static final int PLACE = 1;
-	public static final int CANCEL = 1;
+	public static final int CANCEL = 2;
 	
 	public Calendar timestampPlace=null;
 	public Calendar timestampCancel=null;
@@ -214,4 +215,9 @@ public class BetData {
 	public int getTransition() {
 		return transition;
 	}
+	
+	public void setTransition(int transition) {
+		this.transition = transition;
+	}
+
 }

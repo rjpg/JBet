@@ -182,6 +182,7 @@ public class BetUtils {
 		
 		ret.setBetID(bet.getBetId());
 		ret.setMatchedAmount(bet.getMatchedSize());
+		//System.err.println(bet.getMatchedSize());
 		ret.setOddMached(bet.getAvgPrice());
 		
 		//System.out.println("Bet Status: "+bet.getBetStatus());
