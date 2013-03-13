@@ -21,7 +21,7 @@ public class ModelCore {
 	double table[][];
 	double totalTable=0;
 	
-	double drawFactor=1.0;
+	double drawFactor=1;
 	
 	//Handicap
 	double hcapHome[];
@@ -521,10 +521,10 @@ public class ModelCore {
 			System.out.println("Segment :"+i+"       (Minute :"+(i)/2.+")");
 			printMatchOdds();
 			
-			chart.addValue("A", i, sumA, Color.RED);
-			chart.addValue("D", i, sumDraw, Color.GREEN);
-			chart.addValue("B", i, sumB, Color.BLUE);
-			chart.addValue("Actual", i, actual, Color.YELLOW);
+			//chart.addValue("A", i, sumA, Color.RED);
+			//chart.addValue("D", i, sumDraw, Color.GREEN);
+			//chart.addValue("B", i, sumB, Color.BLUE);
+			chart.addValue("Actual", i, 1/actual, Color.YELLOW);
 			
 		}	
 		
@@ -536,16 +536,16 @@ public class ModelCore {
 			//totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
 			System.out.println("Segment :"+(i+segments+1)+"       (Minute :"+(i+segments+1)/2.+")");
 			printMatchOdds();
-			chart.addValue("A", i+segments+1, sumA, Color.RED);
-			chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
-			chart.addValue("B", i+segments+1, sumB, Color.BLUE);
-			chart.addValue("Actual", i+segments+1, actual, Color.YELLOW);
+			//chart.addValue("A", i+segments+1, sumA, Color.RED);
+			//chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
+			//chart.addValue("B", i+segments+1, sumB, Color.BLUE);
+			chart.addValue("Actual", i+segments+1, 1/actual, Color.YELLOW);
 		}	
 		
-		for(int i=0;i<segments;i++)
+		/*for(int i=0;i<segments;i++)
 		{
 			chart.addValue("X", i, 0.7, Color.CYAN);
-		}
+		}*/
 		
 		
 		
@@ -594,6 +594,8 @@ public class ModelCore {
 		
 		}
 		actual = table[0][0];
+		
+		if(actual<0.05) actual=0.05;
 		
 		System.out.println("A:"+1/sumA);
 		System.out.println("Draw:"+1/sumDraw);

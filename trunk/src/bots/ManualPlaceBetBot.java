@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -41,10 +42,12 @@ public class ManualPlaceBetBot extends Bot{
 	public MessageJFrame msgjf=new MessageJFrame("Manual Place Bet Bot");
 	
 	public BetPanel betPanel=null;
+	public BetPanel betPanel2=null;
 	//---------
 	
 	
 	public BetData bet=null;
+	public BetData bet2=null;
 	
 	public ManualPlaceBetBot(MarketData md, Manager managerA) {
 		super(md,"Manual Place Bet Bot");
@@ -80,14 +83,25 @@ public class ManualPlaceBetBot extends Bot{
 		return actionsPanel;
 	}
 	
-	public BetPanel getBetPanel()
+	public JPanel getBetPanel()
 	{
+		JPanel placeBetsPanel=new JPanel();
+		
+		placeBetsPanel.setLayout(new BorderLayout());
 		if(betPanel==null)
 		{
 			betPanel= new BetPanel(getMd());
 		}
 		
-		return betPanel;
+		placeBetsPanel.add(betPanel,BorderLayout.NORTH);
+		
+		if(betPanel2==null)
+		{
+			betPanel2= new BetPanel(getMd());
+		}
+		
+		placeBetsPanel.add(betPanel2,BorderLayout.SOUTH);
+		return placeBetsPanel;
 	}
 	
 	
@@ -106,7 +120,14 @@ public class ManualPlaceBetBot extends Bot{
 					
 					msgjf.writeMessageText("Place pressed",Color.BLUE);
 					bet=betPanel.createBetData();
-					getMd().getBetManager().placeBet(bet);
+					bet2=betPanel2.createBetData();
+					
+					Vector<BetData> bds=new Vector<BetData>();
+					
+					bds.add(bet);
+					bds.add(bet2);
+					
+					getMd().getBetManager().placeBets(bds);
 				}
 			});
 		}
@@ -125,6 +146,8 @@ public class ManualPlaceBetBot extends Bot{
 				public void actionPerformed(ActionEvent e) {
 					
 					msgjf.writeMessageText("Cancel pressed",Color.BLUE);
+					if(bet!=null)
+						getMd().getBetManager().cancelBet(bet);
 				}
 			});
 		}
