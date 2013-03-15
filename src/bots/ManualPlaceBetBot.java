@@ -146,8 +146,15 @@ public class ManualPlaceBetBot extends Bot{
 				public void actionPerformed(ActionEvent e) {
 					
 					msgjf.writeMessageText("Cancel pressed",Color.BLUE);
-					if(bet!=null)
-						getMd().getBetManager().cancelBet(bet);
+					Vector<BetData> bds=new Vector<BetData>();
+					if(bet!=null) 
+						bds.add(bet);
+					
+					if(bet2!=null)
+						bds.add(bet2);
+						
+					if(bds.size()>0)
+						getMd().getBetManager().cancelBets(bds);
 				}
 			});
 		}
