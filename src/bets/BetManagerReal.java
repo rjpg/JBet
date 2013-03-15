@@ -25,34 +25,26 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
 
-public class BetManagerReal {
+public class BetManagerReal extends BetManager {
 	
 	// THREAD
 	private BetsManagerThread as;
 	private Thread t;
-	private boolean polling = false;
 	protected int updateInterval = 400;
+	private boolean polling = false;
 	
 	//Bets data
 	public Vector<BetData> bets=new Vector<BetData>();
 	
-	//Market
-	public MarketData md;
-	
+		
 	//Bet in progress Max frames until error state
 	protected int BIP_ERROR_UPDATES = 10;
 	
 	public BetManagerReal(MarketData mdA) {
-		
-		md=mdA;
-		
+		super(mdA);
 	}
 	
-	public MarketData getMd() {
-		return md;
-	}
 
-	
 	private void refresh()
 	{
 		//System.out.println("processing");
@@ -311,7 +303,7 @@ public class BetManagerReal {
 		return null;
 	}
 	
-	private BetData getBetById(long ID)
+	public BetData getBetById(long ID)
 	{
 		for(BetData bd:bets)
 		{
@@ -325,7 +317,7 @@ public class BetManagerReal {
 	{
 		Bet gb=null;
 		try {
-			gb =ExchangeAPI.getBet(md.getSelectedExchange(), md.getApiContext(),id);
+			gb =ExchangeAPI.getBet(getMd().getSelectedExchange(), getMd().getApiContext(),id);
 		} catch (Exception e) {
 			e.printStackTrace();
 			writeError(e.getMessage());
@@ -1283,6 +1275,20 @@ public class BetManagerReal {
 		polling = false;
 
 	}
+	
+	@Override
+	public boolean isPolling() {
+	
+		return polling;
+	}
+	
+	@Override
+	public Vector<BetData> getBets() {
+		
+		return bets;
+	}
+	
+	
 	public void clean()
 	{
 		for(BetData bd:bets)
@@ -1294,6 +1300,9 @@ public class BetManagerReal {
 		md=null;
 	}
 	
+	
+	
+	
 	public static void main(String[] args)  throws Exception {
 		Vector<BetData> possibleBetsInProgress=new Vector<BetData>();
 		// possibleBetsInProgress.add(null);
@@ -1304,4 +1313,10 @@ public class BetManagerReal {
  		BetData bd=new BetData( null, 100, 4.5, BetData.LAY,false);
  		System.out.println(BetUtils.printBet(bd));
 	}
+
+
+	
+
+
+	
 }

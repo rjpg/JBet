@@ -27,7 +27,9 @@ import javax.swing.JOptionPane;
 
 import main.Parameters;
 import bets.BetData;
+import bets.BetManager;
 import bets.BetManagerReal;
+import bets.BetManagerSim;
 import bots.Bot;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
@@ -48,7 +50,7 @@ public class MarketData {
 	//-----------Trade -------------
 	public Vector<Bot> botsTrading=new Vector<Bot>();
 	
-	public BetManagerReal betManager=null;
+	public BetManager betManager=null;
 	
 	//true if it is in tradding process 
 	//public boolean inTrade=false;
@@ -135,7 +137,11 @@ public class MarketData {
 	
 	public void initializeBetManager()
 	{
-		betManager=new BetManagerReal(this);
+		if(Parameters.simulation)
+			betManager=new BetManagerSim(this);
+		else
+			betManager=new BetManagerReal(this);
+		
 		betManager.startPolling();
 	}
 	
@@ -1814,7 +1820,7 @@ public class MarketData {
 		return false;
 	}
 	
-	public BetManagerReal getBetManager() {
+	public BetManager getBetManager() {
 		return betManager;
 	}
 

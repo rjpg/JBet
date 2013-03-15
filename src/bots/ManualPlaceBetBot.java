@@ -195,6 +195,7 @@ public class ManualPlaceBetBot extends Bot{
 		{
 			setMd(md);
 			betPanel.reset(getMd());
+			betPanel2.reset(getMd());
 		}
 		
 		if(bet!=null)
