@@ -266,6 +266,8 @@ public class BetUtils {
 			ret+="State: PLACING_ERROR \n";
 		else if(bd.getState()==BetData.BET_IN_PROGRESS)
 			ret+="State: BET_IN_PROGRESS \n";
+		else if(bd.getState()==BetData.UNMONITORED)
+			ret+="State: UNMONITORED \n";
 		
 		if(bd.getLastState()==BetData.NOT_PLACED)
 			ret+="Last State: NOT_PLACED \n";
@@ -283,6 +285,8 @@ public class BetUtils {
 			ret+="Last State: PLACING_ERROR \n";
 		else if(bd.getLastState()==BetData.BET_IN_PROGRESS)
 			ret+="Last State: BET_IN_PROGRESS \n";
+		else if(bd.getLastState()==BetData.UNMONITORED)
+			ret+="Last State: UNMONITORED \n";
 
 		if(bd.getTransition()==BetData.SYSTEM)
 			ret+="Transition: SYSTEM \n";
@@ -323,7 +327,11 @@ public class BetUtils {
 	
 	public static boolean isBetFinalState(int state)
 	{
-		if(state==BetData.MATCHED || state==BetData.PARTIAL_CANCELED || state==BetData.CANCELED || state==BetData.PLACING_ERROR)
+		if(state==BetData.MATCHED || 
+				state==BetData.PARTIAL_CANCELED || 
+				state==BetData.CANCELED || 
+				state==BetData.PLACING_ERROR ||
+				state==BetData.UNMONITORED)
 			return true;
 		else
 			return false;

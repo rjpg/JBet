@@ -1285,6 +1285,10 @@ public class BetManager {
 	}
 	public void clean()
 	{
+		for(BetData bd:bets)
+		{
+			bd.setState(BetData.UNMONITORED, BetData.SYSTEM);
+		}
 		bets.clear();
 		bets=null;
 		md=null;
