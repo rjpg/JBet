@@ -25,7 +25,7 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
 
-public class BetManager {
+public class BetManagerReal {
 	
 	// THREAD
 	private BetsManagerThread as;
@@ -42,7 +42,7 @@ public class BetManager {
 	//Bet in progress Max frames until error state
 	protected int BIP_ERROR_UPDATES = 10;
 	
-	public BetManager(MarketData mdA) {
+	public BetManagerReal(MarketData mdA) {
 		
 		md=mdA;
 		
