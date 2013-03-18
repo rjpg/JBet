@@ -14,11 +14,8 @@ import generated.exchange.BFExchangeServiceStub.UpdateBets;
 import generated.exchange.BFExchangeServiceStub.UpdateBetsResult;
 import generated.exchange.BFExchangeServiceStub.UpdateBetsResultEnum;
 
-import java.awt.Color;
 import java.util.Calendar;
 import java.util.Vector;
-
-import main.Manager;
 
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
@@ -34,9 +31,8 @@ public class BetManagerReal extends BetManager {
 	private boolean polling = false;
 	
 	//Bets data
-	public Vector<BetData> bets=new Vector<BetData>();
+	private Vector<BetData> bets=new Vector<BetData>();
 	
-		
 	//Bet in progress Max frames until error state
 	protected int BIP_ERROR_UPDATES = 10;
 	

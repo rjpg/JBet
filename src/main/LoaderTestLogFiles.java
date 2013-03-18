@@ -27,7 +27,7 @@ public class LoaderTestLogFiles {
 	Parameters.studyBot=false; // manual bot
 	Parameters.neuralBot=false; // manual bot
 	Parameters.neuralDataBot=false; // manual bot
-	Parameters.simulation=true;
+	Parameters.simulation=false;
 	Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 	Parameters.WOM_DIST_CENTER=5;
 	Parameters.CHART_FRAMES=22;
