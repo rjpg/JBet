@@ -1139,8 +1139,8 @@ public class BetManagerReal extends BetManager {
 		{
 			if (betResult[i].getSuccess())
 			{
-				if(BetUtils.fillBetFromAPI(bds[i])==0);
-					bds[i].setTransition(BetData.CANCEL);
+				BetUtils.fillBetFromAPI(bds[i]);
+				bds[i].setTransition(BetData.CANCEL);
 				someCancel=true;
 			}
 			else
