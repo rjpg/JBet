@@ -99,7 +99,11 @@ public class BetUtils {
 			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
-			ret.setState(BetData.CANCELED,BetData.SYSTEM);
+			if(bet.getMatchedSize()>0)
+				ret.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM);
+			else
+				ret.setState(BetData.CANCELED,BetData.SYSTEM);
+		
 		
 		if(bet.getBetStatus()==BetStatusEnum.V) //Voided (?)
 			ret.setState(BetData.CANCELED,BetData.SYSTEM);
@@ -119,6 +123,7 @@ public class BetUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
+			return null;
 		}
 			
 		if(gb==null)
@@ -126,6 +131,7 @@ public class BetUtils {
 			System.err.println("Failed to get Bet: ExchangeAPI.getBet return null ");
 			return null;
 		}
+		
 		
 		return BetUtils.createBetData(gb,md);
 	

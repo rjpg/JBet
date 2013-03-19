@@ -78,7 +78,8 @@ public class BetManagerReal extends BetManager {
 		{
 			if(b.getState()==BetData.UNMATCHED || 
 					b.getState()==BetData.PARTIAL_MACHED || 
-					b.getState()==BetData.BET_IN_PROGRESS)
+					b.getState()==BetData.BET_IN_PROGRESS ||
+					b.getState()==BetData.CANCEL_WAIT_UPDATE)
 				ret=true;
 		}
 		return ret;
@@ -89,7 +90,7 @@ public class BetManagerReal extends BetManager {
 	{
 		for(BetData bd:bets)
 		{
-			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATCHED)
+			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATCHED || bd.getState()==BetData.CANCEL_WAIT_UPDATE)
 			{
 				Vector<MUBet> matched=new Vector<MUBet>();
 				Vector<MUBet> unmatched=new Vector<MUBet>();
@@ -1139,8 +1140,8 @@ public class BetManagerReal extends BetManager {
 		{
 			if (betResult[i].getSuccess())
 			{
-				BetUtils.fillBetFromAPI(bds[i]);
-				bds[i].setTransition(BetData.CANCEL);
+				if(BetUtils.fillBetFromAPI(bds[i])!=0);
+					bds[i].setTransition(BetData.CANCEL_WAIT_UPDATE);
 				someCancel=true;
 			}
 			else
