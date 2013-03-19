@@ -62,7 +62,8 @@ public class BetData {
 	public static final int MATCHED =  4;
 	public static final int CANCELED = 5;
 	public static final int PARTIAL_CANCELED = 6;
-	public static final int UNMONITORED = 7;
+	public static final int CANCEL_WAIT_UPDATE = 7;
+	public static final int UNMONITORED = 8;
 	
 	
 	public Long BetID=null; // given from betfair after placed 
