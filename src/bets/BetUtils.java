@@ -26,7 +26,7 @@ import demo.handler.ExchangeAPI;
 public class BetUtils {
 
 	
-	public static long cancelBetID(long betID, TradeMecanism tm,MarketData marketData) {
+	public static long cancelBetID(long betID, MarketData marketData) {
 		
 		CancelBets canc = new CancelBets();
 		canc.setBetId(betID);
@@ -36,15 +36,15 @@ public class BetUtils {
 		int attempts = 0;
 		while (attempts < 3 && betResult == null) {
 			try {
-				betResult = ExchangeAPI.cancelBets(marketData.getSelectedExchange(),Manager.apiContext, new CancelBets[] {canc})[0];
+				betResult = ExchangeAPI.cancelBets(marketData.getSelectedExchange(),marketData.getApiContext(), new CancelBets[] {canc})[0];
 			} catch (Exception e) {
-				tm.writeMsgTM(e.getMessage(), Color.RED);
+				//tm.writeMsgTM(e.getMessage(), Color.RED);
 				if(e.getMessage().contains(new String("EVENT_SUSPENDED"))  || e.getMessage().contains(new String("BET_IN_PROGRESS")) )
 				{
-					tm.writeMsgTM("ExchangeAPI.cancelBets Returned NULL: Market is supended | Bet in progress",Color.BLUE);
+					//tm.writeMsgTM("ExchangeAPI.cancelBets Returned NULL: Market is supended | Bet in progress",Color.BLUE);
 					attempts--;
 				}				
-				tm.writeMsgTM("ExchangeAPI.cancelBets Returned NULL: bet not canceled :Attempt :"+attempts, Color.RED);
+				//tm.writeMsgTM("ExchangeAPI.cancelBets Returned NULL: bet not canceled :Attempt :"+attempts, Color.RED);
 				e.printStackTrace();
 			}
 			attempts++;
@@ -52,14 +52,14 @@ public class BetUtils {
 		
 		if(betResult==null)
 		{
-			tm.writeMsgTM("Failed to cancel bet: ExchangeAPI.cancelBets return null ",Color.RED);
+			//tm.writeMsgTM("Failed to cancel bet: ExchangeAPI.cancelBets return null ",Color.RED);
 			return -1;
 		}
 		
 		if (betResult.getSuccess()) {
-			tm.writeMsgTM("Bet "+betResult.getBetId()+" cancelled.",Color.BLUE);
+			//tm.writeMsgTM("Bet "+betResult.getBetId()+" cancelled.",Color.BLUE);
 		} else {
-			tm.writeMsgTM("Failed to cancel bet: Problem was: "+betResult.getResultCode(),Color.RED);
+			//tm.writeMsgTM("Failed to cancel bet: Problem was: "+betResult.getResultCode(),Color.RED);
 			return -1;
 		}
 		
@@ -109,6 +109,49 @@ public class BetUtils {
 			ret.setKeepInPlay(true);
 		
 		return ret;
+	}
+	
+	public static BetData getBetFromAPI(long id,MarketData md)
+	{
+		Bet gb=null;
+		try {
+			gb =ExchangeAPI.getBet(md.getSelectedExchange(), md.getApiContext(),id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+		}
+			
+		if(gb==null)
+		{
+			System.err.println("Failed to get Bet: ExchangeAPI.getBet return null ");
+			return null;
+		}
+		
+		return BetUtils.createBetData(gb,md);
+	
+	}
+	
+	public static int fillBetFromAPI(BetData bd)
+	{
+		if(bd.getBetID()==null) return -1;
+		
+		if(bd.getRd()==null) return -1;
+		
+		if(bd.getRd().getMarketData()==null) return -1;
+		
+		
+		BetData bdAux=BetUtils.getBetFromAPI(bd.getBetID(),bd.getRd().getMarketData());
+		
+		if(bdAux==null) return -1;
+		
+		bd.setState(bdAux.getState(), bdAux.getTransition());
+		bd.setAmount(bdAux.getAmount());
+		bd.setOddMached(bdAux.getOddMached());
+		bd.setOddRequested(bdAux.getOddRequested());
+		bd.setMatchedAmount(bdAux.getMatchedAmount());
+		bd.setRd(bdAux.getRd());
+		
+		return 0;
 	}
 	
 	public static PlaceBets createPlaceBet(BetData bd)

@@ -201,7 +201,7 @@ public class BetManagerReal extends BetManager {
 				{
 					if(isPossibleBetInProgress(mubet))
 					{
-						BetData bd=getBetFromAPI(mubet.getBetId());
+						BetData bd=BetUtils.getBetFromAPI(mubet.getBetId(),getMd());
 						if(bd!=null)
 							possibleBetsInProgress.add(bd);
 					}
@@ -309,39 +309,9 @@ public class BetManagerReal extends BetManager {
 		return null;
 	}
 	
-	private BetData getBetFromAPI(long id)
-	{
-		Bet gb=null;
-		try {
-			gb =ExchangeAPI.getBet(getMd().getSelectedExchange(), getMd().getApiContext(),id);
-		} catch (Exception e) {
-			e.printStackTrace();
-			writeError(e.getMessage());
-		}
-			
-		if(gb==null)
-		{
-			writeError("Failed to get Bet: ExchangeAPI.getBet return null ");
-			return null;
-		}
-		
-		return BetUtils.createBetData(gb,getMd());
 	
-	}
 	
-	private void fillBetFromAPI(BetData bd)
-	{
-		if(bd.getBetID()==null) return;
-		
-		BetData bdAux=getBetFromAPI(bd.getBetID());
-		
-		bd.setState(bdAux.getState(), bdAux.getTransition());
-		bd.setAmount(bdAux.getAmount());
-		bd.setOddMached(bdAux.getOddMached());
-		bd.setOddRequested(bdAux.getOddRequested());
-		bd.setMatchedAmount(bdAux.getMatchedAmount());
-		
-	}
+	
 	
 	public int placeBet(BetData bet)
 	{
@@ -900,7 +870,7 @@ public class BetManagerReal extends BetManager {
 				}
 				else
 				{
-					fillBetFromAPI(bd);
+					BetUtils.fillBetFromAPI(bd);
 					bd.setTransition(BetData.PLACE);
 					
 				}
@@ -913,7 +883,7 @@ public class BetManagerReal extends BetManager {
 				}
 				else
 				{
-					fillBetFromAPI(bd);
+					BetUtils.fillBetFromAPI(bd);
 					bd.setTransition(BetData.PLACE);
 				}
 			}
@@ -1036,7 +1006,7 @@ public class BetManagerReal extends BetManager {
 			{
 				//cancelBetsID(new long[]{bds1[i].getBetID()});
 				bds1[i].setBetID(betUpdateResult1[i].getNewBetId());
-				fillBetFromAPI(bds1[i]);
+				BetUtils.fillBetFromAPI(bds1[i]);
 				bds1[i].setTransition(BetData.PLACE);
 				someUpdated=true;
 				
@@ -1169,8 +1139,8 @@ public class BetManagerReal extends BetManager {
 		{
 			if (betResult[i].getSuccess())
 			{
-				fillBetFromAPI(bds[i]);
-				bds[i].setTransition(BetData.CANCEL);
+				if(BetUtils.fillBetFromAPI(bds[i])==0);
+					bds[i].setTransition(BetData.CANCEL);
 				someCancel=true;
 			}
 			else
