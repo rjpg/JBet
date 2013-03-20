@@ -27,7 +27,7 @@ public class BetManagerReal extends BetManager {
 	// THREAD
 	private BetsManagerThread as;
 	private Thread t;
-	protected int updateInterval = 400;
+	protected int updateInterval = 4000;
 	private boolean polling = false;
 	
 	//Bets data
@@ -1140,8 +1140,10 @@ public class BetManagerReal extends BetManager {
 		{
 			if (betResult[i].getSuccess())
 			{
-				if(BetUtils.fillBetFromAPI(bds[i])!=0);
-					bds[i].setTransition(BetData.CANCEL_WAIT_UPDATE);
+				if(BetUtils.fillBetFromAPI(bds[i])!=0)
+					bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
+				else
+					bds[i].setTransition(BetData.CANCEL);
 				someCancel=true;
 			}
 			else
