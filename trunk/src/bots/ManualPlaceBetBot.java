@@ -128,6 +128,7 @@ public class ManualPlaceBetBot extends Bot{
 					bds.add(bet2);
 					
 					getMd().getBetManager().placeBets(bds);
+					msgjf.writeMessageText("Place End",Color.BLUE);
 				}
 			});
 		}
@@ -155,6 +156,8 @@ public class ManualPlaceBetBot extends Bot{
 						
 					if(bds.size()>0)
 						getMd().getBetManager().cancelBets(bds);
+					
+					msgjf.writeMessageText("Cancel End",Color.BLUE);
 				}
 			});
 		}

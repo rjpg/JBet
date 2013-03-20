@@ -27,7 +27,7 @@ public class BetManagerReal extends BetManager {
 	// THREAD
 	private BetsManagerThread as;
 	private Thread t;
-	protected int updateInterval = 4000;
+	protected int updateInterval = 400;
 	private boolean polling = false;
 	
 	//Bets data
@@ -1262,7 +1262,8 @@ public class BetManagerReal extends BetManager {
 	{
 		for(BetData bd:bets)
 		{
-			bd.setState(BetData.UNMONITORED, BetData.SYSTEM);
+			if(!BetUtils.isBetFinalState(bd.getState()))
+				bd.setState(BetData.UNMONITORED, BetData.SYSTEM);
 		}
 		bets.clear();
 		bets=null;
