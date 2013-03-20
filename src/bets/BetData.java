@@ -45,30 +45,32 @@ public class BetData {
 	public static final int ERROR_MARKET_CLOSED = 2;
 	public static final int ERROR_BALANCE_EXCEEDED=3;
 	public static final int ERROR_BET_IN_PROGRESS=4;
+
 	// cancel errors
 	//public static final int ERROR_TAKEN_OR_LAPSED = 5;
 	//public static final int ERROR_NOT_CANCELED= 5;
+	
 	// generic error
 	public static final int ERROR_UNKNOWN = 6;
 	
 	public int updatesBetInProgress=0;
 	
-	//public static final int CANCEL_ERROR = -2;	 	 // after cancel error  (check error)
-	public static final int PLACING_ERROR = -1;      // after placed error (check error)
-	public static final int NOT_PLACED = 0;          // before placed 
-	public static final int BET_IN_PROGRESS = 1;     // waiting 
-	public static final int UNMATCHED = 2;            //
-	public static final int PARTIAL_MACHED = 3;
-	public static final int MATCHED =  4;
-	public static final int CANCELED = 5;
-	public static final int PARTIAL_CANCELED = 6;
-	public static final int CANCEL_WAIT_UPDATE = 7;
-	public static final int UNMONITORED = 8;
+	//public static final int CANCEL_ERROR = -2;	    // after cancel error  (check error)
+	public static final int PLACING_ERROR = -1;     // after placed error (check error)
+	public static final int NOT_PLACED = 0;         // before place is called on this bet 
+	public static final int BET_IN_PROGRESS = 1;    // waiting to recover betId by BetManager 
+	public static final int UNMATCHED = 2;          // Waiting to be Matched
+	public static final int PARTIAL_MACHED = 3;     // Partial Matched waiting to be Completely Matched
+	public static final int MATCHED =  4;           // Completely matched 
+	public static final int CANCELED = 5;           // Nothing Matched and Canceled 
+	public static final int PARTIAL_CANCELED = 6;   // Partial Matched then Cancel 
+	public static final int CANCEL_WAIT_UPDATE = 7; // If getBet() after Cancel do not work it will use normal update
+	public static final int UNMONITORED = 8;        // BetManager stop updates on this bet
 	
 	
 	public Long BetID=null; // given from betfair after placed 
 	
-	//Simulation
+	//To use in Simulation (and in real to get estimated place on queue)
 	public double entryVolume=-1;
 	public double entryAmount=-1;
 	

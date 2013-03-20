@@ -107,8 +107,8 @@ public class BetUtils {
 			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
-			if(bet.getMatchedSize()>0)
-				ret.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM);
+			if(bet.getMatchedSize()>0)  // Never happens otherwise is considered MATCHED and UNMATCHED part disappears 
+				ret.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM); 
 			else
 				ret.setState(BetData.CANCELED,BetData.SYSTEM);
 		
@@ -160,18 +160,7 @@ public class BetUtils {
 		BetData bdAux=BetUtils.getBetFromAPI(bd.getBetID(),bd.getRd().getMarketData());
 		
 		if(bdAux==null) return -1;
-		
-		
-		// When bet is canceled with partial Matched the API getbet() gives only data about 
-		// matched and consider completed matched (canceled part simply disappears)  
-		if(bd.getAmount()>bdAux.getMatchedAmount() && bdAux.getState()==BetData.MATCHED)
-		{
-			bd.setState(BetData.PARTIAL_CANCELED, BetData.SYSTEM);	
-		}
-		else
-			bd.setState(bdAux.getState(), BetData.SYSTEM);
-		
-		//bd.setAmount(bdAux.getAmount());
+
 		
 		bd.setOddMached(bdAux.getOddMached());
 		
@@ -179,6 +168,16 @@ public class BetUtils {
 		
 		bd.setMatchedAmount(bdAux.getMatchedAmount());
 		bd.setRd(bdAux.getRd());
+		
+		//bd.setAmount(bdAux.getAmount());  //error
+		// When bet is canceled with partial Matched the API getbet() gives only data about 
+		// matched and consider complete matched (canceled part simply disappears)  
+		if(bd.getAmount()>bdAux.getMatchedAmount() && bdAux.getState()==BetData.MATCHED)
+		{
+			bd.setState(BetData.PARTIAL_CANCELED, BetData.SYSTEM);	
+		}
+		else
+			bd.setState(bdAux.getState(), BetData.SYSTEM);
 		
 		return 0;
 	}

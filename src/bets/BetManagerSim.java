@@ -86,7 +86,8 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 		
 		for(BetData bd:bets)
 		{
-			bd.setState(BetData.UNMONITORED, BetData.SYSTEM);
+			if(!BetUtils.isBetFinalState(bd.getState()))
+				bd.setState(BetData.UNMONITORED, BetData.SYSTEM);
 		}
 		bets.clear();
 		bets=null;
