@@ -203,6 +203,8 @@ public class ManualPlaceBetBot extends Bot{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
 			if(BetUtils.isBetFinalState(bet.getState()))
 				bet=null;
+			if(BetUtils.isBetFinalState(bet2.getState()))
+				bet2=null;
 		}
 		
 		

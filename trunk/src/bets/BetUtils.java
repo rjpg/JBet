@@ -69,7 +69,7 @@ public class BetUtils {
 	
 	public static  BetData createBetData(Bet bet,MarketData md)
 	{
-		
+		//System.out.println("entrei");
 		if(bet==null)
 			return null;
 		
@@ -84,16 +84,24 @@ public class BetUtils {
 		//System.err.println(bet.getMatchedSize());
 		ret.setOddMached(bet.getAvgPrice());
 		
+		//System.out.println("--------------------------");
 		//System.out.println("Bet Status: "+bet.getBetStatus());
+		//System.out.println("Bet Id: "+bet.getBetId());
+		//System.out.println("Bet RequestedSize: "+bet.getRequestedSize());
+		//System.out.println("Bet MatchedSize: "+bet.getMatchedSize());
+		//System.out.println("Bet RemainingSize: "+bet.getRemainingSize());
+		
 		
 		if(bet.getBetStatus()==BetStatusEnum.U)
 			ret.setState(BetData.UNMATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.M)
+		{
 			if(bet.getRequestedSize()>bet.getMatchedSize())
 				ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
 			else
 				ret.setState(BetData.MATCHED,BetData.SYSTEM);
+		}
 		
 		if(bet.getBetStatus()==BetStatusEnum.MU)
 			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
@@ -108,6 +116,8 @@ public class BetUtils {
 		if(bet.getBetStatus()==BetStatusEnum.V) //Voided (?)
 			ret.setState(BetData.CANCELED,BetData.SYSTEM);
 		//testar os voideds quando o mercado fica suspenso para ver se fica estado Cancelado "C" ou voided "V"
+		
+		//System.out.println("Bet State Number final: "+ret.getState());
 		
 		if(bet.getBetPersistenceType()==BetPersistenceTypeEnum.IP)
 			ret.setKeepInPlay(true);
@@ -139,6 +149,7 @@ public class BetUtils {
 	
 	public static int fillBetFromAPI(BetData bd)
 	{
+		
 		if(bd.getBetID()==null) return -1;
 		
 		if(bd.getRd()==null) return -1;
@@ -150,10 +161,22 @@ public class BetUtils {
 		
 		if(bdAux==null) return -1;
 		
-		bd.setState(bdAux.getState(), bdAux.getTransition());
-		bd.setAmount(bdAux.getAmount());
+		
+		// When bet is canceled with partial Matched the API getbet() gives only data about 
+		// matched and consider completed matched (canceled part simply disappears)  
+		if(bd.getAmount()>bdAux.getMatchedAmount() && bdAux.getState()==BetData.MATCHED)
+		{
+			bd.setState(BetData.PARTIAL_CANCELED, BetData.SYSTEM);	
+		}
+		else
+			bd.setState(bdAux.getState(), BetData.SYSTEM);
+		
+		//bd.setAmount(bdAux.getAmount());
+		
 		bd.setOddMached(bdAux.getOddMached());
+		
 		bd.setOddRequested(bdAux.getOddRequested());
+		
 		bd.setMatchedAmount(bdAux.getMatchedAmount());
 		bd.setRd(bdAux.getRd());
 		
@@ -210,6 +233,8 @@ public class BetUtils {
 			ret+="State: CANCELED \n";
 		else if(bd.getState()==BetData.PARTIAL_CANCELED)
 			ret+="State: PARTIAL_CANCELED \n";
+		else if(bd.getState()==BetData.CANCEL_WAIT_UPDATE)
+			ret+="State: CANCEL_WAIT_UPDATE \n";
 		else if(bd.getState()==BetData.PLACING_ERROR)
 			ret+="State: PLACING_ERROR \n";
 		else if(bd.getState()==BetData.BET_IN_PROGRESS)
@@ -229,6 +254,8 @@ public class BetUtils {
 			ret+="Last State: CANCELED \n";
 		else if(bd.getLastState()==BetData.PARTIAL_CANCELED)
 			ret+="Last State: PARTIAL_CANCELED \n";
+		else if(bd.getLastState()==BetData.CANCEL_WAIT_UPDATE)
+			ret+="Last State: CANCEL_WAIT_UPDATE \n";
 		else if(bd.getLastState()==BetData.PLACING_ERROR)
 			ret+="Last State: PLACING_ERROR \n";
 		else if(bd.getLastState()==BetData.BET_IN_PROGRESS)
@@ -236,6 +263,7 @@ public class BetUtils {
 		else if(bd.getLastState()==BetData.UNMONITORED)
 			ret+="Last State: UNMONITORED \n";
 
+		//System.out.println("TRANSITION:"+bd.getTransition());
 		if(bd.getTransition()==BetData.SYSTEM)
 			ret+="Transition: SYSTEM \n";
 		else if(bd.getTransition()==BetData.PLACE)
