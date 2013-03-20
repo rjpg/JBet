@@ -60,7 +60,7 @@ public class BetData {
 	public static final int NOT_PLACED = 0;         // before place is called on this bet 
 	public static final int BET_IN_PROGRESS = 1;    // waiting to recover betId by BetManager 
 	public static final int UNMATCHED = 2;          // Waiting to be Matched
-	public static final int PARTIAL_MACHED = 3;     // Partial Matched waiting to be Completely Matched
+	public static final int PARTIAL_MATCHED = 3;     // Partial Matched waiting to be Completely Matched
 	public static final int MATCHED =  4;           // Completely matched 
 	public static final int CANCELED = 5;           // Nothing Matched and Canceled 
 	public static final int PARTIAL_CANCELED = 6;   // Partial Matched then Cancel 

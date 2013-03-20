@@ -8,12 +8,9 @@ import generated.global.BFGlobalServiceStub.GetEventsResp;
 import generated.global.BFGlobalServiceStub.MarketSummary;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
-import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,8 +21,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import bets.BetData;
-import bot123.Bot123;
+import DataRepository.MarketChangeListener;
+import DataRepository.MarketData;
+import GUI.MarketMainFrame;
 import bots.BaseOfBot;
 import bots.BotAmountCat;
 import bots.BotDutching;
@@ -39,14 +37,9 @@ import bots.NeuralBot;
 import bots.NeuralDataBot;
 import bots.StudyBot;
 import bots.WomNeighboursBot;
-
-import DataRepository.MarketChangeListener;
-import DataRepository.MarketData;
-import DataRepository.RunnersData;
-import GUI.MarketMainFrame;
 import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
 import demo.handler.ExchangeAPI.Exchange;
+import demo.handler.GlobalAPI;
 import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedMarketPrices;
@@ -144,7 +137,7 @@ public class Manager  implements MarketChangeListener{
 			{
 				//System.out.println("passei aqui");
 				mmf = new MarketMainFrame(md);
-				mmf.setSize(100, 200);
+				mmf.setSize(400, 600);
 				mmf.setVisible(true);
 			}
 			
@@ -205,7 +198,7 @@ public class Manager  implements MarketChangeListener{
 				//System.out.println("passei aqui");
 				mmf = new MarketMainFrame(md);
 				//Bot123 a=new Bot123(md);
-				mmf.setSize(100, 200);
+				mmf.setSize(400, 600);
 				mmf.setVisible(true);
 			}
 			if(Parameters.manualBot)

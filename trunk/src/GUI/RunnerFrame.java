@@ -170,7 +170,7 @@ public class RunnerFrame extends JFrame{
 		aux2.add(jScrollPane,BorderLayout.EAST);
 		
 		this.setContentPane(aux2);
-		this.setSize(400, 800);
+		this.setSize(700, 900);
 	}
 	
 	public JPanel getBack() {
@@ -421,7 +421,7 @@ public class RunnerFrame extends JFrame{
 							unBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=bd.getAmount();
 					}
 					
-					if(bd.getState()==BetData.MATCHED || bd.getState()==BetData.PARTIAL_CANCELED || bd.getState()==BetData.PARTIAL_MACHED)
+					if(bd.getState()==BetData.MATCHED || bd.getState()==BetData.PARTIAL_CANCELED || bd.getState()==BetData.PARTIAL_MATCHED)
 					{
 						if(bd.getType()==BetData.BACK)
 							matchedLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddMached()))]+=bd.getMatchedAmount();
@@ -429,12 +429,12 @@ public class RunnerFrame extends JFrame{
 							matchedBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddMached()))]+=bd.getMatchedAmount();
 					}
 					
-					if(bd.getState()==BetData.PARTIAL_MACHED)
+					if(bd.getState()==BetData.PARTIAL_MATCHED)
 					{
 						if(bd.getType()==BetData.BACK)
-							unLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=Utils.convertAmountToBF(bd.getAmount()-bd.getMatchedAmount());
+							unLayValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=bd.getAmount()-bd.getMatchedAmount();
 						else
-							unBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=Utils.convertAmountToBF(bd.getAmount()-bd.getMatchedAmount());
+							unBackValues[Utils.oddToIndex(Utils.nearValidOdd(bd.getOddRequested()))]+=bd.getAmount()-bd.getMatchedAmount();
 					}
 					
 				}
@@ -446,22 +446,22 @@ public class RunnerFrame extends JFrame{
 				if( unBackValues[i]==0)
 					ladderUnMatchedBackAmount[i].setText("");
 				else
-					ladderUnMatchedBackAmount[i].setText(unBackValues[i]+"");
+					ladderUnMatchedBackAmount[i].setText(Utils.convertAmountToBF(unBackValues[i])+"");
 				
 				if( unLayValues[i]==0)
 					ladderUnMatchedLayAmount[i].setText("");
 				else
-					ladderUnMatchedLayAmount[i].setText(unLayValues[i]+"");
+					ladderUnMatchedLayAmount[i].setText(Utils.convertAmountToBF(unLayValues[i])+"");
 				
 				if( matchedBackValues[i]==0)
 					ladderMatchedBackAmount[i].setText("");
 				else
-					ladderMatchedBackAmount[i].setText(matchedBackValues[i]+"");
+					ladderMatchedBackAmount[i].setText(Utils.convertAmountToBF(matchedBackValues[i])+"");
 				
 				if( matchedLayValues[i]==0)
 					ladderMatchedLayAmount[i].setText("");
 				else
-					ladderMatchedLayAmount[i].setText(matchedLayValues[i]+"");
+					ladderMatchedLayAmount[i].setText(Utils.convertAmountToBF(matchedLayValues[i])+"");
 					
 			}
 		}
