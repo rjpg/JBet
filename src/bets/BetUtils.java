@@ -98,13 +98,13 @@ public class BetUtils {
 		if(bet.getBetStatus()==BetStatusEnum.M)
 		{
 			if(bet.getRequestedSize()>bet.getMatchedSize())
-				ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
+				ret.setState(BetData.PARTIAL_MATCHED,BetData.SYSTEM);
 			else
 				ret.setState(BetData.MATCHED,BetData.SYSTEM);
 		}
 		
 		if(bet.getBetStatus()==BetStatusEnum.MU)
-			ret.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
+			ret.setState(BetData.PARTIAL_MATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
 			if(bet.getMatchedSize()>0)  // Never happens otherwise is considered MATCHED and UNMATCHED part disappears 
@@ -224,7 +224,7 @@ public class BetUtils {
 			ret+="State: NOT_PLACED \n";
 		else if(bd.getState()==BetData.UNMATCHED)
 			ret+="State: UNMATHED \n";
-		else if(bd.getState()==BetData.PARTIAL_MACHED)
+		else if(bd.getState()==BetData.PARTIAL_MATCHED)
 			ret+="State: PARTIAL_MACHED \n";
 		else if(bd.getState()==BetData.MATCHED)
 			ret+="State: MACHED \n";
@@ -245,7 +245,7 @@ public class BetUtils {
 			ret+="Last State: NOT_PLACED \n";
 		else if(bd.getLastState()==BetData.UNMATCHED)
 			ret+="Last State: UNMATHED \n";
-		else if(bd.getLastState()==BetData.PARTIAL_MACHED)
+		else if(bd.getLastState()==BetData.PARTIAL_MATCHED)
 			ret+="Last State: PARTIAL_MACHED \n";
 		else if(bd.getLastState()==BetData.MATCHED)
 			ret+="Last State: MACHED \n";

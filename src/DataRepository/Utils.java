@@ -237,6 +237,32 @@ public class Utils {
 			return Utils.convertAmountToBF(totalBets/totalStake);
 	}
 	
+	public static double calculateOddAverage(Double[] odds,Double[] amounts)
+	{
+		//Bet 1 = Odds * Stake
+		//Bet 2 = Odds * Stake
+
+		//(Bet 1 + Bet 2 ) / Total Stake = Average Odds.
+		
+		//double bets[]=new double[odds.length];
+		double totalStake=0;
+		double totalBets=0;
+		
+		for(int i=0;i<odds.length;i++)
+		{
+			totalBets+=(odds[i]*amounts[i]);
+			totalStake+=amounts[i];
+		}
+		//System.out.println("AVG ODD:"+(totalBets/totalStake));
+	
+		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dá muito edge
+		// não fazer near mas sim erredondar para 2 casas
+		if(totalStake==0)
+			return 0.00;
+		else
+			return Utils.convertAmountToBF(totalBets/totalStake);
+	}
+	
 	public static boolean validOdd(double odd)
 	{
 		for(int i=0;i<ladder.length;i++)

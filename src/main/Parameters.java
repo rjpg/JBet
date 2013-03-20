@@ -33,7 +33,7 @@ public class Parameters {
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
-	static public boolean simulation=false;
+	static public boolean simulation=true;
 	
 	static public int matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 	//1 - all at first 

@@ -77,7 +77,7 @@ public class BetManagerReal extends BetManager {
 		for(BetData b:bets)
 		{
 			if(b.getState()==BetData.UNMATCHED || 
-					b.getState()==BetData.PARTIAL_MACHED || 
+					b.getState()==BetData.PARTIAL_MATCHED || 
 					b.getState()==BetData.BET_IN_PROGRESS ||
 					b.getState()==BetData.CANCEL_WAIT_UPDATE)
 				ret=true;
@@ -90,7 +90,7 @@ public class BetManagerReal extends BetManager {
 	{
 		for(BetData bd:bets)
 		{
-			if(bd.getState()==BetData.PARTIAL_MACHED || bd.getState()==BetData.UNMATCHED || bd.getState()==BetData.CANCEL_WAIT_UPDATE)
+			if(bd.getState()==BetData.PARTIAL_MATCHED || bd.getState()==BetData.UNMATCHED || bd.getState()==BetData.CANCEL_WAIT_UPDATE)
 			{
 				Vector<MUBet> matched=new Vector<MUBet>();
 				Vector<MUBet> unmatched=new Vector<MUBet>();
@@ -177,7 +177,7 @@ public class BetManagerReal extends BetManager {
 					
 					bd.setMatchedAmount(totalSize);
 					bd.setOddMached(oddAvg);
-					bd.setState(BetData.PARTIAL_MACHED,BetData.SYSTEM);
+					bd.setState(BetData.PARTIAL_MATCHED,BetData.SYSTEM);
 				}
 			}
 		}
@@ -455,7 +455,7 @@ public class BetManagerReal extends BetManager {
 						if(Utils.convertAmountToBF(bds[i].getAmount())<=bds[i].getMatchedAmount())
 							bds[i].setState(BetData.MATCHED,BetData.PLACE);
 						else
-							bds[i].setState(BetData.PARTIAL_MACHED,BetData.PLACE);
+							bds[i].setState(BetData.PARTIAL_MATCHED,BetData.PLACE);
 					}
 					else
 					{
