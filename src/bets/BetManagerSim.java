@@ -25,6 +25,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	public Vector<BetData> getBets() {
 		
 		return bets;
+		
 	}
 
 	@Override
@@ -70,6 +71,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			if(bds[i].getType()==BetData.BACK)
 			{
 				bds[i].setEntryAmount(Utils.getAmountLayOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
+				bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 				
 				if(bds[i].getEntryAmount()<0)
 				{
@@ -131,25 +133,33 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 						}
 						
 						
-						bds[i].setState(BetData.MATCHED, BetData.PLACE);
+						
 						bds[i].setMatchedAmount(bds[i].getAmount());
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
 						bds[i].setTimestampFinalState(Calendar.getInstance());
+						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}
 					else // can only be equal becouse bds[i].getEntryAmount() is negative
 					{
 						if((bds[i].getEntryAmount()*(-1))>=bds[i].getAmount()) // Available amount bigger or equal then bet amount - Mached
 						{
-							bds[i].setState(BetData.MATCHED, BetData.PLACE);
+							
 							bds[i].setMatchedAmount(bds[i].getAmount());
 							bds[i].setOddMached(bds[i].getOddRequested());
 							bds[i].setTimestampFinalState(Calendar.getInstance());
+							bds[i].setState(BetData.MATCHED, BetData.PLACE);
 						}
 						else // Available amount smaller then bet amount - Partial Matched
 						{
-							bds[i].setState(BetData.PARTIAL_MATCHED, BetData.PLACE);
+							
 							bds[i].setMatchedAmount(Utils.convertAmountToBF(bds[i].getEntryAmount()*(-1)));
 							bds[i].setOddMached(bds[i].getOddRequested());
+							
+							bds[i].setLastAvailableAmount(bds[i].getEntryAmount()*(-1));
+							bds[i].setLastVolumeUpdate(bds[i].getEntryVolume());
+							
+							bds[i].setState(BetData.PARTIAL_MATCHED, BetData.PLACE);
+							
 							
 						}
 					}
@@ -157,6 +167,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
+					bds[i].setLastVolumeUpdate(bds[i].getEntryVolume());
 					bds[i].setState(BetData.UNMATCHED, BetData.PLACE);
 					
 				}
@@ -167,6 +178,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 				
 				bds[i].setEntryAmount(Utils.getAmountBackOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
 				//System.out.println("Entry Amount Back:"+Utils.getAmountBackOddFrame(bds[i].getRd(), bds[i].getOddRequested(), 0));
+				bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 				
 				if(bds[i].getEntryAmount()<0)
 				{
@@ -225,26 +237,33 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 							
 						}
 						
-						bds[i].setState(BetData.MATCHED, BetData.PLACE);
+						
 						bds[i].setMatchedAmount(bds[i].getAmount());
 						
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
 						bds[i].setTimestampFinalState(Calendar.getInstance());
+						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}
 					else // can only be equal becouse bds[i].getEntryAmount() is negative
 					{
 						if((bds[i].getEntryAmount()*(-1))>=bds[i].getAmount()) // Available amount bigger or equal then bet amount - Mached
 						{
-							bds[i].setState(BetData.MATCHED, BetData.PLACE);
+							
 							bds[i].setMatchedAmount(bds[i].getAmount());
 							bds[i].setOddMached(bds[i].getOddRequested());
 							bds[i].setTimestampFinalState(Calendar.getInstance());
+							bds[i].setState(BetData.MATCHED, BetData.PLACE);
 						}
 						else // Available amount smaller then bet amount - Partial Matched
 						{
-							bds[i].setState(BetData.PARTIAL_MATCHED, BetData.PLACE);
+							
 							bds[i].setMatchedAmount(Utils.convertAmountToBF(bds[i].getEntryAmount()*(-1)));
 							bds[i].setOddMached(bds[i].getOddRequested());
+							
+							bds[i].setLastAvailableAmount(bds[i].getEntryAmount()*(-1));
+							bds[i].setLastVolumeUpdate(bds[i].getEntryVolume());
+							
+							bds[i].setState(BetData.PARTIAL_MATCHED, BetData.PLACE);
 							
 							
 						}
@@ -252,6 +271,8 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
+					
+					bds[i].setLastVolumeUpdate(bds[i].getEntryVolume());
 					bds[i].setState(BetData.UNMATCHED, BetData.PLACE);
 				}
 				
@@ -306,6 +327,271 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 
 	
 	@Override
+	public void MarketChange(MarketData md, int marketEventType) {
+		if( marketEventType==MarketChangeListener.MarketUpdate)
+		{
+			refresh();
+		}
+		
+	}
+
+	
+	private boolean isBetsToProcess()
+	{
+		boolean ret=false;
+		for(BetData b:bets)
+		{
+			if(b.getState()==BetData.UNMATCHED || 
+					b.getState()==BetData.PARTIAL_MATCHED || 
+					b.getState()==BetData.BET_IN_PROGRESS ||
+					b.getState()==BetData.CANCEL_WAIT_UPDATE)
+				ret=true;
+		}
+		return ret;
+	}
+	
+	
+	private void refresh()
+	{
+		if(!isBetsToProcess())
+			return;
+		//System.out.println("Estou a processar");
+		
+		for(BetData bd:bets)
+		{
+		
+			if(bd.getState()==BetData.PARTIAL_MATCHED || bd.getState()==BetData.UNMATCHED ) //|| bd.getState()==BetData.CANCEL_WAIT_UPDATE)
+			{
+				if(bd.getType()==BetData.BACK)
+				{
+					double oddBack=Utils.getOddBackFrame(bd.getRd(), 0);
+					
+					if(oddBack>bd.getOddRequested())
+					{
+					
+						bd.setMatchedAmount(bd.getAmount());
+						bd.setOddMached(bd.getOddRequested());
+						bd.setState(BetData.MATCHED, BetData.SYSTEM);
+					}
+					else if(oddBack==bd.getOddRequested())
+					{
+						bd.setEntryAmount(0);
+						//System.out.println("equal : "+oddBack);
+						double amountBack=Utils.getAmountBackOddFrame(bd.getRd(), oddBack, 0);
+						
+						double amountIncrease=amountBack-bd.getLastAvailableAmount();
+						if(amountIncrease<0)
+							amountIncrease=0;
+						
+						double volumeIncrease=Utils.getVolumeFrame(bd.getRd(), 0, oddBack)-bd.getLastVolumeUpdate();
+						if(volumeIncrease<=0)
+						{
+							volumeIncrease=0;
+						}
+						else
+						{
+							amountIncrease+=volumeIncrease/2;
+						}
+							
+						
+						double missingAmount=bd.getAmount()-bd.getMatchedAmount();
+						
+						
+						
+						if(amountIncrease>=missingAmount)
+						{
+							bd.setMatchedAmount(bd.getAmount());
+							bd.setOddMached(oddBack);
+							bd.setState(BetData.MATCHED, BetData.SYSTEM);
+						}
+						else
+						{
+							bd.setMatchedAmount(bd.getMatchedAmount()+amountIncrease);
+							bd.setOddMached(oddBack);
+							
+							bd.setLastAvailableAmount(Utils.getAmountBackOddFrame(bd.getRd(), oddBack, 0));
+							bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, oddBack));
+							
+							bd.setState(BetData.PARTIAL_MATCHED, BetData.SYSTEM);
+						}
+						
+						
+						
+					}
+					else // oddBack<bd.getOddRequested()
+					{
+						double missingAmount=bd.getAmount()-bd.getMatchedAmount();
+						
+						double volumeIncrease=Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested())-bd.getLastVolumeUpdate();
+						
+						double amountIncrease=0;
+						
+						if(volumeIncrease<=0)
+						{
+							volumeIncrease=0;
+							bd.setLastAvailableAmount(0);
+							continue;
+						}
+						else
+						{
+							amountIncrease=volumeIncrease/2;
+						}
+						
+						
+						//System.out.println("amountIncrease : "+amountIncrease);
+						//System.out.println("bd.getEntryAmount() : "+bd.getEntryAmount());
+						if(amountIncrease>bd.getEntryAmount())
+						{
+							double someMatchedAm=amountIncrease-bd.getEntryAmount();
+							
+							
+							if(someMatchedAm>=missingAmount)
+							{
+								bd.setMatchedAmount(bd.getAmount());
+								bd.setOddMached(bd.getOddRequested());
+								bd.setState(BetData.MATCHED, BetData.SYSTEM);
+							}
+							else
+							{
+								bd.setEntryAmount(0);
+								bd.setMatchedAmount(bd.getMatchedAmount()+someMatchedAm);
+								bd.setOddMached(bd.getOddRequested());
+								
+								bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested()));
+								bd.setLastAvailableAmount(0);
+								
+								bd.setState(BetData.PARTIAL_MATCHED, BetData.SYSTEM);
+							}
+								
+						}
+						else
+						{
+							bd.setEntryAmount(bd.getEntryAmount()-amountIncrease);
+							bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested()));
+							bd.setLastAvailableAmount(0);
+						}
+					}
+				}
+				else
+				{
+					
+					double oddLay=Utils.getOddLayFrame(bd.getRd(), 0);
+					
+					if(oddLay<bd.getOddRequested())
+					{
+					
+						bd.setMatchedAmount(bd.getAmount());
+						bd.setOddMached(bd.getOddRequested());
+						bd.setState(BetData.MATCHED, BetData.SYSTEM);
+					}
+					else if(oddLay==bd.getOddRequested())
+					{
+						//System.out.println("equal : "+oddLay);
+						bd.setEntryAmount(0);
+						
+						double amountLay=Utils.getAmountLayOddFrame(bd.getRd(), oddLay, 0);
+						
+						double amountIncrease=amountLay-bd.getLastAvailableAmount();
+						if(amountIncrease<0)
+							amountIncrease=0;
+						
+						double volumeIncrease=Utils.getVolumeFrame(bd.getRd(), 0, oddLay)-bd.getLastVolumeUpdate();
+						if(volumeIncrease<=0)
+						{
+							volumeIncrease=0;
+						}
+						else
+						{
+							amountIncrease+=volumeIncrease/2;
+						}
+							
+						
+						double missingAmount=bd.getAmount()-bd.getMatchedAmount();
+						
+						
+						
+						if(amountIncrease>=missingAmount)
+						{
+							bd.setMatchedAmount(bd.getAmount());
+							bd.setOddMached(oddLay);
+							bd.setState(BetData.MATCHED, BetData.SYSTEM);
+						}
+						else
+						{
+							bd.setMatchedAmount(bd.getMatchedAmount()+amountIncrease);
+							bd.setOddMached(oddLay);
+							
+							bd.setLastAvailableAmount(Utils.getAmountLayOddFrame(bd.getRd(), oddLay, 0));
+							bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, oddLay));
+							
+							bd.setState(BetData.PARTIAL_MATCHED, BetData.SYSTEM);
+						}
+						
+						
+						
+					}
+					else // oddBack<bd.getOddRequested()
+					{
+						double missingAmount=bd.getAmount()-bd.getMatchedAmount();
+						
+						double volumeIncrease=Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested())-bd.getLastVolumeUpdate();
+						
+						double amountIncrease=0;
+						
+						if(volumeIncrease<=0)
+						{
+							volumeIncrease=0;
+							bd.setLastAvailableAmount(0);
+							continue;
+						}
+						else
+						{
+							amountIncrease=volumeIncrease/2;
+						}
+						
+						
+						//System.out.println("amountIncrease : "+amountIncrease);
+						//System.out.println("bd.getEntryAmount() : "+bd.getEntryAmount());
+						
+						if(amountIncrease>bd.getEntryAmount())
+						{
+							double someMatchedAm=amountIncrease-bd.getEntryAmount();
+							
+							
+							if(someMatchedAm>=missingAmount)
+							{
+								bd.setMatchedAmount(bd.getAmount());
+								bd.setOddMached(bd.getOddRequested());
+								bd.setState(BetData.MATCHED, BetData.SYSTEM);
+							}
+							else
+							{
+								bd.setEntryAmount(0);
+								bd.setMatchedAmount(bd.getMatchedAmount()+someMatchedAm);
+								bd.setOddMached(bd.getOddRequested());
+								
+								bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested()));
+								bd.setLastAvailableAmount(0);
+								
+								bd.setState(BetData.PARTIAL_MATCHED, BetData.SYSTEM);
+							}
+								
+						}
+						else
+						{
+							bd.setEntryAmount(bd.getEntryAmount()-amountIncrease);
+							bd.setLastVolumeUpdate(Utils.getVolumeFrame(bd.getRd(), 0, bd.getOddRequested()));
+							bd.setLastAvailableAmount(0);
+						}
+					}
+					
+					
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void clean() {
 		getMd().removeMarketChangeListener(this);
 		
@@ -319,21 +605,6 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 		md=null;
 		
 	}
-
-	@Override
-	public void MarketChange(MarketData md, int marketEventType) {
-		if( marketEventType==MarketChangeListener.MarketUpdate)
-		{
-			refresh();
-		}
-		
-	}
-
-	private void refresh()
-	{
-		
-	}
-	
 
 
 }
