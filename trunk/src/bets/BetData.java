@@ -74,6 +74,9 @@ public class BetData {
 	public double entryVolume=-1;
 	public double entryAmount=-1;
 	
+	public double LastAvailableAmount=0;
+	public double LastVolumeUpdate=0;
+	
 	
 	
 	public BetData (RunnersData rdA, double  amountA,double  oddA, int typeA,boolean IPA)
@@ -224,4 +227,22 @@ public class BetData {
 		this.transition = transition;
 	}
 
+	public double getLastAvailableAmount() {
+		return LastAvailableAmount;
+	}
+
+	public void setLastAvailableAmount(double lastAvailableAmount) {
+		LastAvailableAmount = lastAvailableAmount;
+	}
+
+	public double getLastVolumeUpdate() {
+		return LastVolumeUpdate;
+	}
+
+	public void setLastVolumeUpdate(double lastVolumeUpdate) {
+		LastVolumeUpdate = lastVolumeUpdate;
+	}
+
+
+	
 }
