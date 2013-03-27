@@ -107,7 +107,7 @@ public class BetUtils {
 			ret.setState(BetData.PARTIAL_MATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
-			if(bet.getMatchedSize()>0)  // Never happens otherwise is considered MATCHED and UNMATCHED part disappears 
+			if(bet.getMatchedSize()>0)  // Never happens otherwise is considered MATCHED, the UNMATCHED part disappears 
 				ret.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM); 
 			else
 				ret.setState(BetData.CANCELED,BetData.SYSTEM);

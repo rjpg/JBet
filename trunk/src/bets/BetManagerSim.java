@@ -286,24 +286,33 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			bds[i].setTimestampPlace(Calendar.getInstance());
 		
 			
-			//if()
 		}
-		
-		
-		
 		
 		return 0;
 	}
 
 	@Override
 	public int cancelBet(BetData bet) {
-		// TODO Auto-generated method stub
-		return 0;
+		Vector<BetData> place=new Vector<BetData>();
+		place.add(bet);
+		return cancelBets(place);
 	}
 
 	@Override
 	public int cancelBets(Vector<BetData> cancelBets) {
-		// TODO Auto-generated method stub
+		for(BetData bd:cancelBets)
+		{
+			if(bd.getMatchedAmount()>0)
+				if(bd.getMatchedAmount()>=bd.getAmount())
+					bd.setState(BetData.MATCHED, BetData.CANCEL);
+				else
+					bd.setState(BetData.PARTIAL_CANCELED, BetData.CANCEL);
+			else
+				bd.setState(BetData.CANCELED, BetData.CANCEL);
+			
+			
+		}
+		
 		return 0;
 	}
 

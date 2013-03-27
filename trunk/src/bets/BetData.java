@@ -8,16 +8,16 @@ public class BetData {
 	
 	public RunnersData rd;
 	
-	public double oddRequested;
-	public double amount=0;
+	protected double oddRequested;
+	protected double amount=0;
 	
 	//--dynamic change variables-- 
-	public double oddMached=-1;
-	public double matchedAmount=0;
-	public int state=BetData.NOT_PLACED;
+	protected double oddMached=-1;
+	protected double matchedAmount=0;
+	protected int state=BetData.NOT_PLACED;
 	
-	public int lastState=BetData.NOT_PLACED;
-	public int transition=BetData.SYSTEM;
+	protected int lastState=BetData.NOT_PLACED;
+	protected int transition=BetData.SYSTEM;
 	//----------------------------
 
 	
@@ -26,9 +26,9 @@ public class BetData {
 	public static final int PLACE = 1;
 	public static final int CANCEL = 2;
 	
-	public Calendar timestampPlace=null;
-	public Calendar timestampCancel=null;
-	public Calendar timestampFinalState=null;
+	protected Calendar timestampPlace=null;
+	protected Calendar timestampCancel=null;
+	protected Calendar timestampFinalState=null;
 	
 	public boolean keepInPlay=false;   // BetPersistenceType (IP)
 	
@@ -38,7 +38,7 @@ public class BetData {
 	public static final int LAY = 2;
 
 	// Error processing
-	public int errorType=BetData.ERROR_NONE;
+	protected int errorType=BetData.ERROR_NONE;
 	// place erros 
 	public static final int ERROR_NONE = 0;
 	public static final int ERROR_MARKET_SUSPENDED = 1;
@@ -53,7 +53,7 @@ public class BetData {
 	// generic error
 	public static final int ERROR_UNKNOWN = 6;
 	
-	public int updatesBetInProgress=0;
+	protected int updatesBetInProgress=0;
 	
 	//public static final int CANCEL_ERROR = -2;	    // after cancel error  (check error)
 	public static final int PLACING_ERROR = -1;     // after placed error (check error)
@@ -68,14 +68,14 @@ public class BetData {
 	public static final int UNMONITORED = 8;        // BetManager stop updates on this bet
 	
 	
-	public Long BetID=null; // given from betfair after placed 
+	protected Long BetID=null; // given from betfair after placed 
 	
 	//To use in Simulation (and in real to get estimated place on queue)
-	public double entryVolume=-1;
-	public double entryAmount=-1;
+	protected double entryVolume=-1;
+	protected double entryAmount=-1;
 	
-	public double LastAvailableAmount=0;
-	public double LastVolumeUpdate=0;
+	protected double LastAvailableAmount=0;
+	protected double LastVolumeUpdate=0;
 	
 	
 	
@@ -108,7 +108,7 @@ public class BetData {
 		return matchedAmount;
 	}
 
-	public void setMatchedAmount(double corresponded) {
+	protected void setMatchedAmount(double corresponded) {
 		this.matchedAmount = corresponded;
 	}
 
@@ -125,13 +125,16 @@ public class BetData {
 		
 		if(BetUtils.isBetFinalState(this.state))
 			setTimestampFinalState(Calendar.getInstance());
+		
+		if(this.state == BetData.CANCEL || this.state == BetData.CANCEL_WAIT_UPDATE || this.state == BetData.PARTIAL_CANCELED)
+			setTimestampCancel(Calendar.getInstance());
 	}
 
 	public Long getBetID() {
 		return BetID;
 	}
 
-	public void setBetID(Long betID) {
+	protected void setBetID(Long betID) {
 		BetID = betID;
 	}
 	
@@ -139,7 +142,7 @@ public class BetData {
 		return timestampPlace;
 	}
 
-	public void setTimestampPlace(Calendar timestamp) {
+	protected void setTimestampPlace(Calendar timestamp) {
 		this.timestampPlace = timestamp;
 	}
 
@@ -147,7 +150,7 @@ public class BetData {
 		return timestampCancel;
 	}
 
-	public void setTimestampCancel(Calendar timestampCancel) {
+	protected void setTimestampCancel(Calendar timestampCancel) {
 		this.timestampCancel = timestampCancel;
 	}
 
@@ -155,7 +158,7 @@ public class BetData {
 		return timestampFinalState;
 	}
 
-	public void setTimestampFinalState(Calendar timestampFinalState) {
+	protected void setTimestampFinalState(Calendar timestampFinalState) {
 		this.timestampFinalState = timestampFinalState;
 	}
 
@@ -180,7 +183,7 @@ public class BetData {
 		return oddMached;
 	}
 
-	public void setOddMached(double oddMached) {
+	protected void setOddMached(double oddMached) {
 		this.oddMached = oddMached;
 	}
 	
@@ -192,7 +195,7 @@ public class BetData {
 		this.keepInPlay = keepInPlay;
 	}
 
-	public void setEntryVolume(double entryVolume) {
+	protected void setEntryVolume(double entryVolume) {
 		this.entryVolume = entryVolume;
 	}
 	
@@ -204,14 +207,14 @@ public class BetData {
 		return entryAmount;
 	}
 	
-	public void setEntryAmount(double entryAmount) {
+	protected void setEntryAmount(double entryAmount) {
 		this.entryAmount = entryAmount;
 	}
 	public int getErrorType() {
 		return errorType;
 	}
 
-	public void setErrorType(int errorType) {
+	protected void setErrorType(int errorType) {
 		this.errorType = errorType;
 	}
 
@@ -219,27 +222,27 @@ public class BetData {
 		return lastState;
 	}
 
-	public int getTransition() {
+	protected int getTransition() {
 		return transition;
 	}
 	
-	public void setTransition(int transition) {
+	protected void setTransition(int transition) {
 		this.transition = transition;
 	}
 
-	public double getLastAvailableAmount() {
+	protected double getLastAvailableAmount() {
 		return LastAvailableAmount;
 	}
 
-	public void setLastAvailableAmount(double lastAvailableAmount) {
+	protected void setLastAvailableAmount(double lastAvailableAmount) {
 		LastAvailableAmount = lastAvailableAmount;
 	}
 
-	public double getLastVolumeUpdate() {
+	protected double getLastVolumeUpdate() {
 		return LastVolumeUpdate;
 	}
 
-	public void setLastVolumeUpdate(double lastVolumeUpdate) {
+	protected void setLastVolumeUpdate(double lastVolumeUpdate) {
 		LastVolumeUpdate = lastVolumeUpdate;
 	}
 
