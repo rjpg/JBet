@@ -20,7 +20,7 @@ import main.Parameters;
 import bots.Bot;
 import demo.handler.ExchangeAPI;
 
-public class SwingFrontLine implements TradeMecanism{
+public class SwingFrontLine {// implements TradeMecanism{
 
 	
 	static public final int UNDEFINED = -1;
@@ -1877,19 +1877,19 @@ public class SwingFrontLine implements TradeMecanism{
 			 System.out.println("reconheço -1");		 
 	 }
 	 
-	 @Override
+	
 		public void forceClose() {
 			countFramesWaitNormal=waitFramesNormal;
 			countFramesWaitEmergency=waitFramesEmergency;
 			
 		}
 
-		@Override
+	
 		public int getState() {
 			return STATE;
 		}
 	
-		@Override
+	
 		public void writeMsgTM(String s, Color c) {
 			writeMessageText(s, c);
 			

@@ -26,6 +26,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import main.Parameters;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismUtils;
 import bets.BetData;
 import bets.BetManager;
 import bets.BetManagerReal;
@@ -49,6 +51,7 @@ public class MarketData {
 
 	//-----------Trade -------------
 	public Vector<Bot> botsTrading=new Vector<Bot>();
+	public Vector<TradeMechanism> TMTrading=new Vector<TradeMechanism>();
 	
 	public BetManager betManager=null;
 	
@@ -141,6 +144,9 @@ public class MarketData {
 			betManager=new BetManagerSim(this);
 		else
 			betManager=new BetManagerReal(this);
+		
+		if(Parameters.synchronizeBetManagerWithMarketData)
+			betManager.setPollingInterval(BetManager.SYNC_MARKET_DATA_UPDATE);
 		
 		betManager.startPolling();
 	}
@@ -1809,6 +1815,16 @@ public class MarketData {
 		botsTrading.remove(b);
 	}
 	
+	public void addTradingMechanismTrading(TradeMechanism tm)
+	{
+		TMTrading.add(tm);
+	}
+	
+	public void removeTradingMechanismTrading(TradeMechanism tm)
+	{
+		TMTrading.remove(tm);
+	}
+	
 	public boolean isInTrade() {
 		//System.out.println("Called : is in inTrade");
 		for(Bot b:botsTrading)
@@ -1817,7 +1833,13 @@ public class MarketData {
 				return true;
 		}
 		
+		for(TradeMechanism tm:TMTrading)
+			if(TradeMechanismUtils.isTradeMechanismFinalState(tm.getState()))
+				return true;
+		
 		return false;
+		
+		
 	}
 	
 	public BetManager getBetManager() {

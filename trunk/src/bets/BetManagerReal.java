@@ -1,6 +1,5 @@
 package bets;
 
-import generated.exchange.BFExchangeServiceStub.Bet;
 import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
@@ -17,12 +16,13 @@ import generated.exchange.BFExchangeServiceStub.UpdateBetsResultEnum;
 import java.util.Calendar;
 import java.util.Vector;
 
+import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
 
-public class BetManagerReal extends BetManager {
+public class BetManagerReal extends BetManager implements MarketChangeListener{
 	
 	// THREAD
 	private BetsManagerThread as;
@@ -34,10 +34,12 @@ public class BetManagerReal extends BetManager {
 	private Vector<BetData> bets=new Vector<BetData>();
 	
 	//Bet in progress Max frames until error state
-	protected int BIP_ERROR_UPDATES = 10;
+	protected static int BIP_ERROR_UPDATES = 10;
 	
 	public BetManagerReal(MarketData mdA) {
 		super(mdA);
+		
+		getMd().addMarketChangeListener(this);
 	}
 	
 
@@ -1194,9 +1196,11 @@ public class BetManagerReal extends BetManager {
 			
 			while (!stopRequested) {
 				try {
-					
-					refresh(); /// connect and get the data 
-					
+					if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
+					{
+						refresh(); /// connect and get the data
+						System.out.println("Not sync with MarketData");
+					}
 				
 					//	refreshBets();
 				} catch (Exception e) {
@@ -1260,6 +1264,8 @@ public class BetManagerReal extends BetManager {
 	
 	public void clean()
 	{
+		getMd().removeMarketChangeListener(this);
+		
 		for(BetData bd:bets)
 		{
 			if(!BetUtils.isBetFinalState(bd.getState()))
@@ -1282,6 +1288,22 @@ public class BetManagerReal extends BetManager {
  		
  		BetData bd=new BetData( null, 100, 4.5, BetData.LAY,false);
  		System.out.println(BetUtils.printBet(bd));
+	}
+
+
+	@Override
+	public void MarketChange(MarketData md, int marketEventType) {
+		if(marketEventType==MarketChangeListener.MarketUpdate)
+			if(updateInterval==BetManager.SYNC_MARKET_DATA_UPDATE)
+				refresh();
+		
+	}
+
+
+	@Override
+	public void setPollingInterval(int milis) {
+		updateInterval=milis;
+		
 	}
 
 
