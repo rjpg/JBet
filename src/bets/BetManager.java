@@ -8,6 +8,8 @@ import DataRepository.RunnersData;
 public abstract class  BetManager {
 	
 	// THREAD
+	public static int SYNC_MARKET_DATA_UPDATE = 0;
+	
 	
 	
 	//Market
@@ -36,6 +38,8 @@ public abstract class  BetManager {
 	public abstract void stopPolling();
 	
 	public abstract boolean  isPolling();
+	
+	public abstract void setPollingInterval (int milis);
 	
 	/**
 	 * 

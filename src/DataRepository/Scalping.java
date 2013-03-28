@@ -25,7 +25,7 @@ import main.Parameters;
 
 import bots.Bot;
 
-public class Scalping implements TradeMecanism//implements MarketChangeListener 
+public class Scalping //implements TradeMecanism//implements MarketChangeListener 
 {
 	
 	static public final int UNDEFINED = -1;
@@ -1810,7 +1810,7 @@ public class Scalping implements TradeMecanism//implements MarketChangeListener
 			 System.out.println("reconheço -1");		 
 	 }
 	 
-	 @Override
+	 
 		public void forceClose() {
 			
 			countFramesWaitNormal=waitFramesNormal;
@@ -1818,12 +1818,12 @@ public class Scalping implements TradeMecanism//implements MarketChangeListener
 			
 		}
 
-		@Override
+		
 		public int getState() {
 			return STATE;
 		}
 
-		@Override
+		
 		public void writeMsgTM(String s, Color c) {
 			writeMessageText(s, c);
 			

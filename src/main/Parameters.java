@@ -17,6 +17,8 @@ public class Parameters {
 	static public boolean graphicalInterface=true; // replay or read from file
 	
 	static public boolean graphicalInterfaceBots=true; // replay or read from file
+	
+	static public boolean synchronizeBetManagerWithMarketData=true; // replay or read from file
 		
 	
 	static public boolean amountBot=false;  // see the amounts
@@ -33,7 +35,7 @@ public class Parameters {
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
-	static public boolean simulation=true;
+	static public boolean simulation=false;
 	
 	static public int matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 	//1 - all at first 

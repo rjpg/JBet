@@ -8,19 +8,12 @@ import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
 import generated.exchange.BFExchangeServiceStub.CancelBets;
 import generated.exchange.BFExchangeServiceStub.CancelBetsResult;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
-import generated.exchange.BFExchangeServiceStub.UpdateBets;
-import generated.exchange.BFExchangeServiceStub.UpdateBetsResult;
 
-import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import DataRepository.MarketData;
-import DataRepository.RunnersData;
-import DataRepository.TradeMecanism;
 import DataRepository.Utils;
-
-import main.Manager;
 import demo.handler.ExchangeAPI;
 
 public class BetUtils {

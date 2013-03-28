@@ -615,5 +615,11 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 		
 	}
 
+	@Override
+	public void setPollingInterval(int milis) {
+		// Nothing to do update in simulation is always BetManager.SYNC_MARKET_DATA_UPDATE  
+		
+	}
+
 
 }
