@@ -4,6 +4,8 @@ import java.awt.Color;
 
 public abstract class TradeMechanism {
 	
+	public static int SYNC_MARKET_DATA_UPDATE = 0;
+	
 	// States
 	public static final int NOT_OPEN = 0;
 	public static final int PARTIAL_OPEN = 1;
