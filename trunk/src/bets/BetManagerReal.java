@@ -1199,7 +1199,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 					if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
 					{
 						refresh(); /// connect and get the data
-						System.out.println("Not sync with MarketData");
+						//System.out.println("Not sync with MarketData");
 					}
 				
 					//	refreshBets();
@@ -1233,9 +1233,13 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	public void startPolling() {
 		if (polling)
 			return;
-		as = new BetsManagerThread();
-		t = new Thread(as);
-		t.start();
+		
+		if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
+		{
+			as = new BetsManagerThread();
+			t = new Thread(as);
+			t.start();
+		}
 
 		polling = true;
 		
@@ -1244,7 +1248,11 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	public void stopPolling() {
 		if (!polling)
 			return;
-		as.stopRequest();
+		if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
+		{
+			as.stopRequest();
+		}
+		
 		polling = false;
 
 	}

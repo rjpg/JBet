@@ -128,8 +128,18 @@ public class MarketData {
 			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
 			//initializeData();
 			
+			for(int i=0;i<this.selectedMarket.getRunners().getRunner().length;i++)
+			{
+				
+				RunnersData runner=new RunnersData(this.selectedMarket.getRunners().getRunner()[i].getName(), this.selectedMarket.getRunners().getRunner()[i].getSelectionId(), this);
+				
+				runners.add(runner);
+				
+			}
+
 			
 			initializeBetManager();
+			
 			
 		}
 		else
@@ -140,7 +150,7 @@ public class MarketData {
 	
 	public void initializeBetManager()
 	{
-		if(Parameters.simulation)
+		if(Parameters.simulation || Parameters.replay)
 			betManager=new BetManagerSim(this);
 		else
 			betManager=new BetManagerReal(this);
@@ -582,7 +592,7 @@ public class MarketData {
 				Hashtable<Double, Double>volume_prev=(Hashtable<Double, Double>) rd.getDataFrames().get(rd.getDataFrames().size()-2).getVolume().clone();
 				rd.getDataFrames().get(rd.getDataFrames().size()-1).setVolume(volume_prev);
 			}
-			else
+			else if(rd.getDataFrames().size()>0)
 			{
 				Hashtable<Double, Double>volume_prev=new Hashtable<Double, Double>();
 				rd.getDataFrames().get(rd.getDataFrames().size()-1).setVolume(volume_prev);
@@ -885,6 +895,10 @@ public class MarketData {
 		return name;
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public String getEventName() {
 		return eventName;
 	}
@@ -902,19 +916,32 @@ public class MarketData {
 	}
 
 
-	public void setSelectedMarket(Market selectedMarket) {
+	public void setSelectedMarket(Market selectedMarketA) {
+		
+		finalizeBetManager();
+		clean();
 		
 		setInPlay(false);
-		if(this.selectedMarket==selectedMarket)
+		if(this.selectedMarket==selectedMarketA)
 			return;
 		
-		//clean();
-		this.selectedMarket = selectedMarket;
+				
+		this.selectedMarket = selectedMarketA;
+		
 		System.out.println("Track:"+selectedMarket.getMenuPath());
 		name=selectedMarket.getName();
 		id=selectedMarket.getMarketId();
 		start=selectedMarket.getMarketTime();
 		eventName=selectedMarket.getMenuPath().split("\\\\")[2];
+
+		for(int i=0;i<this.selectedMarket.getRunners().getRunner().length;i++)
+		{
+			
+			RunnersData runner=new RunnersData(this.selectedMarket.getRunners().getRunner()[i].getName(), this.selectedMarket.getRunners().getRunner()[i].getSelectionId(), this);
+			
+			runners.add(runner);
+			
+		}
 		
 		frame=0;
 		
@@ -934,7 +961,7 @@ public class MarketData {
 		// if logging print header market
 		//initializeData();
 		logWritteHeaderMarket();
-		finalizeBetManager();
+		
 		initializeBetManager();
 		
 	}
@@ -1013,6 +1040,7 @@ public class MarketData {
 	
 	public void clean()
 	{
+		
 		
 		for(RunnersData r:runners)
 		{
@@ -1278,209 +1306,7 @@ public class MarketData {
 			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
 			runFile(input);
 			
-			f=new File("logs/11-2011/6.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);*/
-			
-			/*
-			File f=new File("logs/11-2011/7.log");
-			BufferedReader input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/8.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/9.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/10.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/11.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/12.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/13.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/14.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/15.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/16.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/17.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/18.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/19.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/20.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/21.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/22.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/23.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/24.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/25.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			
-			f=new File("logs/11-2011/26.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/27.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/28.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/29.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/11-2011/30.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/1.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/2.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/3.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/4.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/5.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/6.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/7.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/8.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			*/
-			/*
-			File f=new File("logs/12-2011/9.log");
-			BufferedReader input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/10.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/11.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/12.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/13.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/14.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
-			f=new File("logs/12-2011/15.log");
-			input=getBufferedReader(f);
-			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
-			runFile(input);
-			
+		
 			f=new File("logs/12-2011/16.log");
 			input=getBufferedReader(f);
 			System.out.println("Log file ("+f.getAbsolutePath()+") in processing...");
@@ -1494,11 +1320,7 @@ public class MarketData {
 	public void runFile(BufferedReader input)
 	{
 		
-		
-		
-		
 	
-		
 		JFrame control=new JFrame("Play/Pause");
 		control.setSize(200, 100);
 		JButton play=new JButton("Play/Pause");
@@ -1552,6 +1374,8 @@ public class MarketData {
 		
 		control.setVisible(true);
 		
+		boolean marketNew=false;
+		boolean readOneCompleteFrame=false;
 		
 		String s;
 		currentTime = null;
@@ -1597,7 +1421,10 @@ public class MarketData {
 					
 						jf.dispose();
 					}
+					finalizeBetManager();
 					this.clean();
+					
+					
 					
 					//System.out.println("Playing Market");
 					s=s.substring(1);
@@ -1616,9 +1443,9 @@ public class MarketData {
 					//calendar.set(Calendar.MINUTE,min+10);
 					//start=calendar;
 					
+					marketNew=true;
+					 readOneCompleteFrame=false;
 					
-					for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
-						mcl.MarketChange(this,MarketChangeListener.MarketNew);
 					//System.out.println("today day "+start.get(Calendar.DAY_OF_MONTH));
 					
 					
@@ -1627,8 +1454,20 @@ public class MarketData {
 				{
 					if(!fw)
 					{
+					if(marketNew && readOneCompleteFrame)
+					{
+						initializeBetManager();
 						
-					warnListenersUpdate();
+						for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
+							mcl.MarketChange(this,MarketChangeListener.MarketNew);
+						
+						marketNew=false;
+					}
+					
+					if(readOneCompleteFrame)
+						warnListenersUpdate();
+					
+					
 					if(Parameters.REALISTIC_TIME_REPLAY)
 					{
 						try {
@@ -1666,6 +1505,7 @@ public class MarketData {
 					}
 					fpsAux++;
 					
+					readOneCompleteFrame=true;
 					}
 				}
 				else // runners
