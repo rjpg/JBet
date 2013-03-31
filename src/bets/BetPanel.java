@@ -1,11 +1,5 @@
 package bets;
 
-import generated.exchange.BFExchangeServiceStub.BetCategoryTypeEnum;
-import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
-import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
-import generated.exchange.BFExchangeServiceStub.Market;
-import generated.exchange.BFExchangeServiceStub.PlaceBets;
-import generated.exchange.BFExchangeServiceStub.Runner;
 
 import java.awt.GridLayout;
 
@@ -15,7 +9,7 @@ import javax.swing.JPanel;
 
 import DataRepository.MarketData;
 import DataRepository.OddObj;
-import DataRepository.RunnerObj;
+import DataRepository.RunnersData;
 import DataRepository.Utils;
 
 public class BetPanel extends JPanel{
@@ -24,23 +18,23 @@ public class BetPanel extends JPanel{
 	
 	public static String[] backLay={"L","B"};
 	
-	public RunnerObj[] runners;
+	public RunnersData[] runners;
 	
 	public JComboBox<OddObj> comboOdd;
 	public JComboBox<Double> comboStake;
 	public JComboBox<String> comboBackLay;
-	public JComboBox<RunnerObj> comboRunner;
+	public JComboBox<RunnersData> comboRunner;
 	
 	public JCheckBox checkIP;
 	
 
-	public Market market = null;
+	//public Market market = null;
 	public MarketData md =null;
 	
 	public BetPanel(MarketData MDa) {
 		super();
 		md=MDa;
-		market=md.getSelectedMarket();
+		//market=md.getSelectedMarket();
 		initialize();
 	}
 	
@@ -57,7 +51,7 @@ public class BetPanel extends JPanel{
 		comboBackLay=new JComboBox<String>(backLay);
 		
 		initializeRunnersArray();
-		comboRunner=new JComboBox<RunnerObj>(runners);
+		comboRunner=new JComboBox<RunnersData>(runners);
 		
 		checkIP=new JCheckBox("IP",false);
 		
@@ -73,20 +67,14 @@ public class BetPanel extends JPanel{
 	
 	public void initializeRunnersArray()
 	{
-		
-		runners=new RunnerObj[market.getRunners().getRunner().length];
-		
-		for(int i=0;i<runners.length;i++)
-		{
-			runners[i]=new RunnerObj(market.getRunners().getRunner()[i]);
-		}
-			
+		runners=md.getRunners().toArray(new RunnersData[]{});
+		System.out.println("Number of runners="+md.getRunners().size());	
 	}
 	
 	public void reset(MarketData MDa) {
 	
 		md=MDa;
-		market=md.getSelectedMarket();
+		//market=md.getSelectedMarket();
 		initializeRunnersArray();
 		comboRunner.removeAllItems();
 		
@@ -96,9 +84,9 @@ public class BetPanel extends JPanel{
 		}
 	}
 	
-	public Runner getRunner()
+	public RunnersData getRunner()
 	{
-		return ((RunnerObj)comboRunner.getSelectedItem()).getRunner();
+		return ((RunnersData)comboRunner.getSelectedItem());
 	}
 	
 	public double getStake()
@@ -120,7 +108,7 @@ public class BetPanel extends JPanel{
 	public void setRunner(int id)
 	{
 		for(int i =0;i<runners.length;i++)
-			if(id==runners[i].getRunner().getSelectionId())
+			if(id==runners[i].getId())
 			{
 			//	System.out.println("detectou :" + runners[i].getRunner().getName());
 				comboRunner.setSelectedIndex(i);
@@ -147,38 +135,14 @@ public class BetPanel extends JPanel{
 		return (String)comboBackLay.getSelectedItem();
 	}
 	
-	public PlaceBets createPlaceBet()
-	{
-		PlaceBets bet = new PlaceBets();
-		bet.setMarketId(market.getMarketId());
-		bet.setSelectionId(getRunner().getSelectionId());
-		//bet.setSelectionId(prevSelectionId);
-		
-		bet.setBetCategoryType(BetCategoryTypeEnum.E);
-		
-		if(checkIP.isSelected())
-			bet.setBetPersistenceType(BetPersistenceTypeEnum.IP);
-		else
-			bet.setBetPersistenceType(BetPersistenceTypeEnum.NONE);
-		
-		bet.setBetType(BetTypeEnum.Factory.fromValue(getBackLay()));
-		//bet.setBetType(BetTypeEnum.Factory.fromValue("B"));
-		
-		bet.setPrice(getOdd());
-		bet.setSize(getStake());
-		//bet.setPrice(1000);
-		//bet.setSize(2);
-		
-		return bet;
-	}
 	
 	public BetData createBetData()
 	{
 		BetData ret=null;
 		if(getBackLay().equals(backLay[0]))
-			ret=new BetData(md.getRunnersById(getRunner().getSelectionId()),getStake(),getOdd(),BetData.LAY,false);
+			ret=new BetData(md.getRunnersById(getRunner().getId()),getStake(),getOdd(),BetData.LAY,false);
 		else // Is B or L
-			ret=new BetData(md.getRunnersById(getRunner().getSelectionId()),getStake(),getOdd(),BetData.BACK,false);
+			ret=new BetData(md.getRunnersById(getRunner().getId()),getStake(),getOdd(),BetData.BACK,false);
 		
 		if(checkIP.isSelected())
 			ret.setKeepInPlay(true);

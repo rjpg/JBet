@@ -270,6 +270,11 @@ public class Manager  implements MarketChangeListener{
 				new BotDutching(md);
 			}
 			
+			if(Parameters.manualPlaceBetBot)
+			{
+				new ManualPlaceBetBot(md,this);
+			}
+			
 			// /////////////////////after////////////////////////////////////////////
 			md.runFile();
 		
@@ -365,7 +370,16 @@ public class Manager  implements MarketChangeListener{
 	{
 		if(closeFrame==null)
 		{
-			 closeFrame=new JFrame();
+			String sim="Real";
+			String con="BF Server";
+			
+			if(Parameters.simulation)
+				sim="Sim";
+			
+			if(Parameters.replay)
+				con="File";
+			
+			 closeFrame=new JFrame(sim+" - "+con);
 			 if(close==null)
 			 {
 				 close=new JButton("Logout");
