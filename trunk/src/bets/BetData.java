@@ -57,15 +57,16 @@ public class BetData {
 	
 	//public static final int CANCEL_ERROR = -2;	    // after cancel error  (check error)
 	public static final int PLACING_ERROR = -1;     // after placed error (check error)
-	public static final int NOT_PLACED = 0;         // before place is called on this bet 
-	public static final int BET_IN_PROGRESS = 1;    // waiting to recover betId by BetManager 
-	public static final int UNMATCHED = 2;          // Waiting to be Matched
-	public static final int PARTIAL_MATCHED = 3;     // Partial Matched waiting to be Completely Matched
-	public static final int MATCHED =  4;           // Completely matched 
-	public static final int CANCELED = 5;           // Nothing Matched and Canceled 
-	public static final int PARTIAL_CANCELED = 6;   // Partial Matched then Cancel 
-	public static final int CANCEL_WAIT_UPDATE = 7; // If getBet() after Cancel do not work it will use normal update
-	public static final int UNMONITORED = 8;        // BetManager stop updates on this bet
+	public static final int NOT_PLACED = 0;         // before place is called on this bet
+	public static final int PLACING = 1;            // in thread waiting for bf server count down  
+	public static final int BET_IN_PROGRESS = 2;    // waiting to recover betId by BetManager 
+	public static final int UNMATCHED = 3;          // Waiting to be Matched
+	public static final int PARTIAL_MATCHED = 4;     // Partial Matched waiting to be Completely Matched
+	public static final int MATCHED =  5;           // Completely matched 
+	public static final int CANCELED = 6;           // Nothing Matched and Canceled 
+	public static final int PARTIAL_CANCELED = 7;   // Partial Matched then Cancel 
+	public static final int CANCEL_WAIT_UPDATE = 8; // If getBet() after Cancel do not work it will use normal update
+	public static final int UNMONITORED = 9;        // BetManager stop updates on this bet
 	
 	
 	protected Long BetID=null; // given from betfair after placed 

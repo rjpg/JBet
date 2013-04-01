@@ -316,11 +316,11 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	
 	
 	
-	public int placeBet(BetData bet)
+	public void placeBet(BetData bet)
 	{
 		Vector<BetData> place=new Vector<BetData>();
 		place.add(bet);
-		return placeBets(place);
+		placeBets(place);
 	}
 	/**
 	 * 
@@ -330,7 +330,25 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	 * -1 Nothing placed
 	 * -2 At least some not places 
 	 */
-	public int placeBets(Vector<BetData> place)
+	public void placeBets(final Vector<BetData> place)
+	{
+		
+		for(BetData bd:place)
+			bd.setState(BetData.PLACING, BetData.PLACE);
+		
+		  Thread placeBetsThread = new Thread(){
+	            public void run(){
+	              
+	                    placeBetsThread(place);
+	              
+	            }
+	        };
+	      
+	        placeBetsThread.start();
+
+	}
+	
+	public int placeBetsThread(Vector<BetData> place)
 	{
 	
 		
@@ -1303,7 +1321,8 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	public void MarketChange(MarketData md, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			if(updateInterval==BetManager.SYNC_MARKET_DATA_UPDATE)
-				refresh();
+				if(polling)
+					refresh();
 		
 	}
 
