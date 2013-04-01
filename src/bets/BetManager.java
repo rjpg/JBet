@@ -71,7 +71,7 @@ public abstract class  BetManager {
 	 * -1 Nothing placed
 	 * -2 At least some not places 
 	 */
-	public abstract int placeBet(BetData bet);
+	public abstract void placeBet(BetData bet);
 	
 	/**
 	 * After a bet is placed the BetData fields will be altered by the manager. After placed the BetData should be read Only 
@@ -82,7 +82,7 @@ public abstract class  BetManager {
 	 * -1 Nothing placed
 	 * -2 At least some not places 
 	 */
-	public abstract int placeBets(Vector<BetData> place);
+	public abstract void placeBets(Vector<BetData> place);
 	
 	/**
 	 * 

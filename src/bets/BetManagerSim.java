@@ -10,6 +10,8 @@ import DataRepository.Utils;
 
 public class BetManagerSim extends BetManager implements MarketChangeListener{
 
+	public static long IN_PLAY_DELAY=7000;
+	
 	public Vector<BetData> bets=new Vector<BetData>();
 	
 	private boolean polling = false;
@@ -54,14 +56,43 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	}
 
 	@Override
-	public int placeBet(BetData bet) {
+	public void placeBet(BetData bet) {
 		Vector<BetData> place=new Vector<BetData>();
 		place.add(bet);
-		return placeBets(place);
+		placeBets(place);
 	}
 
+	
 	@Override
-	public int placeBets(Vector<BetData> place) {
+	public void placeBets(final Vector<BetData> place) {
+		
+		for(BetData bd:place)
+		{
+			bd.setState(BetData.PLACING, BetData.PLACE);
+			
+		}
+		
+		  Thread placeBetsThread = new Thread(){
+	            public void run(){
+	                try {
+	                	                   
+	                    Thread.sleep(BetManagerSim.IN_PLAY_DELAY);
+	                    placeBetsThread(place);
+	                   
+	                    
+	                } catch (InterruptedException ex) {
+	                   
+	                }
+	            }
+	        };
+	      
+	        placeBetsThread.start();
+	       
+	        
+		
+	}
+	
+	public void placeBetsThread(Vector<BetData> place) {
 		
 		BetData[] bds=place.toArray(new BetData[]{});
 		
@@ -288,7 +319,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			
 		}
 		
-		return 0;
+		
 	}
 
 	@Override
@@ -339,7 +370,8 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	public void MarketChange(MarketData md, int marketEventType) {
 		if( marketEventType==MarketChangeListener.MarketUpdate)
 		{
-			refresh();
+			if(polling)
+				refresh();
 		}
 		
 	}

@@ -215,6 +215,8 @@ public class BetUtils {
 		
 		if(bd.getState()==BetData.NOT_PLACED)
 			ret+="State: NOT_PLACED \n";
+		else if(bd.getState()==BetData.PLACING)
+			ret+="State: PLACING \n";
 		else if(bd.getState()==BetData.UNMATCHED)
 			ret+="State: UNMATHED \n";
 		else if(bd.getState()==BetData.PARTIAL_MATCHED)
@@ -236,6 +238,8 @@ public class BetUtils {
 		
 		if(bd.getLastState()==BetData.NOT_PLACED)
 			ret+="Last State: NOT_PLACED \n";
+		else if(bd.getLastState()==BetData.PLACING)
+			ret+="Last State: .PLACING \n";
 		else if(bd.getLastState()==BetData.UNMATCHED)
 			ret+="Last State: UNMATHED \n";
 		else if(bd.getLastState()==BetData.PARTIAL_MATCHED)

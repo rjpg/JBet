@@ -22,11 +22,11 @@ public class LoaderManualPlaceBetBot {
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; // replay or read from file
-		Parameters.graphicalInterface=false; // replay or read from file
-		Parameters.graphicalInterfaceBots=false; // replay or read from file
+		Parameters.graphicalInterface=true; // replay or read from file
+		Parameters.graphicalInterfaceBots=true; // replay or read from file
 		Parameters.amountBot=false;  // see the amounts
 		Parameters.manualBot=false; // manual bot
-		Parameters.manualPlaceBetBot=false; // manual place bet bot for betManager test
+		Parameters.manualPlaceBetBot=true; // manual place bet bot for betManager test
 		Parameters.studyBot=false; // manual bot
 		Parameters.neuralBot=false; // manual bot
 		Parameters.neighboursCorrelationBot=false; // use neighbours info
