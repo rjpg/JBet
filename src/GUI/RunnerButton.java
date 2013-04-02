@@ -16,7 +16,7 @@ public class RunnerButton extends JButton{
 	public RunnerFrame runnerFrame;
 	
 	public RunnerButton(RunnersData rdA) {
-		super(rdA.getName()+":"+rdA.getDataFrames().get(rdA.getDataFrames().size()-1).getOddBack());
+		super(rdA.getName()/*+":"+rdA.getDataFrames().get(rdA.getDataFrames().size()-1).getOddBack()*/);
 		runnerData=rdA;
 		
 		this.addActionListener(new ActionListener() {

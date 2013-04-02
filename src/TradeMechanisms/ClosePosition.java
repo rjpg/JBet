@@ -48,34 +48,29 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		waitFramesUntilForceClose=waitFramesUntilForceCloseA;
 		
 		updateInterval=updateIntervalA;
-		
+		md=betCloseInfoA.getRd().getMarketData();
 		
 		
 		
 		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
 		{
-			
+			md.addMarketChangeListener(this);
+		}
+		else
+		{
+			startPolling();
 		}
 	}
 	
 	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
-		super();
-		
-		
-		
-				
-		
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 	}
-	
-	public ClosePosition(BetData betCloseA,int StopLossTicksA, int waitFramesNormal, int waitUntilForceClose)
+
+	public ClosePosition(BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
-		super();
-		
+		this(null,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA);
 	}
-	
-	
-	
 	
 	private void setState(int state)
 	{

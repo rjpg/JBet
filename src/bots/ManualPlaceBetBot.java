@@ -155,7 +155,11 @@ public class ManualPlaceBetBot extends Bot{
 						bds.add(bet2);
 						
 					if(bds.size()>0)
-						getMd().getBetManager().cancelBets(bds);
+					{
+						int retCancel=getMd().getBetManager().cancelBets(bds);
+						msgjf.writeMessageText("Return From Cancel : "+retCancel,Color.BLUE);
+						
+					}
 					
 					msgjf.writeMessageText("Cancel End",Color.BLUE);
 				}
@@ -206,9 +210,12 @@ public class ManualPlaceBetBot extends Bot{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
 			if(BetUtils.isBetFinalState(bet.getState()))
 				bet=null;
+			
+		}
+		
+		if(bet2!=null)
 			if(BetUtils.isBetFinalState(bet2.getState()))
 				bet2=null;
-		}
 		
 		
 	}

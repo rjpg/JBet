@@ -64,8 +64,8 @@ public class BetData {
 	public static final int PARTIAL_MATCHED = 4;     // Partial Matched waiting to be Completely Matched
 	public static final int MATCHED =  5;           // Completely matched 
 	public static final int CANCELED = 6;           // Nothing Matched and Canceled 
-	public static final int PARTIAL_CANCELED = 7;   // Partial Matched then Cancel 
-	public static final int CANCEL_WAIT_UPDATE = 8; // If getBet() after Cancel do not work it will use normal update
+	public static final int PARTIAL_CANCELED = 7;   // Partial Matched then Canceled
+	public static final int CANCEL_WAIT_UPDATE = 8; // If getBet() after Cancel() does not work it will use normal update
 	public static final int UNMONITORED = 9;        // BetManager stop updates on this bet
 	
 	

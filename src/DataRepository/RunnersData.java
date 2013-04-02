@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Vector;
 
+import main.Parameters;
+
 import com.sun.xml.bind.v2.runtime.RuntimeUtil.ToStringAdapter;
 
 import GUI.MyChart2D;
@@ -55,6 +57,15 @@ public class RunnersData {
 		HistoryData d=new HistoryData(timeA, oddLayA, amountLayA, oddBackA, amountBackA,/* weightmoneyLayA, weightmoneyBackA,*/ matchedAmountA, lastMatchetA,layPricesA, backPricesA);
 		dataFrames.add(d);
 		
+		if(Parameters.HISTORICAL_DATA_FRAMES_MEMORY<1)
+			return;
+		if(dataFrames.size()>Parameters.HISTORICAL_DATA_FRAMES_MEMORY)
+		{
+			dataFrames.get(0).clean();
+			dataFrames.removeElementAt(0);
+		}
+		
+		//System.out.println("size : "+dataFrames.size());
 	}
 
 	@Override
