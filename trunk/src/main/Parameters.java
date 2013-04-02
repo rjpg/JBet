@@ -3,11 +3,11 @@ package main;
 public class Parameters {
 	
 	static public boolean log=false;  // Log or not to Log when not in replay
-	static public boolean replay=false; // replay or read from file
+	static public boolean replay=true; // replay or read from file
 	static public boolean replay_file_list=false; // replay or read from file
 	static public boolean replay_file_list_test=false; // replay or read from file
 	
-	static public boolean jump_to_the_next_race=true; //not go inplay ? 
+	static public boolean jump_to_the_next_race=false; //not go inplay ? 
 	
 	static public boolean REALISTIC_TIME_REPLAY=false;
 	static public boolean PAUSE_BETWEEN_RACES_REPLAY=false;
@@ -35,7 +35,7 @@ public class Parameters {
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
-	static public boolean simulation=false;
+	static public boolean simulation=true;
 	
 	static public int matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 	//1 - all at first 
@@ -45,7 +45,9 @@ public class Parameters {
 	//wheight of money calculation depth
 	static public int WOM_DIST_CENTER=5;
 	
-	static public int CHART_FRAMES=240;
+	static public int CHART_FRAMES=40;
+	
+	static public int HISTORICAL_DATA_FRAMES_MEMORY=1000;
 	
 	static public double ODD_FAVORITE=2.00;
 	

@@ -96,6 +96,17 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 		clean();
 		this.setTitle(md.getName());
 		
+		for(RunnersData rd:md.getRunners())
+		{
+				RunnerButton nrdb=new RunnerButton(rd);
+				vectorRdb.add(nrdb);
+				contentPane.add(nrdb);
+				System.out.println("added "+ rd);
+				contentPane.doLayout();
+		
+		}
+		contentPane.doLayout();
+		
 	}
 	
 	public void clean()

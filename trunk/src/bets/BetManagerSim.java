@@ -2,6 +2,7 @@ package bets;
 
 import java.util.Calendar;
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
@@ -13,6 +14,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	public static long IN_PLAY_DELAY=7000;
 	
 	public Vector<BetData> bets=new Vector<BetData>();
+	private static Semaphore sem=new Semaphore(1,true);
 	
 	private boolean polling = false;
 	
@@ -313,7 +315,15 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			
 			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 			
-			bets.add(bds[i]);
+			try {
+				sem.acquire();
+				bets.add(bds[i]);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sem.release();
+			
 			bds[i].setTimestampPlace(Calendar.getInstance());
 		
 			
@@ -331,18 +341,49 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 
 	@Override
 	public int cancelBets(Vector<BetData> cancelBets) {
+		
+		boolean someCanceled=false;
+		boolean someNotCanceled=false;
+		
 		for(BetData bd:cancelBets)
 		{
+			if(BetUtils.isBetFinalState(bd.getState()))
+			{
+				someNotCanceled=true;
+				continue;
+			}
+			
+			if(bd.getState()==BetData.PLACING)
+			{
+				someNotCanceled=true;
+				continue;
+			}
+			
 			if(bd.getMatchedAmount()>0)
 				if(bd.getMatchedAmount()>=bd.getAmount())
+				{
 					bd.setState(BetData.MATCHED, BetData.CANCEL);
+					someCanceled=true;
+				}
 				else
+				{
 					bd.setState(BetData.PARTIAL_CANCELED, BetData.CANCEL);
+					someCanceled=true;
+				}
 			else
+			{
 				bd.setState(BetData.CANCELED, BetData.CANCEL);
+				someCanceled=true;
+			}
 			
 			
 		}
+		
+		if(!someCanceled)
+			return -1;
+		
+		if(someNotCanceled)
+			return -2;
 		
 		return 0;
 	}

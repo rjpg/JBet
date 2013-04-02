@@ -77,10 +77,9 @@ public abstract class  BetManager {
 	 * After a bet is placed the BetData fields will be altered by the manager. After placed the BetData should be read Only 
 	 * 
 	 * @param place - vector of BetData
-	 * @return 
-	 * 0 All placed Ok
-	 * -1 Nothing placed
-	 * -2 At least some not places 
+	 * After processing the BetData.PLACING state if there is an error the state of the bet will be BetData.PLACING_ERROR 
+	 * and the cause of the error can be debug using BetData.getErrorType()  
+	 * 
 	 */
 	public abstract void placeBets(Vector<BetData> place);
 	
@@ -89,8 +88,8 @@ public abstract class  BetManager {
 	 * @param bet - BetData
 	 * @return 
 	 * 0 canceled Ok
-	 * -1 Nothing placed
-	 * -2 At least some not places 
+	 * -1 Nothing Canceled
+	 * -2 At least some not Canceled 
 	 */
 	public abstract int cancelBet(BetData bet);
 	
@@ -100,8 +99,8 @@ public abstract class  BetManager {
 	 * @param place - vector of BetData
 	 * @return 
 	 * 0 All canceled Ok
-	 * -1 Nothing placed
-	 * -2 At least some not places 
+	 * -1 Nothing Canceled
+	 * -2 At least some not Canceled 
 	 */
 	public abstract int cancelBets(Vector<BetData> cancelBets);
 	

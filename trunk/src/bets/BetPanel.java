@@ -68,7 +68,7 @@ public class BetPanel extends JPanel{
 	public void initializeRunnersArray()
 	{
 		runners=md.getRunners().toArray(new RunnersData[]{});
-		System.out.println("Number of runners="+md.getRunners().size());	
+		//System.out.println("Number of runners="+md.getRunners().size());	
 	}
 	
 	public void reset(MarketData MDa) {

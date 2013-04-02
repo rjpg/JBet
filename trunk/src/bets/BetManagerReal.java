@@ -15,6 +15,7 @@ import generated.exchange.BFExchangeServiceStub.UpdateBetsResultEnum;
 
 import java.util.Calendar;
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
@@ -32,6 +33,8 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	
 	//Bets data
 	private Vector<BetData> bets=new Vector<BetData>();
+	
+	private static Semaphore sem=new Semaphore(1,true);
 	
 	//Bet in progress Max frames until error state
 	protected static int BIP_ERROR_UPDATES = 10;
@@ -387,7 +390,15 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				
 				bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 				
-				bets.add(bds[i]);
+				try {
+					sem.acquire();
+					bets.add(bds[i]);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				sem.release();
+				
 				bds[i].setTimestampPlace(Calendar.getInstance());
 				
 			}
@@ -622,7 +633,15 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			
 			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 			
-			bets.add(bds[i]);
+			try {
+				sem.acquire();
+				bets.add(bds[i]);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sem.release();
+			
 			bds[i].setTimestampPlace(Calendar.getInstance());
 			
 		}
@@ -1134,7 +1153,10 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		for(int i=0;i<bds.length;i++)
 		{
 			canc[i]= new CancelBets();
-			canc[i].setBetId(bds[i].getBetID());
+			if(bds[i].getBetID()==null)
+				canc[i].setBetId(-1);     // force to make error of invalid bet ID
+			else
+				canc[i].setBetId(bds[i].getBetID());
 			
 			//bds[i].setTimestampPlace(Calendar.getInstance());
 		}
