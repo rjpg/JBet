@@ -11,7 +11,7 @@ import DataRepository.Utils;
 
 public class BetManagerSim extends BetManager implements MarketChangeListener{
 
-	public static long IN_PLAY_DELAY=7000;
+	public static long IN_PLAY_DELAY=0000;
 	
 	public Vector<BetData> bets=new Vector<BetData>();
 	private static Semaphore sem=new Semaphore(1,true);

@@ -45,7 +45,7 @@ public class Parameters {
 	//wheight of money calculation depth
 	static public int WOM_DIST_CENTER=5;
 	
-	static public int CHART_FRAMES=40;
+	static public int CHART_FRAMES=1000;
 	
 	static public int HISTORICAL_DATA_FRAMES_MEMORY=1000;
 	

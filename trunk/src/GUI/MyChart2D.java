@@ -89,6 +89,9 @@ public class MyChart2D extends Chart2D {
 		}
 		tmp.setColor(c);
 		//traces.put(traceName, tmp);
+		
+		
+		
 		tmp.addPoint(x,y);
 		
 		

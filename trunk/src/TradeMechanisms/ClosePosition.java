@@ -4,6 +4,8 @@ import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.Swing;
+import DataRepository.Utils;
 import bets.BetData;
 import bets.BetManager;
 import bets.BetManagerReal.BetsManagerThread;
@@ -13,21 +15,31 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 
 	
 	// States
-	private static final int I_OPEN = 2;
+	private static final int I_PLACING = 2;
+	private static final int I_PLACED = 2;
 	private static final int I_PARTIAL_CLOSED = 3;
 	private static final int I_CLOSED = 4;
 	private static final int I_CANCELED = 5;
 	private static final int I_UNMONITORED = 6;
 	
+	private int I_STATE=ClosePosition.I_PLACING;
 	
+	
+	
+
 	// this
 	private Bot bot=null;
 	private BetData betCloseInfo=null;
 	private int stopLossTicks=1;
+	private double oddStopLoss=0;
 	private int waitFramesNormal=20;
 	private int waitFramesUntilForceClose=10;
 	
-	private Vector<BetData> historyBets=new Vector<BetData>();
+	private boolean useIPKeep=false;
+	
+	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
+	
+	private BetData betInProcess=null;
 
 	private MarketData md;
 	
@@ -37,8 +49,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
-	
-	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
+	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean useIPKeepA)
 	{
 		super();
 		bot=botA;
@@ -46,20 +57,29 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		stopLossTicks=stopLossTicksA;
 		waitFramesNormal=waitFramesNormalA;
 		waitFramesUntilForceClose=waitFramesUntilForceCloseA;
-		
 		updateInterval=updateIntervalA;
+		useIPKeep=useIPKeepA;
+		
+		
+		betInProcess=betCloseInfo;
+		
+		if(betCloseInfoA.getType()==BetData.BACK)
+			oddStopLoss=Utils.indexToOdd(Utils.oddToIndex(betCloseInfoA.getOddRequested())-stopLossTicks);
+		else
+			oddStopLoss=Utils.indexToOdd(Utils.oddToIndex(betCloseInfoA.getOddRequested())+stopLossTicks);
+			
+		//if(bet.)
+			
 		md=betCloseInfoA.getRd().getMarketData();
 		
+		initialize();
 		
+	}
+	
+	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
+	{
 		
-		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-		{
-			md.addMarketChangeListener(this);
-		}
-		else
-		{
-			startPolling();
-		}
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,false);
 	}
 	
 	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
@@ -70,6 +90,23 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	public ClosePosition(BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
 		this(null,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA);
+	}
+	
+	private void initialize()
+	{
+		
+		
+	/*	if(betCloseInfo.getState()==BetData.NOT_PLACED)
+			place
+		*/
+		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+		{
+			md.addMarketChangeListener(this);
+		}
+		else
+		{
+			startPolling();
+		}
 	}
 	
 	private void setState(int state)
@@ -103,10 +140,30 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	}
 	
 	
+	public int getI_STATE() {
+		return I_STATE;
+	}
+
+	public void setI_STATE(int i_STATE) {
+		I_STATE = i_STATE;
+	}
+	
 	private void refresh()
 	{
 		
+		switch (getI_STATE()) {
+	        case ClosePosition.I_PLACING:  placing();       break;
+	        
+	        default: clean(); break;
+		}
+		
 	}
+	
+	public void placing()
+	{
+		System.out.println("Bet");
+	}
+	
 
 	//---------------------------------thread -----
 	public class ClosePositionThread extends Object implements Runnable {
