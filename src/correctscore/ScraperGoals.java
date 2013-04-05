@@ -27,7 +27,7 @@ public class ScraperGoals {
 	private UpdateThread as;
 	private Thread t;
 	private boolean polling = false;
-	protected int updateIntervalScraper = 1000;
+	protected int updateIntervalScraper = 3000;
 	
 	
 	private String targetURLString = "http://www.xscores.com/soccer/soccer.jsp?sports=soccer&menu3=2&dt=09/08&flag=sportData";
@@ -60,6 +60,8 @@ public class ScraperGoals {
 	}
 
 	public void refresh() {
+		
+		System.out.println("Entrei");
 		NodeList urlNodes = null;
 		targetURLString="http://www.xscores.com/soccer/soccer.jsp?sports=soccer&menu3=2&dt=";
 		
@@ -89,15 +91,21 @@ public class ScraperGoals {
 			URL targetURL = new URL(targetURLString);
 			URLConnection targetConnection = targetURL.openConnection();
 			targetConnection.setDoOutput(true);
+			targetConnection.setUseCaches(false);
+			targetConnection.setAllowUserInteraction(false);
+			targetConnection.setReadTimeout(2000);
 			targetConnection.connect();
+		
 			// Post to output
 			//System.out.println(targetConnection.getInputStream().available());
 			//OutputStreamWriter out = new OutputStreamWriter(
 			//		targetConnection.getOutputStream());
 			//out.write("stst=" + keyword);
 			//out.close();
+
 			
 			Document xmlResponse = tidy(targetConnection.getInputStream());
+			System.out.println("Sai");
 			//xmlResponse.getDoctype().
 			//System.out.println(nodeToString(xmlResponse.getDocumentElement()));
 			urlNodes = XPathAPI.selectNodeList(xmlResponse, "//tbody[@id=\"scoretable\"]");
@@ -207,12 +215,14 @@ public class ScraperGoals {
 				//System.out.println("------------------------");
 			}
 			
+			
 			//System.out.println(nodeToString(urlNodes.item(0)));
 		} catch (Exception urle) {
 			
 			System.err.println("Error: " + urle.toString()+ "(Probably no live games to scrap)");
 		}
 
+		
 		//return urlNodes;
 	}
 	

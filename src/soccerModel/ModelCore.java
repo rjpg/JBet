@@ -2,10 +2,12 @@ package soccerModel;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 
 import org.apache.axis2.jaxws.description.xml.handler.HomeType;
+import org.apache.commons.httpclient.methods.ExpectContinueMethod;
 
 import GUI.MyChart2D;
 
@@ -38,8 +40,8 @@ public class ModelCore {
 	double goalsAVGScale[];
 	
 	//Model Inputs
-	double goalLine=2.5;
-	double asianHcap=0.75;
+	double goalLine=1.5;
+	double asianHcap=-0.75;
 	
 	double gLineOver=2.0;
 	double gLineUnder=2.0;
@@ -50,6 +52,10 @@ public class ModelCore {
 	double desAH=0;
 	double desGL=0;
 	
+	
+	//
+	double initExpectedGoalsA=0;
+	double initExpectedGoalsB=0;
 	
 	
 	//------------------------ time
@@ -66,12 +72,17 @@ public class ModelCore {
 	
 	double halfTimeFactor1Parmeter=0.45;
 	
-	double totalGoalsSegments[]=new double[segments*2+1];
-	double supremacySegments[]=new double[segments*2+1];
+	double expectedGoalsASegments[]=new double[segments*2+1];
+	double expectedGoalsBSegments[]=new double[segments*2+1];
 	
 	double halfTimeFactor1rates[]=new double[segments];
 	
 	double halfTimeFactor2rates[]=new double[segments];
+	
+	
+	// Goals
+	
+	Vector<GoalEvent> goalsVector=new Vector<GoalEvent>();
 	
 	public ModelCore() {
 	
@@ -86,14 +97,27 @@ public class ModelCore {
 		
 		supremacy();
 		
+		goalsVector.add(new GoalEvent(70, true, 1, 0));
+		
+		goalsVector.add(new GoalEvent(95, true, 2, 0));
+		
+		goalsVector.add(new GoalEvent(100, false, 2, 1));
+		
+		
+		//double lA=(sup/2)+(totalGoals/2);
+		//double lB=(totalGoals/2)-(sup/2);
+		
+		initExpectedGoalsA=(supremacy/2)+(totalGoals/2);
+		initExpectedGoalsB=(totalGoals/2)-(supremacy/2);
+		
 		calculateHalfTimeRates1();
 		calculateHalfTimeRates2();
 		
 		printMatchOdds();
 		
-		calculateTotalGoalsSegments();
+		calculateExpectedGoalsBSegments();
 		
-		calculateSupremacySegments();
+		calculateExpectedGoalsASegments();
 		
 		printMatchOddsSegments();
 	}
@@ -156,16 +180,159 @@ public class ModelCore {
 		System.out.println("halfTimeFactor2rates[90]="+halfTimeFactor2rates[segments-1]*rate);
 	}
 	
-	public void calculateTotalGoalsSegments()
+	public void calculateExpectedGoalsBSegments()
 	{
-		totalGoalsSegments[0]=totalGoals;
+		expectedGoalsBSegments[0]=initExpectedGoalsB;
 		
-		System.out.println("totalGoalsSegments[0]="+totalGoalsSegments[0]);
+		System.out.println("totalGoalsSegments[0]="+expectedGoalsBSegments[0]);
 		
 		for(int i=1;i<segments+1;i++)
 		{
-			totalGoalsSegments[i]=totalGoals*(1.-halfTimeFactor1rates[i-1]);
-			System.out.println("totalGoalsSegments["+i+"]="+totalGoalsSegments[i] +"   ("+totalGoals+"*(1-"+halfTimeFactor1rates[i-1]+"))");
+			
+			
+			for(GoalEvent ge:goalsVector)
+			{
+				if(ge.getTimeSegment()==i)
+				{
+					if(ge.isAb())
+					{
+						double[] incentiveArray=new double[segments*2];
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						}
+						
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]=1-incentiveArray[x];
+						}
+						
+						double incentive=incentiveArray[ge.getTimeSegment()];
+						
+						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
+						
+						if(supremacy>0) // favorite home
+						{
+							incentive=incentive/4;
+						}
+						else
+						{
+							incentive=incentive/2;
+						}
+						
+						
+						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
+						
+						
+					}
+				}
+			}
+			
+			expectedGoalsBSegments[i]=initExpectedGoalsB*(1.-halfTimeFactor1rates[i-1]);
+			System.out.println("totalGoalsSegments["+i+"]="+expectedGoalsBSegments[i] +"   ("+initExpectedGoalsB+"*(1-"+halfTimeFactor1rates[i-1]+"))");
+		}	
+		
+		
+		System.out.println("--------------------");
+		
+		for(int i=0;i<segments;i++)
+		{
+			
+			for(GoalEvent ge:goalsVector)
+			{
+				if(ge.getTimeSegment()==i+segments+1)
+				{
+					if(ge.isAb())
+					{
+						double[] incentiveArray=new double[segments*2];
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						}
+						
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]=1-incentiveArray[x];
+						}
+						
+						double incentive=incentiveArray[ge.getTimeSegment()];
+						
+						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
+						
+						if(supremacy>0) // favorite home
+						{
+							incentive=incentive/4;
+						}
+						else
+						{
+							incentive=incentive/2;
+						}
+						
+						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
+						
+						
+					}
+				}
+			}
+			expectedGoalsBSegments[i+segments+1]=initExpectedGoalsB*(1.-halfTimeFactor2rates[i]);
+			System.out.println("totalGoalsSegments["+(i+segments+1)+"]="+expectedGoalsBSegments[i+segments+1]+ "   ("+initExpectedGoalsB+"*(1-"+halfTimeFactor2rates[i]+"))");
+			
+		}	
+	}
+	
+	public void calculateExpectedGoalsASegments()
+	{
+		expectedGoalsASegments[0]=initExpectedGoalsA;
+		
+		System.out.println("supremacySegments[0]="+expectedGoalsASegments[0]);
+		
+		for(int i=1;i<segments+1;i++)
+		{
+			
+			for(GoalEvent ge:goalsVector)
+			{
+				if(ge.getTimeSegment()==i)
+				{
+					if(!ge.isAb())
+					{
+						double[] incentiveArray=new double[segments*2];
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						}
+						
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]=1-incentiveArray[x];
+						}
+						
+						double incentive=incentiveArray[ge.getTimeSegment()];
+						
+						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
+						
+						if(supremacy>0) // favorite home
+						{
+							incentive=incentive/4;
+						}
+						else
+						{
+							incentive=incentive/2;
+						}
+						
+						
+						
+						initExpectedGoalsA=((supremacy+incentive)/2)+(totalGoals/2);
+						
+						
+						
+					}
+				}
+			}
+			expectedGoalsASegments[i]=initExpectedGoalsA*(1.-halfTimeFactor1rates[i-1]);
+			System.out.println("supremacySegments[0]="+expectedGoalsASegments[i]+ "   ("+initExpectedGoalsA+"*(1-"+halfTimeFactor1rates[i-1]+"))");
 			
 		}	
 		
@@ -173,29 +340,50 @@ public class ModelCore {
 		
 		for(int i=0;i<segments;i++)
 		{
-			totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
-			System.out.println("totalGoalsSegments["+(i+segments+1)+"]="+totalGoalsSegments[i+segments+1]+ "   ("+totalGoals+"*(1-"+halfTimeFactor2rates[i]+"))");
-		}	
-	}
-	
-	public void calculateSupremacySegments()
-	{
-		supremacySegments[0]=supremacy;
-		
-		System.out.println("supremacySegments[0]="+supremacySegments[0]);
-		
-		for(int i=1;i<segments+1;i++)
-		{
-			supremacySegments[i]=supremacy*(1.-halfTimeFactor1rates[i-1]);
-			System.out.println("supremacySegments[0]="+supremacySegments[i]+ "   ("+supremacy+"*(1-"+halfTimeFactor1rates[i-1]+"))");
-		}	
-		
-		System.out.println("--------------------");
-		
-		for(int i=0;i<segments;i++)
-		{
-			supremacySegments[i+segments+1]=supremacy*(1.-halfTimeFactor2rates[i]);
-			System.out.println("supremacySegments["+(i+segments+1)+"]="+supremacySegments[i+segments+1]+ "   ("+supremacy+"*(1-"+halfTimeFactor2rates[i]+"))");
+			
+			
+			for(GoalEvent ge:goalsVector)
+			{
+				if(ge.getTimeSegment()==i+segments+1)
+				{
+					if(!ge.isAb())
+					{
+						double[] incentiveArray=new double[segments*2];
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+						}
+						
+						for(int x=0;x<segments*2;x++)
+						{
+							incentiveArray[x]=1-incentiveArray[x];
+						}
+						
+						double incentive=incentiveArray[ge.getTimeSegment()];
+						
+						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
+						
+						if(supremacy>0) // favorite home
+						{
+							incentive=incentive/4;
+						}
+						else
+						{
+							incentive=incentive/2;
+						}
+						
+						
+						initExpectedGoalsA=((supremacy+incentive)/2)+(totalGoals/2);
+						
+						
+						
+					}
+				}
+			}
+			
+			expectedGoalsASegments[i+segments+1]=initExpectedGoalsA*(1.-halfTimeFactor2rates[i]);
+			System.out.println("supremacySegments["+(i+segments+1)+"]="+expectedGoalsASegments[i+segments+1]+ "   ("+initExpectedGoalsA+"*(1-"+halfTimeFactor2rates[i]+"))");
 		}	
 	}
 	
@@ -502,6 +690,65 @@ public class ModelCore {
 	}
 	
 	
+	public GoalEvent getActualGoalEvent(int timeSegment)
+	{
+		if(goalsVector.size()==0) return null;
+		
+		GoalEvent ret=goalsVector.get(0);
+		
+		for(GoalEvent ge:goalsVector)
+		{
+			if(ge.getTimeSegment()<=timeSegment)
+			{
+				if(ret.getTimeSegment()<ge.getTimeSegment())
+				{
+					ret=ge;
+				}
+			}
+		}
+		
+		if(ret.getTimeSegment()>timeSegment)
+			return null;
+		else
+			return ret;
+	}
+	
+	
+	public void updateTable(GoalEvent ge)
+	{
+		
+		if(ge==null) return;
+
+		for(int l=TABLE_MAX_GOALS-1;l>=0;l--)
+		{
+			for(int c=TABLE_MAX_GOALS-1;c>=0;c--)
+			{
+				
+				if(c-ge.getA()>=0)
+					table[c][l]=table[c-ge.getA()][l];
+				else
+					table[c][l]=0;
+				
+			}
+			
+		}
+		
+		for(int l=TABLE_MAX_GOALS-1;l>=0;l--)
+		{
+			for(int c=TABLE_MAX_GOALS-1;c>=0;c--)
+			{
+				
+				if(l-ge.getB()>=0)
+					table[c][l]=table[c][l-ge.getB()];
+				else
+					table[c][l]=0;
+				
+			}
+			
+		}
+
+	}
+	
 	public void printMatchOddsSegments()
 	{
 		
@@ -517,14 +764,31 @@ public class ModelCore {
 		for(int i=0;i<segments+1;i++)
 		{
 			
-			initTable(supremacySegments[i],totalGoalsSegments[i],drawFactor);
+			initTableExpected(expectedGoalsASegments[i],expectedGoalsBSegments[i],drawFactor);
+			
+			GoalEvent ge=getActualGoalEvent(i);
+			
+			updateTable(ge);
+			
+		
+			
+			
 			System.out.println("Segment :"+i+"       (Minute :"+(i)/2.+")");
+			if(ge==null)
+				System.out.println("Score "+0+" "+0);
+			else
+				System.out.println("Score "+ge.getA()+" "+ge.getB());
+			
 			printMatchOdds();
 			
 			//chart.addValue("A", i, sumA, Color.RED);
 			//chart.addValue("D", i, sumDraw, Color.GREEN);
 			//chart.addValue("B", i, sumB, Color.BLUE);
-			chart.addValue("Actual", i, 1/actual, Color.YELLOW);
+			
+			chart.addValue("1-0", i, 1/oneZero, Color.RED);
+			chart.addValue("2-0", i, 1/twoZero, Color.GREEN);
+			chart.addValue("2-1", i, 1/twoOne, Color.BLUE);
+			chart.addValue("0-0", i, 1/actual, Color.MAGENTA);
 			
 		}	
 		
@@ -532,14 +796,32 @@ public class ModelCore {
 		
 		for(int i=0;i<segments;i++)
 		{
-			initTable(supremacySegments[i+segments+1],totalGoalsSegments[i+segments+1],drawFactor);
+			initTableExpected(expectedGoalsASegments[i+segments+1],expectedGoalsBSegments[i+segments+1],drawFactor);
 			//totalGoalsSegments[i+segments+1]=totalGoals*(1.-halfTimeFactor2rates[i]);
+			
+			GoalEvent ge=getActualGoalEvent((i+segments+1));
+			
+			updateTable(ge);
+			
+			
 			System.out.println("Segment :"+(i+segments+1)+"       (Minute :"+(i+segments+1)/2.+")");
+			
+			if(ge==null)
+				System.out.println("Score "+0+" "+0);
+			else
+				System.out.println("Score "+ge.getA()+" "+ge.getB());
+			
 			printMatchOdds();
 			//chart.addValue("A", i+segments+1, sumA, Color.RED);
 			//chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
 			//chart.addValue("B", i+segments+1, sumB, Color.BLUE);
-			chart.addValue("Actual", i+segments+1, 1/actual, Color.YELLOW);
+			
+			chart.addValue("1-0", i+segments+1, 1/oneZero, Color.RED);
+			chart.addValue("2-0", i+segments+1, 1/twoZero, Color.GREEN);
+			chart.addValue("2-1", i+segments+1, 1/twoOne, Color.BLUE);
+			chart.addValue("0-0", i+segments+1, 1/actual, Color.MAGENTA);
+			
+		
 		}	
 		
 		/*for(int i=0;i<segments;i++)
@@ -556,6 +838,10 @@ public class ModelCore {
 	double sumA=0;
 	
 	double actual=0;
+	
+	double oneZero=0;
+	double twoZero=0;
+	double twoOne=0;
 	public void printMatchOdds()
 	{
 		sumB=0;
@@ -595,12 +881,17 @@ public class ModelCore {
 		}
 		actual = table[0][0];
 		
-		if(actual<0.05) actual=0.05;
+
+		oneZero=table[1][0];
+		twoZero=table[2][0];
+		twoOne=table[2][1];
 		
-		System.out.println("A:"+1/sumA);
-		System.out.println("Draw:"+1/sumDraw);
-		System.out.println("B:"+1/sumB);
-		System.out.println("ACtual:"+(1/actual));
+		//if(actual<0.05) actual=0.05;
+		
+		System.out.println("A:"+sumA);
+		System.out.println("Draw:"+sumDraw);
+		System.out.println("B:"+sumB);
+		System.out.println("ACtual:"+(actual));
 		
 	}
 	
@@ -616,6 +907,54 @@ public class ModelCore {
 		
 		double lA=(sup/2)+(totalGoals/2);
 		double lB=(totalGoals/2)-(sup/2);
+		
+		//System.out.println("lA: "+lA+"\nLB: "+lB);
+		
+		for(int i =0;i<TABLE_MAX_GOALS;i++)
+		{
+			goalA[i]=poisson(i,lA);
+			goalB[i]=poisson(i,lB);
+		}
+		
+		String s="";
+		
+		totalTable=0;
+		
+		for(int l=0;l<TABLE_MAX_GOALS;l++)
+		{
+			for(int c=0;c<TABLE_MAX_GOALS;c++)
+			{
+				if(c==l)
+					table[l][c]=goalA[l]*goalB[c]*drawFactor;
+				else
+					table[l][c]=goalA[l]*goalB[c];
+				
+				s=s+" "+table[l][c];
+				
+				totalTable+=table[l][c];
+			}
+			s=s+"\n";
+		}
+		
+		
+		
+		//System.out.println(s);
+		//System.out.println("Total Table : "+totalTable);
+	}
+	
+	public void initTableExpected(double expectedA,double expectedB, double drawFactor)
+	{
+		//System.err.println("TABLE sup: "+sup+"   tg:"+totalGoals);
+		
+		
+		table=new double[TABLE_MAX_GOALS][TABLE_MAX_GOALS];
+		
+		double goalA[]=new double[TABLE_MAX_GOALS];
+		double goalB[]=new double[TABLE_MAX_GOALS];
+		
+		double lA=expectedA;
+		double lB=expectedB;
+		
 		
 		//System.out.println("lA: "+lA+"\nLB: "+lB);
 		
