@@ -39,19 +39,21 @@ public class ModelCore {
 	double goalsSumOverUnder[];
 	double goalsAVGScale[];
 	
-	//Model Inputs
-	double goalLine=1.5;
-	double asianHcap=-0.75;
 	
-	double gLineOver=2.0;
-	double gLineUnder=2.0;
-	
-	double aHcapHome=2.0;
-	double aHcapAway=2.0;
-	
-	double desAH=0;
-	double desGL=0;
-	
+	// model inputs 
+    double goalLine=2.5;
+    double asianHcap=-0.25;
+    
+    double gLineOver=1.90;
+    double gLineUnder=2.02;
+    
+    double aHcapHome=2.17;
+    double aHcapAway=1.80;
+    
+    double desAH=0;
+    double desGL=0;
+
+
 	
 	//
 	double initExpectedGoalsA=0;
@@ -97,6 +99,8 @@ public class ModelCore {
 		
 		supremacy();
 		
+		System.out.println("Supremacy :"+supremacy);
+		
 		goalsVector.add(new GoalEvent(70, true, 1, 0));
 		
 		goalsVector.add(new GoalEvent(95, true, 2, 0));
@@ -114,6 +118,7 @@ public class ModelCore {
 		calculateHalfTimeRates2();
 		
 		printMatchOdds();
+		
 		
 		calculateExpectedGoalsBSegments();
 		
@@ -197,30 +202,30 @@ public class ModelCore {
 					if(ge.isAb())
 					{
 						double[] incentiveArray=new double[segments*2];
-						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
-						for(int x=0;x<segments*2;x++)
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+						for(int x=1;x<segments*2;x++)
 						{
-							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+							incentiveArray[x]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+							incentiveArray[x]+=incentiveArray[x-1];
 						}
 						
 						for(int x=0;x<segments*2;x++)
 						{
-							incentiveArray[x]=1-incentiveArray[x];
+							incentiveArray[x]=1.-incentiveArray[x];
 						}
 						
 						double incentive=incentiveArray[ge.getTimeSegment()];
 						
 						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
+						System.out.println("Supremacy :"+supremacy);
 						
+						System.out.println("Incentive to B1:"+incentive+ "   Time :"+ge.getTimeSegment());
 						if(supremacy>0) // favorite home
-						{
-							incentive=incentive/4;
-						}
-						else
 						{
 							incentive=incentive/2;
 						}
 						
+						System.out.println("Incentive to B2:"+incentive+ "   Time :"+ge.getTimeSegment());
 						
 						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
 						
@@ -246,29 +251,29 @@ public class ModelCore {
 					if(ge.isAb())
 					{
 						double[] incentiveArray=new double[segments*2];
-						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
-						for(int x=0;x<segments*2;x++)
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+						for(int x=1;x<segments*2;x++)
 						{
-							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+							incentiveArray[x]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+							incentiveArray[x]+=incentiveArray[x-1];
 						}
 						
 						for(int x=0;x<segments*2;x++)
 						{
-							incentiveArray[x]=1-incentiveArray[x];
+							incentiveArray[x]=1.-incentiveArray[x];
+							System.out.println("incentiveArray["+x+"]="+incentiveArray[x]);
 						}
 						
 						double incentive=incentiveArray[ge.getTimeSegment()];
 						
 						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
 						
+						System.out.println("Incentive to B1:"+incentive+ "   Time :"+ge.getTimeSegment());
 						if(supremacy>0) // favorite home
-						{
-							incentive=incentive/4;
-						}
-						else
 						{
 							incentive=incentive/2;
 						}
+						System.out.println("Incentive to B2:"+incentive+ "   Time :"+ge.getTimeSegment());
 						
 						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
 						
@@ -298,29 +303,28 @@ public class ModelCore {
 					if(!ge.isAb())
 					{
 						double[] incentiveArray=new double[segments*2];
-						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
-						for(int x=0;x<segments*2;x++)
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+						for(int x=1;x<segments*2;x++)
 						{
-							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+							incentiveArray[x]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+							incentiveArray[x]+=incentiveArray[x-1];
 						}
 						
 						for(int x=0;x<segments*2;x++)
 						{
-							incentiveArray[x]=1-incentiveArray[x];
+							incentiveArray[x]=1.-incentiveArray[x];
+							
 						}
 						
 						double incentive=incentiveArray[ge.getTimeSegment()];
 						
 						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
 						
-						if(supremacy>0) // favorite home
-						{
-							incentive=incentive/4;
-						}
-						else
+						if(supremacy<0) // favorite away
 						{
 							incentive=incentive/2;
 						}
+						
 						
 						
 						
@@ -349,30 +353,34 @@ public class ModelCore {
 					if(!ge.isAb())
 					{
 						double[] incentiveArray=new double[segments*2];
-						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(segments*2));
-						for(int x=0;x<segments*2;x++)
+						incentiveArray[0]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+						
+						
+						for(int x=1;x<segments*2;x++)
 						{
-							incentiveArray[x]+=(Math.abs(ge.getA()-ge.getB())/(segments*2));
+							incentiveArray[x]=(Math.abs(ge.getA()-ge.getB())/(double)(segments*2));
+							incentiveArray[x]+=incentiveArray[x-1];
+							
 						}
 						
 						for(int x=0;x<segments*2;x++)
 						{
-							incentiveArray[x]=1-incentiveArray[x];
+							incentiveArray[x]=1.-incentiveArray[x];
+							//System.out.println("incentiveArray["+x+"]="+incentiveArray[x]);
 						}
 						
 						double incentive=incentiveArray[ge.getTimeSegment()];
 						
+						System.out.println("Incentive to A1:"+incentive+ "   Time :"+ge.getTimeSegment());
+						
 						incentive=incentive*(Math.abs(ge.getA()-ge.getB()));
 						
-						if(supremacy>0) // favorite home
-						{
-							incentive=incentive/4;
-						}
-						else
+						if(supremacy<0) // favorite away
 						{
 							incentive=incentive/2;
 						}
 						
+						System.out.println("Incentive to A:"+incentive);
 						
 						initExpectedGoalsA=((supremacy+incentive)/2)+(totalGoals/2);
 						
