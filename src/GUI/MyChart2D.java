@@ -90,7 +90,7 @@ public class MyChart2D extends Chart2D {
 		tmp.setColor(c);
 		//traces.put(traceName, tmp);
 		
-		
+		if(y>20) y=20;
 		
 		tmp.addPoint(x,y);
 		

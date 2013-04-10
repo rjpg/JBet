@@ -111,8 +111,8 @@ public class ModelCore {
 		//double lA=(sup/2)+(totalGoals/2);
 		//double lB=(totalGoals/2)-(sup/2);
 		
-		initExpectedGoalsA=(supremacy/2)+(totalGoals/2);
-		initExpectedGoalsB=(totalGoals/2)-(supremacy/2);
+		initExpectedGoalsA=(supremacy/2.)+(totalGoals/2.);
+		initExpectedGoalsB=(totalGoals/2.)-(supremacy/2.);
 		
 		calculateHalfTimeRates1();
 		calculateHalfTimeRates2();
@@ -222,12 +222,12 @@ public class ModelCore {
 						System.out.println("Incentive to B1:"+incentive+ "   Time :"+ge.getTimeSegment());
 						if(supremacy>0) // favorite home
 						{
-							incentive=incentive/2;
+							incentive=incentive/2.;
 						}
 						
 						System.out.println("Incentive to B2:"+incentive+ "   Time :"+ge.getTimeSegment());
 						
-						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
+						initExpectedGoalsB=(totalGoals/2.)-((supremacy-incentive)/2.);
 						
 						
 					}
@@ -271,11 +271,11 @@ public class ModelCore {
 						System.out.println("Incentive to B1:"+incentive+ "   Time :"+ge.getTimeSegment());
 						if(supremacy>0) // favorite home
 						{
-							incentive=incentive/2;
+							incentive=incentive/2.;
 						}
 						System.out.println("Incentive to B2:"+incentive+ "   Time :"+ge.getTimeSegment());
 						
-						initExpectedGoalsB=(totalGoals/2)-((supremacy-incentive)/2);
+						initExpectedGoalsB=(totalGoals/2.)-((supremacy-incentive)/2.);
 						
 						
 					}
@@ -322,13 +322,13 @@ public class ModelCore {
 						
 						if(supremacy<0) // favorite away
 						{
-							incentive=incentive/2;
+							incentive=incentive/2.;
 						}
 						
 						
 						
 						
-						initExpectedGoalsA=((supremacy+incentive)/2)+(totalGoals/2);
+						initExpectedGoalsA=((supremacy+incentive)/2.)+(totalGoals/2.);
 						
 						
 						
@@ -377,14 +377,12 @@ public class ModelCore {
 						
 						if(supremacy<0) // favorite away
 						{
-							incentive=incentive/2;
+							incentive=incentive/2.;
 						}
 						
 						System.out.println("Incentive to A:"+incentive);
 						
-						initExpectedGoalsA=((supremacy+incentive)/2)+(totalGoals/2);
-						
-						
+						initExpectedGoalsA=((supremacy+incentive)/2.)+(totalGoals/2.);
 						
 					}
 				}
@@ -399,10 +397,10 @@ public class ModelCore {
 	
 	public void supremacy()
 	{
-		desAH=aHcapHome*(1/aHcapHome+1/aHcapAway);
-		desGL=gLineOver*(1/gLineOver+1/gLineUnder);
+		desAH=aHcapHome*(1./aHcapHome+1./aHcapAway);
+		desGL=gLineOver*(1./gLineOver+1./gLineUnder);
 
-		double sup=0;
+		double sup=0.;
 		double tg=2.5;
 		
 		
@@ -913,8 +911,8 @@ public class ModelCore {
 		double goalA[]=new double[TABLE_MAX_GOALS];
 		double goalB[]=new double[TABLE_MAX_GOALS];
 		
-		double lA=(sup/2)+(totalGoals/2);
-		double lB=(totalGoals/2)-(sup/2);
+		double lA=(sup/2.)+(totalGoals/2.);
+		double lB=(totalGoals/2.)-(sup/2.);
 		
 		//System.out.println("lA: "+lA+"\nLB: "+lB);
 		
