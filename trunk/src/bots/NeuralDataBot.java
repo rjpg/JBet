@@ -507,4 +507,6 @@ public class NeuralDataBot extends Bot{
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 }

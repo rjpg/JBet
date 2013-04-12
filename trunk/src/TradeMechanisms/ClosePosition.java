@@ -8,6 +8,7 @@ import DataRepository.Swing;
 import DataRepository.Utils;
 import bets.BetData;
 import bets.BetManager;
+import bets.BetUtils;
 import bets.BetManagerReal.BetsManagerThread;
 import bots.Bot;
 
@@ -28,7 +29,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 
 	// this
-	private Bot bot=null;
+	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	private BetData betCloseInfo=null;
 	private int stopLossTicks=1;
 	private double oddStopLoss=0;
@@ -49,10 +50,13 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
-	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean useIPKeepA)
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean useIPKeepA)
 	{
 		super();
-		bot=botA;
+		
+		if(botA!=null)
+			addTradeMechanismListener(botA);
+		
 		betCloseInfo=betCloseInfoA;
 		stopLossTicks=stopLossTicksA;
 		waitFramesNormal=waitFramesNormalA;
@@ -72,17 +76,18 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 		md=betCloseInfoA.getRd().getMarketData();
 		
+		md.addTradingMechanismTrading(this);
 		initialize();
 		
 	}
 	
-	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
 	{
 		
-		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,false);
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,betCloseInfoA.isKeepInPlay());
 	}
 	
-	public ClosePosition(Bot botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
 		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 	}
@@ -90,6 +95,16 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	public ClosePosition(BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
 		this(null,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA);
+	}
+	
+	public void addTradeMechanismListener(TradeMechanismListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void removeTradeMechanismListener(TradeMechanismListener listener)
+	{
+		listeners.remove(listener);
 	}
 	
 	private void initialize()
@@ -161,7 +176,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	public void placing()
 	{
-		System.out.println("Bet");
+		System.out.println("Bet.State : "+BetUtils.printBet(betInProcess));
 	}
 	
 
@@ -212,6 +227,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	
 	public void startPolling() {
+		System.out.println("*********************************************");
 		if (polling)
 			return;
 		as = new ClosePositionThread();

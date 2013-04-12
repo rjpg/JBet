@@ -225,7 +225,7 @@ public class BotAmountCat extends Bot{
 		
 	}
 
-	@Override
+	//@Override
 	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
 			double entryOdd, double exitOdd, double stake, double exitStake,
 			double amountMade, int ticksMoved) {

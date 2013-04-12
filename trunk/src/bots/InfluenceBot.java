@@ -447,14 +447,10 @@ public class InfluenceBot extends Bot {
 	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
 			double entryOdd, double exitOdd, double stake, double exitStake,
 			double amountMade, int ticksMoved) {
-
-		Statistics.writeStatistics(getMinutesToStart(), 0, 0, md.getRunners()
-				.size(), false, "null", Calendar.getInstance()
-				.getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd,
-				ticksMoved * redOrGreen, stake, exitStake, amountMade,
-				getMinutesToStart(), rd.getName(), 0, "null", 0, 0, getMd()
-						.getCurrentTime().get(Calendar.DAY_OF_WEEK));
-
+		// TODO Auto-generated method stub
+		
 	}
+
+	
 
 }
