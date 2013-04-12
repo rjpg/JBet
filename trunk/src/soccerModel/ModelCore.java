@@ -39,7 +39,6 @@ public class ModelCore {
 	double goalsSumOverUnder[];
 	double goalsAVGScale[];
 	
-	
 	// model inputs 
     double goalLine=2.5;
     double asianHcap=-0.25;
