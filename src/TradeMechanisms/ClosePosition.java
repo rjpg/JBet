@@ -239,13 +239,18 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 	@Override
 	public void clean() {
-		// TODO Auto-generated method stub
+		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			md.removeMarketChangeListener(this);
 		
 	}
 
 	@Override
 	public void MarketChange(MarketData md, int marketEventType) {
-		// TODO Auto-generated method stub
+		if(marketEventType==MarketChangeListener.MarketUpdate)
+		{
+			refresh();
+			System.out.println("Sync with MarketData");
+		}
 		
 	}
 
