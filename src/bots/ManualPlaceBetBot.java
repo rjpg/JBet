@@ -12,6 +12,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import TradeMechanisms.ClosePosition;
+import TradeMechanisms.ClosePositionPanel;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
@@ -27,13 +31,14 @@ import DataRepository.Scalping;
 import DataRepository.Swing;
 import correctscore.MessageJFrame;
 
-public class ManualPlaceBetBot extends Bot{
+public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 
 	
 	//visuals
 	private JPanel actionsPanel=null;
 	private JButton placeButton=null;
 	private JButton cancelButton=null;
+	private JButton closePositionButton=null;
 	
 	private JButton jumpButton=null;
 	
@@ -43,6 +48,9 @@ public class ManualPlaceBetBot extends Bot{
 	
 	public BetPanel betPanel=null;
 	public BetPanel betPanel2=null;
+	
+	public ClosePositionPanel closePanel=null;
+	
 	//---------
 	
 	
@@ -74,9 +82,10 @@ public class ManualPlaceBetBot extends Bot{
 			actionsPanel.setLayout(new BorderLayout());
 			
 			JPanel auxPanel=new JPanel();
-			auxPanel.setLayout(new GridLayout(2,1));
+			auxPanel.setLayout(new GridLayout(3,1));
 			auxPanel.add(getPlaceButton());
 			auxPanel.add(getCancelButton());
+			auxPanel.add(getClosePositionButton());
 			actionsPanel.add(auxPanel,BorderLayout.CENTER);
 			
 		}
@@ -87,22 +96,32 @@ public class ManualPlaceBetBot extends Bot{
 	{
 		JPanel placeBetsPanel=new JPanel();
 		
-		placeBetsPanel.setLayout(new BorderLayout());
+		placeBetsPanel.setLayout(new GridLayout(3, 1));
 		if(betPanel==null)
 		{
 			betPanel= new BetPanel(getMd());
 		}
 		
-		placeBetsPanel.add(betPanel,BorderLayout.NORTH);
+		placeBetsPanel.add(betPanel);
 		
 		if(betPanel2==null)
 		{
 			betPanel2= new BetPanel(getMd());
 		}
 		
-		placeBetsPanel.add(betPanel2,BorderLayout.SOUTH);
+		placeBetsPanel.add(betPanel2);
+		
+		if(closePanel==null)
+		{
+			closePanel=new ClosePositionPanel(getMd());	
+		}
+		
+		placeBetsPanel.add(closePanel);
+		
 		return placeBetsPanel;
 	}
+	
+	
 	
 	
 	
@@ -168,6 +187,30 @@ public class ManualPlaceBetBot extends Bot{
 		return cancelButton;
 	}
 	
+	public JButton getClosePositionButton()
+	{
+		if(closePositionButton==null)
+		{
+			closePositionButton=new JButton("Close Position");
+			closePositionButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					
+					BetData bd=closePanel.createBetData();
+					getMd().getBetManager().placeBet(bd);
+					
+					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose(),500);
+					
+					msgjf.writeMessageText("Close Position caled",Color.BLUE);
+				}
+			});
+			
+		}
+		return closePositionButton;
+	}
+	
 	public JButton getJumpButton()
 	{
 		if(jumpButton==null)
@@ -203,6 +246,7 @@ public class ManualPlaceBetBot extends Bot{
 			setMd(md);
 			betPanel.reset(getMd());
 			betPanel2.reset(getMd());
+			closePanel.reset(getMd());
 		}
 		
 		if(bet!=null)
@@ -229,6 +273,20 @@ public class ManualPlaceBetBot extends Bot{
 			System.out.println(s);
 	}
 
+
+
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
 			double entryOdd, double exitOdd, double stake, double exitStake,
@@ -236,6 +294,8 @@ public class ManualPlaceBetBot extends Bot{
 		// TODO Auto-generated method stub
 		
 	}
+
+
 	
 		
 }
