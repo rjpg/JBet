@@ -175,17 +175,17 @@ public class ClosePositionPanel extends JPanel{
 	
 	public int getTicksStopLoss()
 	{
-		return (int) comboStopLossTicks.getSelectedItem();
+		return (Integer) comboStopLossTicks.getSelectedItem();
 	}
 	
 	public int getTimeBestOffer()
 	{
-		return (int)comboTimeBestOffer.getSelectedItem();
+		return (Integer)comboTimeBestOffer.getSelectedItem();
 	}
 	
 	public int getTimeForceClose()
 	{
-		return (int)comboTimeForceClose.getSelectedItem();
+		return (Integer)comboTimeForceClose.getSelectedItem();
 	}
 	
 	

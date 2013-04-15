@@ -201,7 +201,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					BetData bd=closePanel.createBetData();
 					getMd().getBetManager().placeBet(bd);
 					
-					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose(),500);
+					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose());
 					
 					msgjf.writeMessageText("Close Position caled",Color.BLUE);
 				}

@@ -36,6 +36,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private int waitFramesNormal=20;
 	private int waitFramesUntilForceClose=10;
 	
+	private int placingErrors=10;
+	
 	private boolean useIPKeep=false;
 	
 	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
@@ -73,7 +75,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			oddStopLoss=Utils.indexToOdd(Utils.oddToIndex(betCloseInfoA.getOddRequested())+stopLossTicks);
 			
 		//if(bet.)
-			
+		
+		//System.out.println("Stop loss Odd:"+oddStopLoss);
+		
 		md=betCloseInfoA.getRd().getMarketData();
 		
 		md.addTradingMechanismTrading(this);
@@ -177,6 +181,44 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	public void placing()
 	{
 		System.out.println("Bet.State : "+BetUtils.printBet(betInProcess));
+		
+		if(betInProcess.getState()==BetData.BET_IN_PROGRESS)
+		{
+			waitFramesNormal--;
+		}
+		else
+		if(betInProcess.getState()==BetData.NOT_PLACED)
+		{
+			
+		}
+		else
+		if(betInProcess.getState()==BetData.CANCELED)
+		{
+			
+		}
+		else
+		if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
+		{
+			
+		}
+		else
+		if(betInProcess.getState()==BetData.MATCHED)
+		{
+			
+		}
+		else
+		if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
+		{
+			
+		}
+		else
+		if(betInProcess.getState()==BetData.PLACING_ERROR)
+		{
+				
+		}	
+		
+		
+		
 	}
 	
 
