@@ -14,6 +14,7 @@ public abstract class TradeMechanism {
 	public static final int CLOSED = 4;
 	public static final int CANCELED = 5;
 	public static final int UNMONITORED = 6;
+	public static final int CRITICAL_ERROR = 7;
 	
 	protected int STATE=NOT_OPEN;
 	
