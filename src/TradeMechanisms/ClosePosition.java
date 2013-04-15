@@ -1,5 +1,7 @@
 package TradeMechanisms;
 
+import generated.exchange.BFExchangeServiceStub.GetMarket;
+
 import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
@@ -189,33 +191,75 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		else
 		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
-			
+			// re place 
+			BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
+			md.getBetManager().placeBet(bd);
+			betInProcess=bd;
 		}
 		else
 		if(betInProcess.getState()==BetData.CANCELED)
 		{
-			
+			BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
+			md.getBetManager().placeBet(bd);
+			betInProcess=bd;
 		}
 		else
 		if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
 		{
-			
+			historyBetsMatched.add(betInProcess);
+			BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount()-betInProcess.getMatchedAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
+			md.getBetManager().placeBet(bd);
+			betInProcess=bd;
 		}
 		else
 		if(betInProcess.getState()==BetData.MATCHED)
 		{
-			
+			historyBetsMatched.add(betInProcess);
+			if(betInProcess.getOddRequested()!=betInProcess.getOddMached())
+			{
+				//TODO edge
+			}
+			else
+			{
+				//TODO end Process
+			}
 		}
 		else
 		if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
-			
+			waitFramesNormal--;
+			//TODO goto wait close 
+		}
+		else
+		if(betInProcess.getState()==BetData.UNMATCHED)
+		{
+				waitFramesNormal--;
+				//TODO goto wait close 
 		}
 		else
 		if(betInProcess.getState()==BetData.PLACING_ERROR)
 		{
+			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED)
+			{
+				// critical Error
+			} 
+			else
+			{
+				BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
+				md.getBetManager().placeBet(bd);
+				betInProcess=bd;
 				
-		}	
+				
+				waitFramesNormal--;
+			}
+			
+				
+		}
+		else if(betInProcess.getState()==BetData.UNMONITORED)
+		{
+				// critical Error
+		}
+		
 		
 		
 		
