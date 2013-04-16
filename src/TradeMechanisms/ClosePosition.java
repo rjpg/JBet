@@ -180,13 +180,39 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 	}
 	
+	/**
+	 * 
+	 * @return
+	 * 0 inside normal
+	 * 1 inside close best price
+	 * -1 emergency close
+	 */
+	private int processFrames()
+	{
+		if(waitFramesNormal<0)
+		{
+			if(waitFramesUntilForceClose<0)
+				return -1;
+			else
+			{
+				waitFramesUntilForceClose--;
+				return 1;
+			}
+		}
+		else
+		{
+			waitFramesNormal--;
+			return 0;
+		}
+	}
+	
 	public void placing()
 	{
 		System.out.println("Bet.State : "+BetUtils.printBet(betInProcess));
 		
 		if(betInProcess.getState()==BetData.BET_IN_PROGRESS)
 		{
-			waitFramesNormal--;
+			processFrames();
 		}
 		else
 		if(betInProcess.getState()==BetData.NOT_PLACED)
@@ -217,7 +243,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			historyBetsMatched.add(betInProcess);
 			if(betInProcess.getOddRequested()!=betInProcess.getOddMached())
 			{
-				//TODO edge
+			
+				//TODO edge (close the edge)
 			}
 			else
 			{
@@ -227,14 +254,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		else
 		if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
-			waitFramesNormal--;
 			//TODO goto wait close 
 		}
 		else
 		if(betInProcess.getState()==BetData.UNMATCHED)
 		{
-				waitFramesNormal--;
-				//TODO goto wait close 
+			//TODO goto wait close 
 		}
 		else
 		if(betInProcess.getState()==BetData.PLACING_ERROR)
@@ -245,12 +270,29 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			} 
 			else
 			{
-				BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
-				md.getBetManager().placeBet(bd);
-				betInProcess=bd;
+				int stateFrames=processFrames();
 				
+				/// ver se a odd já passou o stoploss para passar à emergencia
+				///if(betInProcess.getRd().)
+				/// stateFrames=-1;  // forçar emergencia
+				/// ...
 				
-				waitFramesNormal--;
+				if(stateFrames==0)
+				{
+					BetData bd=new BetData(betInProcess.getRd(), betInProcess.getAmount(), betInProcess.getOddRequested(), betInProcess.getType(), betInProcess.isKeepInPlay());
+					md.getBetManager().placeBet(bd);
+					betInProcess=bd;
+				}
+				else if(stateFrames==1)
+				{
+					//	calculate and place at best price
+				}
+				else if(stateFrames==-1)
+				{
+					//	calculate and place at price available 
+				}
+				
+			
 			}
 			
 				
