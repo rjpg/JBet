@@ -169,6 +169,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 						
 						bds[i].setMatchedAmount(bds[i].getAmount());
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
+						//bds[i].setOddMached(bds[i].getOddRequested());
 						bds[i].setTimestampFinalState(Calendar.getInstance());
 						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}
@@ -274,6 +275,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 						bds[i].setMatchedAmount(bds[i].getAmount());
 						
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
+						//bds[i].setOddMached(bds[i].getOddRequested());
 						bds[i].setTimestampFinalState(Calendar.getInstance());
 						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}

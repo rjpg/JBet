@@ -20,9 +20,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	// States
 	private static final int I_PLACING = 0;
 	private static final int I_WAIT = 1;
-	private static final int I_CANCEL = 2;
-	private static final int I_HEDGE = 3;
-	private static final int I_END = 4;
+	private static final int I_HEDGE = 2;
+	private static final int I_END = 3;
 	
 	private int I_STATE=ClosePosition.I_PLACING;
 	
@@ -109,10 +108,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	{
 		setState(TradeMechanism.OPEN);
 		
-		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-		{
-			md.addMarketChangeListener(this);
-		}
+		md.addMarketChangeListener(this);
+		
 		
 		betInProcess=betCloseInfo;
 
@@ -262,6 +259,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			}
 			else
 			{
+				System.err.println("BACK MISSING!!!!!!!!!!!!!!   : "+miss);
 				am=Utils.closeAmountBack(betCloseInfo.getOddRequested(), Math.abs(miss), odd);
 				am=Utils.convertAmountToBF(am);
 				if(am==0)
@@ -310,9 +308,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	 */
 	private int processFrames()
 	{
-		if(waitFramesNormal<0)
+		if(waitFramesNormal<=0)
 		{
-			if(waitFramesUntilForceClose<0)
+			if(waitFramesUntilForceClose<=0)
 				return -1;
 			else
 			{
@@ -329,6 +327,17 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void updateTargetOdd()
 	{
+		if(betCloseInfo.getType()==BetData.BACK)
+		{
+			if(getActualOdd()<=oddStopLoss)
+				forceClose();
+		}
+		else
+		{
+			if(getActualOdd()>=oddStopLoss)
+				forceClose();
+		}
+			
 		int state = processFrames();
 		
 		switch (state) {
@@ -348,7 +357,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		switch (getI_STATE()) {
 	        case I_PLACING: placing(); break;
 	        case I_WAIT   : waitMatch(); break;
-	        case I_CANCEL : cancel(); break;
 	        case I_HEDGE  : hedge(); break;
 	        case I_END    : end(); break;
 	        default: end(); break;
@@ -380,6 +388,22 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
+			//md.getBetManager().placeBet(betInProcess);
+			betInProcess=createBetForOdd(targetOdd);
+			
+			if(betInProcess==null)   // nothing to close
+			{
+				this.setI_STATE(I_END);
+				return;
+			}
+			if(betInProcess.getType()!=betCloseInfo.getType())
+			{
+				betInProcess=null;
+				this.setI_STATE(I_HEDGE);
+				refresh();
+				return ;
+			}
+			
 			md.getBetManager().placeBet(betInProcess);
 		}
 		else if(betInProcess.getState()==BetData.CANCELED )
@@ -399,6 +423,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.MATCHED)
 		{
+			System.out.println("matched");
 			historyBetsMatched.add(betInProcess);
 			setState(TradeMechanism.PARTIAL_CLOSED);
 			
@@ -490,7 +515,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				int resultCancel=md.getBetManager().cancelBet(betInProcess);
 				if(resultCancel==0)
 				{
-					setI_STATE(I_CANCEL);
+					setI_STATE(I_PLACING);  
 					refresh();
 					return;
 				}
@@ -504,7 +529,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				int resultCancel=md.getBetManager().cancelBet(betInProcess);
 				if(resultCancel==0)
 				{
-					setI_STATE(I_CANCEL);
+					setI_STATE(I_PLACING); //mantem o estado porque o cancel ia ser igual 
 					refresh();
 					return;
 				}
@@ -521,23 +546,23 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 	}
 	
-	private void cancel()
+	private void hedge()
 	{
-		if(betInProcess==null)
+		betInProcess=createBetForOdd(getActualOdd());
+		
+		if(betInProcess==null)   // nothing to close
 		{
-			setI_STATE(I_PLACING);
+			this.setI_STATE(I_END);
 			refresh();
 			return;
 		}
-		
-		
-		
-			
-	}
-	
-	private void hedge()
-	{
-		
+		else
+		{
+			md.getBetManager().placeBet(betInProcess);
+			this.setI_STATE(I_END);
+			refresh();
+			return;
+		}
 	}
 	
 	
@@ -640,11 +665,16 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	public void MarketChange(MarketData md, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 		{
-			if(isPolling())
+			if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
 			{
 				refresh();
 				System.out.println("Sync with MarketData");
 			}
+		}
+		
+		if(marketEventType==MarketChangeListener.MarketNew)
+		{
+			this.forceCancel();
 		}
 		
 	}

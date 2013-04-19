@@ -175,7 +175,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 						
 					if(bds.size()>0)
 					{
-						int retCancel=getMd().getBetManager().cancelBets(bds);
+						
+						int retCancel=getMd().getBetManager().cancelBets(getMd().getBetManager().getBets());
 						msgjf.writeMessageText("Return From Cancel : "+retCancel,Color.BLUE);
 						
 					}

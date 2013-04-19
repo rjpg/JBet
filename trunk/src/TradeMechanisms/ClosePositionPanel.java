@@ -22,9 +22,9 @@ public class ClosePositionPanel extends JPanel{
 	
 	public static Integer[] ticksStopLoss={1,2,3,4,5,6,7,8,9,10};
 	
-	public static Integer[] timeBestOffer={10,15,20,25,30,35,40,45,50};
+	public static Integer[] timeBestOffer={0,10,15,20,25,30,35,40,45,50};
 	
-	public static Integer[] timeForceClose={10,15,20,25,30,35,40,45,50};
+	public static Integer[] timeForceClose={0,10,15,20,25,30,35,40,45,50};
 	
 	public static String[] backLay={"L","B"};
 	
