@@ -305,7 +305,12 @@ public class MarketData {
 	
 	
 	public Calendar getCurrentTime() {
-		return currentTime;
+		
+		if (selectedMarket==null) // reading from file 
+			return currentTime;
+		else
+			return Calendar.getInstance();
+		
 	}
 
 	private void refresh()

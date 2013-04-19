@@ -71,19 +71,15 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				oddStopLoss=1000;
 		}
 			
-		//if(bet.)
-		
 		//System.out.println("Stop loss Odd:"+oddStopLoss);
 		
 		md=betCloseInfoA.getRd().getMarketData();
 		
 		md.addTradingMechanismTrading(this);
 		
-		initialize();
-		
+		initialize();	
 	}
 	
-
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
 		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);

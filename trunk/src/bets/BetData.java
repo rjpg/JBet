@@ -1,5 +1,7 @@
 package bets;
 
+import generated.exchange.BFExchangeServiceStub.GetMarket;
+
 import java.util.Calendar;
 
 import DataRepository.RunnersData;
@@ -125,10 +127,10 @@ public class BetData {
 		this.transition=transitionA;
 		
 		if(BetUtils.isBetFinalState(this.state))
-			setTimestampFinalState(Calendar.getInstance());
+			setTimestampFinalState(getRd().getMarketData().getCurrentTime());
 		
 		if(this.state == BetData.CANCELED || this.state == BetData.CANCEL_WAIT_UPDATE || this.state == BetData.PARTIAL_CANCELED)
-			setTimestampCancel(Calendar.getInstance());
+			setTimestampCancel(getRd().getMarketData().getCurrentTime());
 	}
 
 	public Long getBetID() {

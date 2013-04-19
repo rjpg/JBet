@@ -170,7 +170,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 						bds[i].setMatchedAmount(bds[i].getAmount());
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
 						//bds[i].setOddMached(bds[i].getOddRequested());
-						bds[i].setTimestampFinalState(Calendar.getInstance());
+						bds[i].setTimestampFinalState(bds[i].getRd().getMarketData().getCurrentTime());
 						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}
 					else // can only be equal becouse bds[i].getEntryAmount() is negative
@@ -180,7 +180,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 							
 							bds[i].setMatchedAmount(bds[i].getAmount());
 							bds[i].setOddMached(bds[i].getOddRequested());
-							bds[i].setTimestampFinalState(Calendar.getInstance());
+							bds[i].setTimestampFinalState(bds[i].getRd().getMarketData().getCurrentTime());
 							bds[i].setState(BetData.MATCHED, BetData.PLACE);
 						}
 						else // Available amount smaller then bet amount - Partial Matched
@@ -276,7 +276,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 						
 						bds[i].setOddMached(Utils.calculateOddAverage(ODDs.toArray(new Double[]{}), amounts.toArray(new Double[]{})));
 						//bds[i].setOddMached(bds[i].getOddRequested());
-						bds[i].setTimestampFinalState(Calendar.getInstance());
+						bds[i].setTimestampFinalState(bds[i].getRd().getMarketData().getCurrentTime());
 						bds[i].setState(BetData.MATCHED, BetData.PLACE);
 					}
 					else // can only be equal becouse bds[i].getEntryAmount() is negative
@@ -286,7 +286,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 							
 							bds[i].setMatchedAmount(bds[i].getAmount());
 							bds[i].setOddMached(bds[i].getOddRequested());
-							bds[i].setTimestampFinalState(Calendar.getInstance());
+							bds[i].setTimestampFinalState(bds[i].getRd().getMarketData().getCurrentTime());
 							bds[i].setState(BetData.MATCHED, BetData.PLACE);
 						}
 						else // Available amount smaller then bet amount - Partial Matched
@@ -326,7 +326,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			}
 			sem.release();
 			
-			bds[i].setTimestampPlace(Calendar.getInstance());
+			bds[i].setTimestampPlace(bds[i].getRd().getMarketData().getCurrentTime());
 		
 			
 		}
