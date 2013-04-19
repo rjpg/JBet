@@ -62,7 +62,12 @@ public class MarketData {
 
 	// true if the market is inplay
 	public boolean inPlay=false;
-
+	
+	public boolean suspended=false;
+	public boolean error=false;
+	public boolean closed=false;
+	
+	
 	private int fpsAux=0;
 	private Calendar calendarFpsAux; 
 	//------------------------
@@ -107,7 +112,7 @@ public class MarketData {
 	private int dayLog=0;
 	
 	//Volume capture 
-	private int volumeCapCurrentRunner=0;
+	//private int volumeCapCurrentRunner=0;
 	
 	
 	public MarketData(Market selectedMarketA, Exchange selectedExchangeA,APIContext apiContextA)
@@ -605,7 +610,7 @@ public class MarketData {
 				
 		}
 	}
-	
+	/*
 	private void refreshCompleteVolume()
 	{
 		//clone for the last frame
@@ -640,7 +645,7 @@ public class MarketData {
 		//System.out.println(rd.getName()+" volume NOW is:"+rd.getDataFrames().get(rd.getDataFrames().size()-1).getVolume());
 		volumeCapCurrentRunner++;
 	}
-	
+	*/
 	private void refreshCompressedVolume()
 	{
 		if(!polling) return;
