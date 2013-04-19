@@ -127,7 +127,7 @@ public class BetData {
 		if(BetUtils.isBetFinalState(this.state))
 			setTimestampFinalState(Calendar.getInstance());
 		
-		if(this.state == BetData.CANCEL || this.state == BetData.CANCEL_WAIT_UPDATE || this.state == BetData.PARTIAL_CANCELED)
+		if(this.state == BetData.CANCELED || this.state == BetData.CANCEL_WAIT_UPDATE || this.state == BetData.PARTIAL_CANCELED)
 			setTimestampCancel(Calendar.getInstance());
 	}
 
