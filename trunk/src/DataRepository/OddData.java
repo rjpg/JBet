@@ -1,16 +1,29 @@
 package DataRepository;
 
+import bets.BetData;
+
 public class OddData {
 	public double odd =0;
 	public double amount=0;
 	//public int depth=0;  // nova API não vem 
 	//public double totalBSPBackersStake=0;
 	//public double totalBSPLayLiability=0;
+	public int type = BetData.BACK; // optional 
 	
 	public OddData(double oddA,double amountA)
 	{
 		odd=oddA;
 		amount=amountA;
+		//depth=depthA;
+		//totalBSPBackersStake=aTotalBSPBackersStake;
+		//totalBSPLayLiability=atotalBSPLayLiability;
+	}
+	
+	public OddData(double oddA,double amountA,int typeA)
+	{
+		odd=oddA;
+		amount=amountA;
+		type=typeA;
 		//depth=depthA;
 		//totalBSPBackersStake=aTotalBSPBackersStake;
 		//totalBSPLayLiability=atotalBSPLayLiability;
@@ -29,6 +42,15 @@ public class OddData {
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
+	
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+	
 //	public int getDepth() {
 //		return depth;
 //	}
