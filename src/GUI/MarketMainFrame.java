@@ -2,6 +2,7 @@ package GUI;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +31,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 	public MarketMainFrame( MarketData mdA) {
 		super(mdA.getName());
 		md=mdA;
-		contentPane=new JPanel(new FlowLayout());
+		contentPane=new JPanel(new GridLayout(0, 1));
 		this.setContentPane(contentPane);
 		md.addMarketChangeListener(this);
 		

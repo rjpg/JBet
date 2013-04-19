@@ -1289,8 +1289,9 @@ public class Utils {
         	}
         
         
-        System.out.println("AM:"+Utils.closeAmountLay(1000, 700, 9.805940141486307 ));
+        System.out.println("AM:"+Utils.closeAmountLay(1000, 11.5, 13.936238926792617 ));
        
+        //825.19
      //  71385.0
         //109.40493571934792
        //986.3635326834435
