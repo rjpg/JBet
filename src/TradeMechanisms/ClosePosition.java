@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.Swing;
 import DataRepository.Utils;
 import bets.BetData;
@@ -205,28 +206,53 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		Vector<Double> ams=new Vector<Double>();
 		double totalAm=0;
 		
+		Vector<Double> oddsX=new Vector<Double>();
+		Vector<Double> amsX=new Vector<Double>();
+		double totalAmX=0;
+		
 		if(historyBetsMatched.size()==0)
 			return betCloseInfo.getAmount();
 		
 		for(BetData bd:historyBetsMatched)
 		{
-			odds.add(bd.getOddMached());
-			ams.add(bd.getMatchedAmount());
-			totalAm+=bd.getMatchedAmount();
+			if(bd.getType()==betCloseInfo.getType())
+			{
+				odds.add(bd.getOddMached());
+				ams.add(bd.getMatchedAmount());
+				totalAm+=bd.getMatchedAmount();
+			}
+			else
+			{
+				oddsX.add(bd.getOddMached());
+				amsX.add(bd.getMatchedAmount());
+				totalAmX+=bd.getMatchedAmount();
+			}
+				
 		}
 		
 		double oddAvg=Utils.calculateOddAverage(odds.toArray(new Double[]{}), ams.toArray(new Double[]{}));
+		
+		double oddAvgX=Utils.calculateOddAverage(oddsX.toArray(new Double[]{}), amsX.toArray(new Double[]{}));
 		
 		double ret=0;
 		
 		if(betCloseInfo.getType()==BetData.BACK)
 		{
 			double amountToCloseBack=Utils.closeAmountLay(oddAvg, totalAm, betCloseInfo.getOddRequested());
+			
+			if(totalAmX>0)
+				amountToCloseBack-=Utils.closeAmountBack(oddAvgX, totalAmX,  betCloseInfo.getOddRequested());
+			
 			ret= betCloseInfo.getAmount()-amountToCloseBack;
 		}
 		else
 		{
 			double amountToCloseLay=Utils.closeAmountBack(oddAvg, totalAm, betCloseInfo.getOddRequested());
+			
+			if(totalAmX>0)
+				amountToCloseLay-=Utils.closeAmountLay(oddAvgX, totalAmX,  betCloseInfo.getOddRequested());
+
+			
 			ret= betCloseInfo.getAmount()-amountToCloseLay;
 		}
 		
@@ -548,28 +574,214 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void hedge()
 	{
-		betInProcess=createBetForOdd(getActualOdd());
+		if(betInProcess==null)
+		{
+			betInProcess=createBetForOdd(getActualOdd());
+			
+			if(betInProcess==null)   // nothing to close
+			{
+				this.setI_STATE(I_END);
+				refresh();
+				return;
+			}
+			
+			if(betInProcess.getType()==BetData.BACK)
+			{
+				betInProcess=createBetForOdd(Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
+			}
+			else
+			{
+				betInProcess=createBetForOdd(Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
+			}
+			
+			if(betInProcess==null)   // nothing to close
+			{
+				this.setI_STATE(I_END);
+				refresh();
+				return;
+			}
+			
+			
+		}
 		
-		if(betInProcess==null)   // nothing to close
+		
+		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
-			this.setI_STATE(I_END);
-			refresh();
-			return;
-		}
-		else
-		{
+			System.out.println("Hedge :"+betInProcess.getOddRequested());
+			System.err.println("getOddBackFrame :"+Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
+			System.err.println("getOddLayFrame :"+Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
 			md.getBetManager().placeBet(betInProcess);
-			this.setI_STATE(I_END);
+			
+		}
+		else if(betInProcess.getState()==BetData.CANCELED )
+		{
+			betInProcess=null;
 			refresh();
 			return;
 		}
+		else if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
+		{
+			setState(TradeMechanism.PARTIAL_CLOSED);
+			historyBetsMatched.add(betInProcess);
+			
+			betInProcess=null;
+			refresh();
+			return;
+		}
+		else if(betInProcess.getState()==BetData.MATCHED)
+		{
+			historyBetsMatched.add(betInProcess);
+			
+			this.setI_STATE(I_END);
+			refresh();
+			return;
+			
+		}
+		else if(betInProcess.getState()==BetData.UNMATCHED || betInProcess.getState()==BetData.PARTIAL_MATCHED)
+		{
+			double bestPrice=Utils.getOddLayFrame(betCloseInfo.getRd(), 0);
+			if(betInProcess.getType()==BetData.LAY)
+			{
+				bestPrice=Utils.getOddBackFrame(betCloseInfo.getRd(), 0);
+				if(bestPrice<betInProcess.getOddRequested())   // to work better in simulation
+					bestPrice=betInProcess.getOddRequested();
+			}
+			else
+				if(bestPrice>betInProcess.getOddRequested())   // to work better in simulation
+					bestPrice=betInProcess.getOddRequested();
+
+			
+			if(bestPrice!=betInProcess.getOddRequested())
+			{
+				md.getBetManager().cancelBet(betInProcess);
+				refresh();
+				return;
+			}
+		}	
+		else if(betInProcess.getState()==BetData.PLACING_ERROR)
+		{
+			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED || betInProcess.getErrorType()==BetData.ERROR_BALANCE_EXCEEDED)
+			{
+				this.setState(TradeMechanism.CRITICAL_ERROR);
+				end();
+				return;
+			} 
+			else
+			{
+				betInProcess=null;
+				refresh();
+				return;
+			}
+		}
+		else if(betInProcess.getState()==BetData.UNMONITORED)
+		{
+			this.setState(TradeMechanism.CRITICAL_ERROR);
+			end();
+			return;
+		}
+		
 	}
+	
+	
 	
 	
 	private void end()
 	{
+		if(!TradeMechanismUtils.isTradeMechanismFinalState(getState()))
+			setState(TradeMechanism.CLOSED);
+		
 		md.removeTradingMechanismTrading(this);
 		stopPolling();
+		
+		OddData od=getMatchedInfo();
+		if(od!=null)
+		{
+			if(od.getType()==BetData.BACK)
+				System.out.println("Final Match : "+od.getAmount()+" @ "+od.getOdd()+" Back");
+			else
+				System.out.println("Final Match : "+od.getAmount()+" @ "+od.getOdd()+" Lay");
+		}
+		else
+			System.out.println("No Match");
+			
+	}
+	
+	
+	public OddData getMatchedInfo()
+	{
+		
+		OddData ret=null;
+		
+		
+		if(historyBetsMatched.size()==0)
+			return ret;
+		
+		Vector<BetData> bdB=new Vector<BetData>();
+		Vector<BetData> bdL=new Vector<BetData>();
+		
+		for(BetData bd:historyBetsMatched)
+		{
+			if(bd.getType()==BetData.BACK)
+				bdB.add(bd);
+			else
+				bdL.add(bd);
+		}
+		
+		double totalAmB=0;
+		double oddAvgB=0;
+		
+		if(bdB.size()!=0)
+		{
+		
+			Vector<Double> oddsB=new Vector<Double>();
+			Vector<Double> amsB=new Vector<Double>();
+			
+			for(BetData bd:bdB)
+			{
+				oddsB.add(bd.getOddMached());
+				amsB.add(bd.getMatchedAmount());
+				totalAmB+=bd.getMatchedAmount();
+			}
+			
+			oddAvgB=Utils.calculateOddAverage(oddsB.toArray(new Double[]{}), amsB.toArray(new Double[]{}));
+		}
+		
+		double totalAmL=0;
+		double oddAvgL=0;
+		
+		if(bdL.size()!=0)
+		{
+		
+			Vector<Double> oddsL=new Vector<Double>();
+			Vector<Double> amsL=new Vector<Double>();
+			
+			for(BetData bd:bdL)
+			{
+				oddsL.add(bd.getOddMached());
+				amsL.add(bd.getMatchedAmount());
+				totalAmL+=bd.getMatchedAmount();
+			}
+			
+			oddAvgL=Utils.calculateOddAverage(oddsL.toArray(new Double[]{}), amsL.toArray(new Double[]{}));
+		}
+		
+		if(totalAmL==0)
+			return new OddData(oddAvgB, totalAmB,BetData.BACK);
+		
+		if(totalAmB==0)
+			return new OddData(oddAvgL, totalAmL,BetData.LAY);
+		
+		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
+		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
+		
+		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
+		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.BACK);
+		
+		if(odB.getAmount()>odL.getAmount())
+			return odB;
+		else
+			return odL;
+		
 	}
 
 	//---------------------------------thread -----
@@ -668,7 +880,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
 			{
 				refresh();
-				System.out.println("Sync with MarketData");
+				//System.out.println("Sync with MarketData");
 			}
 		}
 		

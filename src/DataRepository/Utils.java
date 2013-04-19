@@ -1252,9 +1252,6 @@ public class Utils {
        
         System.out.println("amount"+convertAmountToBF(3.329525));
         
-        System.out.println("AM:"+Utils.closeAmountBack(11.0, 2., 11.5));
-        
-        
         System.out.println("%Utils.indexToOdd(Utils.oddToIndex(7.8)-1)  :"+Utils.indexToOdd(Utils.oddToIndex(7.8)-1));
         
         //>=getRunnerOddLay()
@@ -1291,6 +1288,17 @@ public class Utils {
         		//matrix[l][c]=l+c;
         	}
         
+        
+        System.out.println("AM:"+Utils.closeAmountLay(1000, 1000,   10.488845073309195 ));
+       
+        //95338.99500000001
+        
+        //102020.41
+        // 613.2200000000003
+        //71464.82   
+        //135.02038747294012
+        // 134.33922894459704
+        // 1022.8799999999999
 	}
 	
 	// Select a market by the following process
