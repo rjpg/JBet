@@ -20,9 +20,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	// States
 	private static final int I_PLACING = 0;
-	private static final int I_WAIT = 1;
-	private static final int I_HEDGE = 2;
-	private static final int I_END = 3;
+	private static final int I_HEDGE = 1;
+	private static final int I_END = 2;
 	
 	private int I_STATE=ClosePosition.I_PLACING;
 	
@@ -256,7 +255,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			ret= betCloseInfo.getAmount()-amountToCloseLay;
 		}
 		
-		return (Utils.convertAmountToBF(ret));
+		return ret;
 	}
 	
 	private BetData createBetForOdd(double odd)
@@ -285,7 +284,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			}
 			else
 			{
-				System.err.println("BACK MISSING!!!!!!!!!!!!!!   : "+miss);
+				//System.err.println("BACK MISSING!!!!!!!!!!!!!!   : "+miss);
 				am=Utils.closeAmountBack(betCloseInfo.getOddRequested(), Math.abs(miss), odd);
 				am=Utils.convertAmountToBF(am);
 				if(am==0)
@@ -382,7 +381,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		switch (getI_STATE()) {
 	        case I_PLACING: placing(); break;
-	        case I_WAIT   : waitMatch(); break;
 	        case I_HEDGE  : hedge(); break;
 	        case I_END    : end(); break;
 	        default: end(); break;
@@ -393,7 +391,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	public void placing()
 	{
-		System.out.println("placing");
+		//System.out.println("placing");
 		if(betInProcess==null)
 		{
 			betInProcess=createBetForOdd(targetOdd);
@@ -449,7 +447,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.MATCHED)
 		{
-			System.out.println("matched");
+			//System.out.println("matched");
 			historyBetsMatched.add(betInProcess);
 			setState(TradeMechanism.PARTIAL_CLOSED);
 			
@@ -459,12 +457,29 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
+			
 			setState(TradeMechanism.PARTIAL_CLOSED);
-			setI_STATE(ClosePosition.I_WAIT);
+			//setI_STATE(ClosePosition.I_WAIT);
+			
+			if(targetOdd!=betInProcess.getOddRequested())
+			{
+				md.getBetManager().cancelBet(betInProcess);
+				refresh(); // to go faster (dont wait for update)
+				return;
+			}
+			
+				
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
-			setI_STATE(ClosePosition.I_WAIT);
+			//setI_STATE(ClosePosition.I_WAIT);
+			
+			if(targetOdd!=betInProcess.getOddRequested())
+			{
+				md.getBetManager().cancelBet(betInProcess);
+				refresh();
+				return;
+			}
 		}
 		else if(betInProcess.getState()==BetData.PLACING_ERROR)
 		{
@@ -489,7 +504,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	}
 	
-	private void  waitMatch()
+	/*private void  waitMatch()
 	{
 		if(betInProcess==null)
 		{
@@ -570,7 +585,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		
 		
-	}
+	}*/
 	
 	private void hedge()
 	{
@@ -607,9 +622,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
-			System.out.println("Hedge :"+betInProcess.getOddRequested());
-			System.err.println("getOddBackFrame :"+Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
-			System.err.println("getOddLayFrame :"+Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
+			//System.out.println("Hedge :"+betInProcess.getOddRequested());
+			//System.err.println("getOddBackFrame :"+Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
+			//System.err.println("getOddLayFrame :"+Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
 			md.getBetManager().placeBet(betInProcess);
 			
 		}
