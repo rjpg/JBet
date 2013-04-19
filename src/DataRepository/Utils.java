@@ -51,6 +51,7 @@ public class Utils {
 	
 	public static double convertAmountToBF(double am)
 	{
+		
 		double ret=0.0;
 		DecimalFormat df = new DecimalFormat("#.##");
 	    DecimalFormatSymbols symbols=df.getDecimalFormatSymbols();
@@ -59,6 +60,7 @@ public class Utils {
 	    
 	    ret=Double.parseDouble(df.format(am));
 		return ret;
+		//return am;
 	}
 
 	public static void init()
@@ -260,7 +262,8 @@ public class Utils {
 		if(totalStake==0)
 			return 0.00;
 		else
-			return Utils.convertAmountToBF(totalBets/totalStake);
+		//	return Utils.convertAmountToBF(totalBets/totalStake);
+			return totalBets/totalStake;
 	}
 	
 	public static boolean validOdd(double odd)
@@ -1247,7 +1250,7 @@ public class Utils {
         System.out.println("Average ODD BETFAIR :"+Utils.calculateOddAverage(new double []{12,1.5},new double []{2,5}));
         
        
-        System.out.println("amount"+convertAmountToBF(3.325325));
+        System.out.println("amount"+convertAmountToBF(3.329525));
         
         System.out.println("AM:"+Utils.closeAmountBack(11.0, 2., 11.5));
         
