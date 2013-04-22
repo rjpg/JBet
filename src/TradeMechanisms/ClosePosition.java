@@ -127,11 +127,14 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 
 	@Override
 	public void forceCancel() {
+		if(!TradeMechanismUtils.isTradeMechanismFinalState(this.getState()))
+		{
 		this.setI_STATE(I_END);
 		
 		end();
 		
 		setState(TradeMechanism.CANCELED);
+		}
 		
 	}
 
@@ -714,6 +717,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else
 			System.out.println("No Match");
+		
+		stopPolling();
 			
 	}
 	
