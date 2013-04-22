@@ -3,7 +3,7 @@ package main;
 public class Parameters {
 	
 	static public boolean log=false;  // Log or not to Log when not in replay
-	static public boolean replay=true; // replay or read from file
+	static public boolean replay=false; // replay or read from file
 	static public boolean replay_file_list=false; // replay or read from file
 	static public boolean replay_file_list_test=false; // replay or read from file
 	
@@ -35,7 +35,7 @@ public class Parameters {
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
-	static public boolean simulation=true;
+	static public boolean simulation=false;
 	
 	static public int matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 	//1 - all at first 
