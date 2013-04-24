@@ -16,6 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import marketNavigator.MarketNavigatorPanel;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -65,8 +70,9 @@ public class Manager  implements MarketChangeListener{
 	//interface
 	MarketMainFrame mmf;
 	
-	public Manager() {
+	public Manager() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		// Initialise logging and turn logging off. Change OFF to DEBUG for detailed output.
 		Logger rootLog = LogManager.getRootLogger();
 		Level lev = Level.toLevel("OFF");
@@ -122,6 +128,13 @@ public class Manager  implements MarketChangeListener{
 				Display.showException("*** Failed to log in", e);
 				System.exit(1);
 			}
+			
+			JFrame jf=new JFrame();
+			JScrollPane jsp=new JScrollPane(new MarketNavigatorPanel(apiContext,selectedExchange));
+			jf.add(jsp);
+			jf.setSize(400,640);
+			jf.setVisible(true);
+			
 			md = new MarketData(selectedMarket, selectedExchange,apiContext);
 			
 			JFrame close = getCloseFrame();
@@ -182,6 +195,7 @@ public class Manager  implements MarketChangeListener{
 			// /////////////////////after////////////////////////////////////////////
 			md.startPolling();
 
+			
 			
 		} else {
 			MarketData md = new MarketData(null, Exchange.UK,null);

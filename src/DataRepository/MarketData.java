@@ -37,6 +37,7 @@ import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.InflatedCompleteMarketPrices;
+import demo.util.InflatedMarketPrices;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompletePrice;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompleteRunner;
 import demo.util.RunnerTradedVolumeCompressed;
@@ -132,6 +133,14 @@ public class MarketData {
 			eventName=selectedMarket.getMenuPath().split("\\\\")[2];
 			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
 			//initializeData();
+			try {
+				InflatedMarketPrices prices = ExchangeAPI.getMarketPrices(
+						selectedExchange, apiContext,
+						selectedMarket.getMarketId());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			for(int i=0;i<this.selectedMarket.getRunners().getRunner().length;i++)
 			{
@@ -1051,7 +1060,7 @@ public class MarketData {
 	public void clean()
 	{
 		
-		
+		stopPolling();
 		for(RunnersData r:runners)
 		{
 			r.clean();
@@ -1127,7 +1136,8 @@ public class MarketData {
 	public void stopPolling() {
 		if (!polling)
 			return;
-		as.stopRequest();
+		if(as!=null)
+			as.stopRequest();
 		polling = false;
 
 	}
