@@ -133,14 +133,7 @@ public class MarketData {
 			eventName=selectedMarket.getMenuPath().split("\\\\")[2];
 			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
 			//initializeData();
-			try {
-				InflatedMarketPrices prices = ExchangeAPI.getMarketPrices(
-						selectedExchange, apiContext,
-						selectedMarket.getMarketId());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			
 			for(int i=0;i<this.selectedMarket.getRunners().getRunner().length;i++)
 			{

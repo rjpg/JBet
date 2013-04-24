@@ -20,7 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import marketNavigator.MarketNavigatorPanel;
+import marketNavigator.MarketNavigator;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -28,6 +28,8 @@ import org.apache.log4j.Logger;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.MarketProvider;
+import DataRepository.MarketProviderListerner;
 import GUI.MarketMainFrame;
 import bots.BaseOfBot;
 import bots.BotAmountCat;
@@ -49,7 +51,7 @@ import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedMarketPrices;
 
-public class Manager  implements MarketChangeListener{
+public class Manager  implements MarketChangeListener,MarketProviderListerner{
 
 	
 	
@@ -130,7 +132,10 @@ public class Manager  implements MarketChangeListener{
 			}
 			
 			JFrame jf=new JFrame();
-			JScrollPane jsp=new JScrollPane(new MarketNavigatorPanel(apiContext,selectedExchange));
+			MarketNavigator mp=new MarketNavigator(apiContext,selectedExchange);
+			mp.addMarketProviderListener(this);
+			
+			JScrollPane jsp=new JScrollPane(mp.getPanel());
 			jf.add(jsp);
 			jf.setSize(400,640);
 			jf.setVisible(true);
@@ -599,6 +604,54 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			fps.setText("FPS:"+md.getFPS());
+		
+	}
+
+	@Override
+	public void newMarketSelected(MarketProvider mp, Market m) {
+System.err.println("Manager knows the market is Live");
+		
+		if(md.isInTrade())
+		{
+			System.err.println("Cant change the market because Market is in trade operation");
+			return;
+		}
+		
+		md.stopPolling();
+		System.err.println("Stop Polling");
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			// e.printStackTrace();
+		}
+		md.clean();
+		System.err.println("Clean");
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			// e.printStackTrace();
+		}
+		
+		selectedMarket=m;
+		System.err.println("Select new Market");
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			// e.printStackTrace();
+		}
+		System.err.println("Instantating new Market");
+		md.setSelectedMarket(selectedMarket);
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			// e.printStackTrace();
+		}
+		
+		
+		/// delay ?? for graphical restart...
+		System.err.println("Start Pooling");
+		md.startPolling();
+	
 		
 	}
 

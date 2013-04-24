@@ -7,6 +7,7 @@ import generated.global.BFGlobalServiceStub.GetEventsResp;
 import generated.global.BFGlobalServiceStub.MarketSummary;
 
 import java.awt.BorderLayout;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,9 +20,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import main.Parameters;
 import DataRepository.MarketData;
+import DataRepository.MarketProvider;
+import DataRepository.MarketProviderListerner;
 import GUI.MarketMainFrame;
 
 import demo.handler.ExchangeAPI;
@@ -29,13 +33,24 @@ import demo.handler.GlobalAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 
-public class MarketNavigatorPanel extends JPanel {
+public class MarketNavigator extends MarketProvider {
 	
 	private APIContext apiContext=null;
 	private Exchange selectedExchange=null;
 	private JTree tree=null;
 	
-	public MarketNavigatorPanel(APIContext apiC, Exchange selectedExchangeA) {
+	private JPanel panel =null;
+		
+	private Market selectedMarket=null;
+	
+	private Vector<MarketProviderListerner> listeners=new Vector<MarketProviderListerner>();
+		
+	public JPanel getPanel() {
+		return panel;
+	}
+
+
+	public MarketNavigator(APIContext apiC, Exchange selectedExchangeA) {
 		apiContext=apiC;
 		selectedExchange=selectedExchangeA;
 		initialize();
@@ -44,9 +59,9 @@ public class MarketNavigatorPanel extends JPanel {
 	
 	private void initialize()
 	{
+		panel=new JPanel();
 		
-		
-		this.setLayout(new BorderLayout());
+		panel.setLayout(new BorderLayout());
 		DefaultMutableTreeNode dmtn=new DefaultMutableTreeNode("Event Types");
 		
 		tree=new JTree(dmtn);
@@ -137,16 +152,11 @@ public class MarketNavigatorPanel extends JPanel {
 					if(m==null)
 						return;
 					
-					MarketData md = new MarketData(m, selectedExchange,apiContext);
-					if(Parameters.graphicalInterface)
-					{
-						//System.out.println("passei aqui");
-						MarketMainFrame mmf = new MarketMainFrame(md);
-						mmf.setSize(400, 600);
-						mmf.setVisible(true);
-					}
+					if(selectedMarket!=null && m.getMarketId()==selectedMarket.getMarketId())
+						return;
+					selectedMarket=m;
 					
-					md.startPolling();
+					warnListeners();
 					return;
 				}
 			}
@@ -180,7 +190,9 @@ public class MarketNavigatorPanel extends JPanel {
 			}
 		}
 		
-		this.add(tree,BorderLayout.CENTER);
+		tree.expandPath(new TreePath(dmtn.getPath()));
+		panel.add(tree,BorderLayout.CENTER);
+		
 	}
 	
 	private void fillTree(GetEventsResp resp,DefaultMutableTreeNode dmtn)
@@ -234,6 +246,33 @@ public class MarketNavigatorPanel extends JPanel {
 	
 	public static void main(String[] args)  throws Exception {
 		
+	}
+
+	
+	@Override
+	public void addMarketProviderListener(MarketProviderListerner mpl) {
+		listeners.add(mpl);
+		
+	}
+
+
+	@Override
+	public void removeMarketProviderListener(MarketProviderListerner mpl) {
+		listeners.remove(mpl);
+		
+	}
+
+	private void warnListeners()
+	{
+		if(selectedMarket==null) return;
+		
+		for(MarketProviderListerner mpl:listeners)
+			mpl.newMarketSelected(this, selectedMarket);
+	}
+
+	@Override
+	public Market getCurrentSelectedMarket() {
+		return selectedMarket;
 	}
 	
 }
