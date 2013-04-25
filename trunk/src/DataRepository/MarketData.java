@@ -385,11 +385,11 @@ public class MarketData {
 			//return;
 		}
 		
-		if(prices!=null && prices.getInPlayDelay()>0)
+		/*if(prices!=null && prices.getInPlayDelay()>0)
 		{
 			setInPlay(true);
 			warnListenersLive();
-		}
+		}*/
 		//System.out.println("---------------------------------------------------");
 		
 		Calendar timestamp=currentTime;
@@ -894,11 +894,14 @@ public class MarketData {
 	
 	public void warnListenersUpdate()
 	{
+	
 		
 			try {
 				for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
+				{
 					mcl.MarketChange(this, MarketChangeListener.MarketUpdate);
-				
+					System.out.println(" Size: "+mcl );
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
