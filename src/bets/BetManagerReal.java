@@ -22,6 +22,7 @@ import DataRepository.MarketData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
+import demo.util.APIContext;
 
 public class BetManagerReal extends BetManager implements MarketChangeListener{
 	
@@ -415,7 +416,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			PlaceBetsResult[] betResult=null;
 			
 			try {
-				betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(),  getMd().getApiContext(), betsAPI);
+				betResult=ExchangeAPI.placeBets(getMd().getSelectedExchange(), getMd().getApiContext(), betsAPI);
 			} catch (Exception e) {
 				e.printStackTrace();
 				
@@ -1146,6 +1147,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 
 	public int cancelBets(Vector<BetData> cancelBets)
 	{
+		if(cancelBets.isEmpty()) return 0;
 		CancelBets canc[] = new CancelBets[cancelBets.size()];
 		
 		BetData[] bds=cancelBets.toArray(new BetData[]{});

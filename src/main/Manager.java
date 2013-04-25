@@ -547,7 +547,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 	
 
 	public void MarketLiveMode(MarketData md) {
-		System.out.println("");
+		System.out.println("XXXXXXXXXXX");
 		System.err.println("Manager knows the market is Live");
 		
 		if(md.isInTrade())
@@ -605,11 +605,12 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			fps.setText("FPS:"+md.getFPS());
 		
+		System.out.println("Chamou");
 	}
 
 	@Override
 	public void newMarketSelected(MarketProvider mp, Market m) {
-System.err.println("Manager knows the market is Live");
+		System.err.println("Manager knows the market is Live");
 		
 		if(md.isInTrade())
 		{

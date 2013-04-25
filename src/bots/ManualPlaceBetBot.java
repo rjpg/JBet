@@ -175,8 +175,14 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 						
 					if(bds.size()>0)
 					{
-						
-						int retCancel=getMd().getBetManager().cancelBets(getMd().getBetManager().getBets());
+						Vector<BetData> bets=getMd().getBetManager().getBets();
+						Vector<BetData> unbets=new Vector<BetData>();
+						for(BetData b:bets)
+						{
+							if(b.getState()== BetData.UNMATCHED || b.getState()== BetData.PARTIAL_MATCHED)
+								unbets.add(b);
+						}
+						int retCancel=getMd().getBetManager().cancelBets(unbets);
 						msgjf.writeMessageText("Return From Cancel : "+retCancel,Color.BLUE);
 						
 					}
@@ -244,12 +250,13 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 //		
 		if( marketEventType==MarketChangeListener.MarketNew)
 		{
+			System.out.println("Market NEW");
 			setMd(md);
 			betPanel.reset(getMd());
 			betPanel2.reset(getMd());
 			closePanel.reset(getMd());
 		}
-		
+		System.out.println("Market :"+md.getName()+" "+md.getEventName());
 		if(bet!=null)
 		{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
