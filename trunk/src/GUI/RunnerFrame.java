@@ -151,7 +151,7 @@ public class RunnerFrame extends JFrame{
 	    aux2.add(contentPane,BorderLayout.CENTER);
 		
 	    JScrollPane jScrollPane = new JScrollPane();
-	    jScrollPane.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	    jScrollPane.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	    jScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	    
 		JPanel aux=new JPanel();
