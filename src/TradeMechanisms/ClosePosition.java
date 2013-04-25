@@ -115,8 +115,14 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void setState(int state)
 	{
+		if(STATE==state) return;
 		
 		STATE=state;
+		
+		for(TradeMechanismListener tml: listeners)
+		{
+			tml.tradeMechanismChangeState(this, STATE);
+		}
 	}
 	
 	@Override

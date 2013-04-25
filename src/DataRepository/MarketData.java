@@ -77,6 +77,7 @@ public class MarketData {
 	protected int updateInterval = 400;
 	//------------------------
 	
+	
 	//------- Market----------
 	public String name=null;
 	public int id;
@@ -130,7 +131,10 @@ public class MarketData {
 			name=selectedMarket.getName();
 			id=selectedMarket.getMarketId();
 			start=selectedMarket.getMarketTime();
-			eventName=selectedMarket.getMenuPath().split("\\\\")[2];
+			String slist[]=selectedMarket.getMenuPath().split("\\\\");
+			
+			eventName=selectedMarket.getMenuPath().split("\\\\")[slist.length-1];
+			
 			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
 			//initializeData();
 			
@@ -944,7 +948,9 @@ public class MarketData {
 		name=selectedMarket.getName();
 		id=selectedMarket.getMarketId();
 		start=selectedMarket.getMarketTime();
-		eventName=selectedMarket.getMenuPath().split("\\\\")[2];
+		String[] slist=selectedMarket.getMenuPath().split("\\\\");
+		eventName=selectedMarket.getMenuPath().split("\\\\")[slist.length-1];
+		System.out.println("Event"+eventName);
 
 		for(int i=0;i<this.selectedMarket.getRunners().getRunner().length;i++)
 		{
@@ -1134,6 +1140,15 @@ public class MarketData {
 		polling = false;
 
 	}
+	
+	public int getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(int updateInterval) {
+		this.updateInterval = updateInterval;
+	}
+
 	
 	public boolean isLogging() {
 		return logging;
