@@ -84,8 +84,8 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			Display.println("Starting...");
 		
 			
-			String username = "birinhos";
-			String password = "6mgprldi777";
+			String username = "cocotaxi";
+			String password = "merdamerda0";
 			
 			
 			selectedExchange = Exchange.UK;

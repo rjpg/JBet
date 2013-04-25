@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
+
+import correctscore.CorrectScoreMainFrame;
 
 import demo.handler.ExchangeAPI;
 import demo.handler.GlobalAPI;
@@ -47,6 +50,7 @@ public class NextPreLiveMO extends MarketProvider{
 
 	public NextPreLiveMO(Exchange selectedExchangeA,APIContext apiContextA) {
 
+		
 		apiContext=apiContextA;
 		selectedExchange=selectedExchangeA;
 		try {
@@ -63,9 +67,10 @@ public class NextPreLiveMO extends MarketProvider{
 
 
 	public void loadEvents() throws Exception {
+
 		// Get available event types.
 		EventType[] types = GlobalAPI.getActiveEventTypes(apiContext);
-		int indexFound=0;
+		int indexFound=-1;
 		for(int i=0;i<types.length;i++)
 		{
 			//System.out.println("\""+types[i].getName()+"\"");
@@ -75,7 +80,7 @@ public class NextPreLiveMO extends MarketProvider{
 			}
 		}
 
-		System.out.println(types[indexFound].getName()+"-"+indexFound);
+		System.out.println(types[indexFound].getName()+" with "+indexFound +" entries");
 
 		GetEventsResp resp = GlobalAPI.getEvents(apiContext, types[indexFound].getId());
 		BFEvent[] events = resp.getEventItems().getBFEvent();
@@ -84,26 +89,14 @@ public class NextPreLiveMO extends MarketProvider{
 
 		Calendar now = Calendar.getInstance();
 		int day=now.get(Calendar.DAY_OF_MONTH);
-		SimpleDateFormat sdf;
-
-
-		sdf = new SimpleDateFormat("MMMMM",Locale.UK);
-		sdf.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-		int hour=now.get(Calendar.HOUR_OF_DAY);
-		System.out.println("HOUR:"+hour);
-		if(hour<=3)
-		{
-			day--;//########################### se se correr depois da meia noite 
-		}
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("MMMMM",Locale.UK);	
 
 		if(day>9)
-			fixturesToday+=day;
+			fixturesToday+=day+" "+sdf.format(now.getTime());
 		else
 			fixturesToday+="0"+day+" "+sdf.format(now.getTime());
-		//Calendar.AUGUST
-
-
-
+	
 		System.out.println(fixturesToday);
 
 		for(int i=0;i<events.length;i++)
@@ -115,7 +108,9 @@ public class NextPreLiveMO extends MarketProvider{
 			}
 		}
 
-		System.out.println(events[indexFound].getEventName());
+//		if (indexFound==-1 && indexFound>=events.length)
+//			return;
+			System.out.println(events[indexFound].getEventName());
 
 
 		resp=null;
@@ -127,7 +122,11 @@ public class NextPreLiveMO extends MarketProvider{
 
 		for(int i=0;i<events.length;i++)
 		{
-			System.out.println("\""+events[i].getEventName()+"\"");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+			
+			System.out.println("#############: "+events[i].getStartTime());
+			
+			System.out.println(dateFormat.format(new Date(events[i].getStartTime().getTimeInMillis()))+" \""+events[i].getEventName()+"\"");
 			todayGames.add(events[i]);
 			//System.out.println(events[i].getStartTime().toString()); //dá 0 em tempo
 		}                                                            
@@ -204,8 +203,65 @@ public class NextPreLiveMO extends MarketProvider{
 
 	private void refresh()
 	{
+		Calendar now= Calendar.getInstance();
+		Calendar nowPlusTenSecs = (Calendar) now.clone();
+		nowPlusTenSecs.add(Calendar.SECOND, 10);
+		
 		System.out.println("running");
 		
+		for (BFEvent bfe:todayGames)
+		{
+			Calendar eventMinus1M= (Calendar) bfe.getStartTime().clone();
+			eventMinus1M.add(Calendar.MINUTE, -1);
+			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(bfe))
+			{
+				eventsInformed.add(bfe);
+				
+				GetEventsResp resp=null;
+				MarketSummary[] markets = null;
+				int indexFound = -1;
+				try {
+					resp = GlobalAPI.getEvents(CorrectScoreMainFrame.apiContext,
+							bfe.getEventId());
+					markets = resp.getMarketItems().getMarketSummary();
+
+					for (int i = 0; i < markets.length; i++) {
+						if (markets[i].getMarketName().contains(new String("Match Odds"))) {
+							
+							indexFound = i;
+						}
+						// todayGames.add(events[i]);
+					}
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Market matchOddsMarket = null;
+				
+				if(indexFound!=-1)
+				{
+					try {
+						matchOddsMarket = ExchangeAPI.getMarket(
+								CorrectScoreMainFrame.selectedExchange,
+								CorrectScoreMainFrame.apiContext,
+								markets[indexFound].getMarketId());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						
+						e.printStackTrace();
+						
+					}
+				}
+				
+				if(matchOddsMarket!=null)
+				{
+					currentMarket=matchOddsMarket;
+					informListeners();
+				}
+			}
+		}
 		
 
 	}

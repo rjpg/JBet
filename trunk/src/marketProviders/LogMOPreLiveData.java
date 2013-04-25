@@ -7,7 +7,7 @@ import DataRepository.Utils;
 
 public class LogMOPreLiveData implements MarketChangeListener{
 
-	int x=10;
+	int x=3;
 	
 	public LogMOPreLiveData() {
 	
