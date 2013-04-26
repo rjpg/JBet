@@ -30,13 +30,13 @@ import DataRepository.MarketProviderListerner;
 
 public class NextPreLiveMO extends MarketProvider{
 
-	private Vector<BFEvent> todayGames=new Vector<BFEvent>();
+	private Vector<EventData> todayGames=new Vector<EventData>();
 
 	private Market currentMarket=null;
 
 	private Vector<MarketProviderListerner> listeners=new Vector<MarketProviderListerner>();
 
-	private Vector<BFEvent> eventsInformed=new Vector<BFEvent>();
+	private Vector<EventData> eventsInformed=new Vector<EventData>();
 
 	// THREAD
 	private MOMPThread as;
@@ -113,6 +113,7 @@ public class NextPreLiveMO extends MarketProvider{
 //			return;
 			System.out.println(events[indexFound].getEventName());
 
+			System.out.println(events[indexFound].getEventId());
 
 		resp=null;
 
@@ -128,7 +129,13 @@ public class NextPreLiveMO extends MarketProvider{
 			System.out.println("#############: "+events[i].getStartTime());
 			
 			System.out.println(dateFormat.format(new Date(events[i].getStartTime().getTimeInMillis()))+" \""+events[i].getEventName()+"\"");
-			todayGames.add(events[i]);
+			
+
+			String sret=ExchangeAPI.getAllMarkets(selectedExchange, apiContext, new int[]{events[i].getEventId()});	
+			
+			System.out.println(sret);
+		
+			//todayGames.add(new EventData(start)[i]);
 			//System.out.println(events[i].getStartTime().toString()); //dá 0 em tempo
 		}                                                            
 
@@ -210,7 +217,7 @@ public class NextPreLiveMO extends MarketProvider{
 		
 		System.out.println("running");
 		
-		for (BFEvent bfe:todayGames)
+	/*	for (BFEvent bfe:todayGames)
 		{
 			Calendar eventMinus1M= (Calendar) bfe.getStartTime().clone();
 			eventMinus1M.add(Calendar.MINUTE, -1);
@@ -263,7 +270,7 @@ public class NextPreLiveMO extends MarketProvider{
 				}
 			}
 		}
-		
+		*/
 
 	}
 
