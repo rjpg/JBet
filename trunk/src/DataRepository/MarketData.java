@@ -135,7 +135,7 @@ public class MarketData {
 
 			eventName=selectedMarket.getMenuPath().split("\\\\")[slist.length-1];
 
-			System.out.println("Track:"+selectedMarket.getMenuPath()+" eventName:"+eventName);
+			System.out.println("Event Name:"+eventName);
 			//initializeData();
 
 

@@ -1,7 +1,5 @@
 package demo.handler;
 
-import demo.util.APIContext;
-import demo.util.UsageMap;
 import generated.global.BFGlobalServiceStub;
 import generated.global.BFGlobalServiceStub.APIRequestHeader;
 import generated.global.BFGlobalServiceStub.APIResponseHeader;
@@ -21,6 +19,7 @@ import generated.global.BFGlobalServiceStub.Logout;
 import generated.global.BFGlobalServiceStub.LogoutErrorEnum;
 import generated.global.BFGlobalServiceStub.LogoutReq;
 import generated.global.BFGlobalServiceStub.LogoutResp;
+import demo.util.APIContext;
 
 
 public class GlobalAPI {
@@ -164,6 +163,8 @@ public class GlobalAPI {
         
         setHeaderDataToContext(context, resp.getHeader());
 	}
+	
+	
 	
 	
 	

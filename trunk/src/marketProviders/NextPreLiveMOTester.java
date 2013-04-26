@@ -1,5 +1,7 @@
 package marketProviders;
 
+import java.util.Vector;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -91,7 +93,15 @@ public class NextPreLiveMOTester implements MarketProviderListerner{
 		
 	}
 
+	@Override
+	public void newMarketsSelected(MarketProvider mp, Vector<Market> mv) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public static void main(String[] args) {
 		new NextPreLiveMOTester();
 	}
+
+
 }

@@ -7,7 +7,7 @@ import DataRepository.Utils;
 
 public class LogMOPreLiveData implements MarketChangeListener{
 
-	int x=3;
+	int x=1;
 	
 	public LogMOPreLiveData() {
 	
@@ -20,12 +20,12 @@ public class LogMOPreLiveData implements MarketChangeListener{
 		{
 			for(RunnersData rd:md.getRunners())
 			{
-				System.out.println(rd.getName()+" Odd Back:"+Utils.getOddBackLastFrameMove(rd));
+				System.out.println(rd.getName()+" Odd Back:"+Utils.getAmountBackFrame(rd, 0)+" @ "+Utils.getOddBackFrame(rd, 0));
 			}
 			
 			x--;
 			
-			if(x<0)
+			if(x<=0)
 			{
 				System.out.println("Closing Market : "+md.getName()+" from :"+md.getEventName());
 				md.removeMarketChangeListener(this);

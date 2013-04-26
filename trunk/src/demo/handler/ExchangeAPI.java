@@ -70,6 +70,7 @@ import generated.exchange.BFExchangeServiceStub.UpdateBetsResp;
 import generated.exchange.BFExchangeServiceStub.UpdateBetsResult;
 import generated.exchange.BFExchangeServiceStub.VolumeInfo;
 
+import java.util.Calendar;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
@@ -603,7 +604,7 @@ public class ExchangeAPI {
         return resp.getBetResults().getCancelBetsResult();
 	}
 	
-	public static String getAllMarkets(Exchange exch, APIContext context,int eventTypeIds[]) throws Exception 
+	public static String getAllMarkets(Exchange exch, APIContext context,int eventTypeId[],Calendar from,Calendar to) throws Exception 
 	{
 		
 		// Create a request object
@@ -612,8 +613,10 @@ public class ExchangeAPI {
 
 		// Set the parameters
 		ArrayOfInt aoi=new ArrayOfInt();
-		aoi.set_int(eventTypeIds);
+		aoi.set_int(eventTypeId);
 		request.setEventTypeIds(aoi);
+		request.setFromDate(from);
+		request.setToDate(to);
 		
 		// Create the message and attach the request to it.
 		GetAllMarkets msg=new GetAllMarkets();
@@ -690,5 +693,7 @@ public class ExchangeAPI {
 		
 		return resp.getBet();
 	}
+	
+
 	
 }

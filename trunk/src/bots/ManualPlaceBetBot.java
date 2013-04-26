@@ -16,6 +16,7 @@ import TradeMechanisms.ClosePosition;
 import TradeMechanisms.ClosePositionPanel;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.TradeMechanismUtils;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
@@ -39,6 +40,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	private JButton placeButton=null;
 	private JButton cancelButton=null;
 	private JButton closePositionButton=null;
+	private JButton openPositionButton=null;
 	
 	private JButton jumpButton=null;
 	
@@ -210,6 +212,34 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					
 					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose());
 					
+					//cp.addTradeMechanismListener(ManualPlaceBetBot.this);
+					
+					msgjf.writeMessageText("Close Position caled",Color.BLUE);
+				}
+			});
+			
+		}
+		return closePositionButton;
+	}
+	
+	public JButton getOpenPositionButton()
+	{
+		if(closePositionButton==null)
+		{
+			closePositionButton=new JButton("Close Position");
+			closePositionButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					
+					BetData bd=closePanel.createBetData();
+					getMd().getBetManager().placeBet(bd);
+					
+					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose());
+					
+					//cp.addTradeMechanismListener(ManualPlaceBetBot.this);
+					
 					msgjf.writeMessageText("Close Position caled",Color.BLUE);
 				}
 			});
@@ -287,8 +317,11 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
-		// TODO Auto-generated method stub
-		
+		if(TradeMechanismUtils.isTradeMechanismFinalState(state))
+		{
+			System.out.println("Trade mecanism has ended");
+			tm.removeTradeMechanismListener(this);
+		}
 	}
 
 	@Override

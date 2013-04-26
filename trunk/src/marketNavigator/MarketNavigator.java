@@ -274,5 +274,11 @@ public class MarketNavigator extends MarketProvider {
 	public Market getCurrentSelectedMarket() {
 		return selectedMarket;
 	}
+
+
+	@Override
+	public Vector<Market> getCurrentSelectedMarkets() {
+		return null;
+	}
 	
 }
