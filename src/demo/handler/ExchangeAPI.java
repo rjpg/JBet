@@ -5,6 +5,7 @@ import generated.exchange.BFExchangeServiceStub.APIErrorEnum;
 import generated.exchange.BFExchangeServiceStub.APIRequestHeader;
 import generated.exchange.BFExchangeServiceStub.APIResponseHeader;
 import generated.exchange.BFExchangeServiceStub.ArrayOfCancelBets;
+import generated.exchange.BFExchangeServiceStub.ArrayOfInt;
 import generated.exchange.BFExchangeServiceStub.ArrayOfPlaceBets;
 import generated.exchange.BFExchangeServiceStub.ArrayOfUpdateBets;
 import generated.exchange.BFExchangeServiceStub.Bet;
@@ -20,6 +21,10 @@ import generated.exchange.BFExchangeServiceStub.GetAccountFunds;
 import generated.exchange.BFExchangeServiceStub.GetAccountFundsErrorEnum;
 import generated.exchange.BFExchangeServiceStub.GetAccountFundsReq;
 import generated.exchange.BFExchangeServiceStub.GetAccountFundsResp;
+import generated.exchange.BFExchangeServiceStub.GetAllMarkets;
+import generated.exchange.BFExchangeServiceStub.GetAllMarketsErrorEnum;
+import generated.exchange.BFExchangeServiceStub.GetAllMarketsReq;
+import generated.exchange.BFExchangeServiceStub.GetAllMarketsResp;
 import generated.exchange.BFExchangeServiceStub.GetBet;
 import generated.exchange.BFExchangeServiceStub.GetBetErrorEnum;
 import generated.exchange.BFExchangeServiceStub.GetBetReq;
@@ -598,9 +603,49 @@ public class ExchangeAPI {
         return resp.getBetResults().getCancelBetsResult();
 	}
 	
-	public static String getAllMarkets()
+	public static String getAllMarkets(Exchange exch, APIContext context,int eventTypeIds[]) throws Exception 
 	{
-		return null;
+		
+		// Create a request object
+		GetAllMarketsReq request=new GetAllMarketsReq();
+		request.setHeader(getHeader(context.getToken()));
+
+		// Set the parameters
+		ArrayOfInt aoi=new ArrayOfInt();
+		aoi.set_int(eventTypeIds);
+		request.setEventTypeIds(aoi);
+		
+		// Create the message and attach the request to it.
+		GetAllMarkets msg=new GetAllMarkets();
+		msg.setRequest(request);
+		
+		// Send the request to the Betfair Exchange Service.
+		GetAllMarketsResp resp=null;
+		
+		try {
+			resp = getStub(exch).getAllMarkets(msg).getResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		context.getUsage().addCall("getAllMarkets");
+		
+
+		if(resp==null)
+		{
+			throw new IllegalArgumentException("Failed to retrieve data: getStub(exch).getAllMarkets(msg).getResult() return null");
+		}
+		
+        // Check the response code, and throw and exception if call failed
+        if (resp.getErrorCode() != GetAllMarketsErrorEnum.OK)
+        {
+        	throw new IllegalArgumentException("Failed to retrieve data: "+resp.getErrorCode() + " Minor Error:"+resp.getErrorCode()+ " Header Error:"+resp.getHeader().getErrorCode());
+        	
+        }
+
+        setHeaderDataToContext(context, resp.getHeader());
+		
+		return resp.getMarketData();
 	}
 	
 	
