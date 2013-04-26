@@ -131,14 +131,8 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 				System.exit(1);
 			}
 			
-			JFrame jf=new JFrame();
-			MarketNavigator mp=new MarketNavigator(apiContext,selectedExchange);
-			mp.addMarketProviderListener(this);
 			
-			JScrollPane jsp=new JScrollPane(mp.getPanel());
-			jf.add(jsp);
-			jf.setSize(400,640);
-			jf.setVisible(true);
+			
 			
 			md = new MarketData(selectedMarket, selectedExchange,apiContext);
 			
@@ -153,9 +147,20 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			// //////////////////////////////
 			if(Parameters.graphicalInterface)
 			{
+				JFrame jf=new JFrame();
+				MarketNavigator mp=new MarketNavigator(apiContext,selectedExchange);
+				mp.addMarketProviderListener(this);
+				
+				JScrollPane jsp=new JScrollPane(mp.getPanel());
+				jf.add(jsp);
+				jf.setSize(400,400);
+				jf.setLocation(0,100);
+				jf.setVisible(true);
+				
 				//System.out.println("passei aqui");
 				mmf = new MarketMainFrame(md);
-				mmf.setSize(400, 600);
+				mmf.setSize(400, 400);
+				mmf.setLocation(0,500);
 				mmf.setVisible(true);
 			}
 			
@@ -430,7 +435,8 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			 panel.add(fps,BorderLayout.SOUTH);
 			 
 			 closeFrame.setContentPane(panel);
-			 closeFrame.setSize(100, 100);
+			 closeFrame.setSize(400, 100);
+			 
 		}
 		return closeFrame;
 	}
@@ -547,7 +553,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 	
 
 	public void MarketLiveMode(MarketData md) {
-		System.out.println("XXXXXXXXXXX");
+	//	System.out.println("XXXXXXXXXXX");
 		System.err.println("Manager knows the market is Live");
 		
 		if(md.isInTrade())
@@ -558,33 +564,33 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		
 		md.stopPolling();
 		System.err.println("Stop Polling");
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		md.clean();
 		System.err.println("Clean");
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		
 		selectedMarket=selectMarketNextEvent(selectedEventType);
 		System.err.println("Select new Market");
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		System.err.println("Instantating new Market");
 		md.setSelectedMarket(selectedMarket);
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		
 		
 		/// delay ?? for graphical restart...
@@ -605,12 +611,11 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			fps.setText("FPS:"+md.getFPS());
 		
-		System.out.println("Chamou");
+		//System.out.println("Chamou");
 	}
 
 	@Override
 	public void newMarketSelected(MarketProvider mp, Market m) {
-		System.err.println("Manager knows the market is Live");
 		
 		if(md.isInTrade())
 		{
@@ -620,33 +625,33 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		
 		md.stopPolling();
 		System.err.println("Stop Polling");
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		md.clean();
 		System.err.println("Clean");
-		try {
+	/*	try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		
 		selectedMarket=m;
 		System.err.println("Select new Market");
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		System.err.println("Instantating new Market");
 		md.setSelectedMarket(selectedMarket);
-		try {
+		/*try {
 			Thread.sleep(2000);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}
+		}*/
 		
 		
 		/// delay ?? for graphical restart...

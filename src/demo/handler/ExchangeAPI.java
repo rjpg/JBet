@@ -357,6 +357,7 @@ public class ExchangeAPI {
         // Transfer the response data back to the API context
         setHeaderDataToContext(context, resp.getHeader());
 
+        
         return new InflatedMarketPrices(resp.getMarketPrices());
 	}
 	
@@ -596,6 +597,12 @@ public class ExchangeAPI {
 
         return resp.getBetResults().getCancelBetsResult();
 	}
+	
+	public static String getAllMarkets()
+	{
+		return null;
+	}
+	
 	
 	public static Bet getBet(Exchange exch, APIContext context, long betId) throws Exception 
 	{

@@ -256,7 +256,9 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			betPanel2.reset(getMd());
 			closePanel.reset(getMd());
 		}
-		System.out.println("Market :"+md.getName()+" "+md.getEventName());
+		else if( marketEventType==MarketChangeListener.MarketUpdate)
+		{
+		//System.out.println("Market :"+md.getName()+" "+md.getEventName());
 		if(bet!=null)
 		{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
@@ -268,7 +270,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		if(bet2!=null)
 			if(BetUtils.isBetFinalState(bet2.getState()))
 				bet2=null;
-		
+		}
 		
 	}
 
