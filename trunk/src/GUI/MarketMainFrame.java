@@ -25,6 +25,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 	private JPanel contentPane;
 	public Vector<RunnerButton> vectorRdb=new Vector<RunnerButton>();
 	
+	private boolean initializing=false; 
 	
 	public MarketData md;
 	
@@ -33,6 +34,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 		md=mdA;
 		contentPane=new JPanel(new GridLayout(0, 1));
 		this.setContentPane(contentPane);
+		MarketChange(md);
 		md.addMarketChangeListener(this);
 		
 		
@@ -45,6 +47,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 
 	public void MarketUpdate(MarketData md) {
 		
+		if(initializing) return;
 		//System.out.println("updateeeee");	
 		
 		////////////////////////////// Frame with time to end ///////////////////////////
@@ -71,14 +74,14 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 					now=rdb.getRunnerData().getDataFrames().get(rdb.getRunnerData().getDataFrames().size()-1).getTimestamp();
 				}
 			}
-			if(!found)
+			/*if(!found)
 			{
 				RunnerButton nrdb=new RunnerButton(rd);
 				vectorRdb.add(nrdb);
 				contentPane.add(nrdb);
 				System.out.println("added "+ rd);
 				contentPane.doLayout();
-			}
+			}*/
 		}
 		
 		
@@ -94,6 +97,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 
 
 	public void MarketChange(MarketData md) {
+		initializing=true;
 		clean();
 		this.setTitle(md.getName());
 		
@@ -107,7 +111,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 		
 		}
 		contentPane.doLayout();
-		
+		initializing=false;
 	}
 	
 	public void clean()

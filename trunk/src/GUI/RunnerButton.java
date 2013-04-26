@@ -27,6 +27,7 @@ public class RunnerButton extends JButton{
 			}
 		});
 		runnerFrame=new RunnerFrame(runnerData);
+		runnerFrame.setLocation(400, 0);
 	}
 
 	public RunnerFrame getRunnerFrame() {

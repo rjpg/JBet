@@ -49,7 +49,8 @@ public class NextPreLiveMO extends MarketProvider{
 	private Exchange selectedExchange;
 
 	public NextPreLiveMO(Exchange selectedExchangeA,APIContext apiContextA) {
-
+		//String allMarkets = ExchangeAPI.getAllMarkets(Exchange.UK, apiContext);
+		
 		
 		apiContext=apiContextA;
 		selectedExchange=selectedExchangeA;
