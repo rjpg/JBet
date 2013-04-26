@@ -33,5 +33,8 @@ public abstract class TradeMechanism {
 	
 	public abstract void clean();
 	
+	public abstract void addTradeMechanismListener(TradeMechanismListener listener);
+	
+	public abstract void removeTradeMechanismListener(TradeMechanismListener listener);
 	
 }

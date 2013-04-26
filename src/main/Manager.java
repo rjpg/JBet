@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -84,8 +85,8 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			Display.println("Starting...");
 		
 			
-			String username = "cocotaxi";
-			String password = "merdamerda0";
+			String username = "birinhos";
+			String password = "6mgprldi777";
 			
 			
 			selectedExchange = Exchange.UK;
@@ -660,6 +661,14 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 	
 		
 	}
+	
+
+	@Override
+	public void newMarketsSelected(MarketProvider mp, Vector<Market> mv) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 /*	@Override
 	public void MarketBetChange(MarketData md, BetData bd, int marketBetEventType) {

@@ -31,12 +31,14 @@ public class LoaderManualPlaceBetBot {
 		Parameters.neuralBot=false; // manual bot
 		Parameters.neighboursCorrelationBot=false; // use neighbours info
 		Parameters.neuralDataBot=false; // manual bot
-		Parameters.simulation=false;
+		
+		Parameters.simulation=true;
 		Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 		Parameters.WOM_DIST_CENTER=5;
 		Parameters.CHART_FRAMES=300;
 		Parameters.ODD_FAVORITE=2.00;
-		
+		int x=Integer.MAX_VALUE;
+		System.out.println(x);
 		new Manager();
 		}
 }

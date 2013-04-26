@@ -1,38 +1,27 @@
 package marketProviders;
 
-import java.awt.Color;
+import generated.exchange.BFExchangeServiceStub.Market;
+import generated.global.BFGlobalServiceStub.EventType;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.Vector;
 
-import correctscore.CorrectScoreMainFrame;
-
-import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
-import demo.util.APIContext;
-import demo.util.Display;
-
-import bets.BetManager;
-import bets.BetManagerReal.BetsManagerThread;
-
-import generated.exchange.BFExchangeServiceStub.Market;
-import generated.global.BFGlobalServiceStub.BFEvent;
-import generated.global.BFGlobalServiceStub.EventType;
-import generated.global.BFGlobalServiceStub.GetEventsResp;
-import generated.global.BFGlobalServiceStub.MarketSummary;
 import DataRepository.MarketProvider;
 import DataRepository.MarketProviderListerner;
+import correctscore.CorrectScoreMainFrame;
+import demo.handler.ExchangeAPI;
+import demo.handler.ExchangeAPI.Exchange;
+import demo.handler.GlobalAPI;
+import demo.util.APIContext;
 
 public class NextPreLiveMO extends MarketProvider{
 
 	private Vector<EventData> todayGames=new Vector<EventData>();
 
 	private Market currentMarket=null;
+	
+	private Vector<Market> currentMarkets=new Vector<Market>();
 
 	private Vector<MarketProviderListerner> listeners=new Vector<MarketProviderListerner>();
 
@@ -49,15 +38,12 @@ public class NextPreLiveMO extends MarketProvider{
 	private Exchange selectedExchange;
 
 	public NextPreLiveMO(Exchange selectedExchangeA,APIContext apiContextA) {
-		//String allMarkets = ExchangeAPI.getAllMarkets(Exchange.UK, apiContext);
-		
-		
+	
 		apiContext=apiContextA;
 		selectedExchange=selectedExchangeA;
 		try {
 			loadEvents();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -74,193 +60,143 @@ public class NextPreLiveMO extends MarketProvider{
 		int indexFound=-1;
 		for(int i=0;i<types.length;i++)
 		{
-			//System.out.println("\""+types[i].getName()+"\"");
-			if(types[i].getName().equals("Soccer - Fixtures"))
+			
+			System.out.println("\""+types[i].getName()+"\"");
+			if(types[i].getName().equals("Soccer"))
 			{
 				indexFound=i;
 			}
 		}
-
-		System.out.println(types[indexFound].getName()+" with "+indexFound +" entries");
-
-		GetEventsResp resp = GlobalAPI.getEvents(apiContext, types[indexFound].getId());
-		BFEvent[] events = resp.getEventItems().getBFEvent();
-
-		String fixturesToday="Fixtures ";
-
-		Calendar now = Calendar.getInstance();
-		int day=now.get(Calendar.DAY_OF_MONTH);
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("MMMMM",Locale.UK);	
-
-		if(day>9)
-			fixturesToday+=day+" "+sdf.format(now.getTime());
-		else
-			fixturesToday+="0"+day+" "+sdf.format(now.getTime());
+		Calendar from=Calendar.getInstance();
+		
+		Calendar to=(Calendar)from.clone();
+		
+		to.add(Calendar.HOUR, 24);
+		
+		String sret=ExchangeAPI.getAllMarkets(selectedExchange, apiContext, new int[]{types[indexFound].getId()},from,to);	
+		
+		
+		
+		String[] markets=sret.split(":");
+		
+		String name="";
+		
+		EventData edInprocess=null;
+		
+		for(int i=1;i<markets.length;i++)
+		{
+			String fields[]=markets[i].split("~");
+			String path[]=fields[5].split("\\\\");
+			String name2=path[path.length-1];
+			if(!name2.equals(name))
+			{
+				name=name2;
+				System.out.println(name);
+				
+				edInprocess=new EventData(name);
+				Calendar starttime=Calendar.getInstance();
+				
+				starttime.setTimeInMillis(Long.parseLong(fields[4]));
+				//System.out.println("Time Milis "+fields[4] );
+				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss,SSS");
+				System.out.println("Time : "+dateFormat.format(starttime.getTimeInMillis()));
+				edInprocess.setStartTime(starttime);
+				todayGames.add(edInprocess);
+			}
+			
+			if(fields[1].equals("Match Odds"))
+			{
+				edInprocess.setMatchOddsId(Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getMatchOddsId());
+			}
+			
+			if(fields[1].equals("Correct Score"))
+			{
+				edInprocess.setCorrectScoreId(Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			
+			if(fields[1].equals("Over/Under 0.5 Goals"))
+			{
+				edInprocess.setOverUnderId(0,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 1.5 Goals"))
+			{
+				edInprocess.setOverUnderId(1,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 2.5 Goals"))
+			{
+				edInprocess.setOverUnderId(2,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 3.5 Goals"))
+			{
+				edInprocess.setOverUnderId(3,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 4.5 Goals"))
+			{
+				edInprocess.setOverUnderId(4,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 5.5 Goals"))
+			{
+				edInprocess.setOverUnderId(5,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 6.5 Goals"))
+			{
+				edInprocess.setOverUnderId(6,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 7.5 Goals"))
+			{
+				edInprocess.setOverUnderId(7,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+			if(fields[1].equals("Over/Under 8.5 Goals"))
+			{
+				edInprocess.setOverUnderId(8,Integer.parseInt(fields[0]));
+				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+			}
+			
+		}
+	}
 	
-		System.out.println(fixturesToday);
-
-		for(int i=0;i<events.length;i++)
-		{
-			//System.out.println("\""+events[i].getEventName()+"\"");
-			if(events[i].getEventName().startsWith(fixturesToday))
-			{
-				indexFound=i;
-			}
-		}
-
-//		if (indexFound==-1 && indexFound>=events.length)
-//			return;
-			System.out.println(events[indexFound].getEventName());
-
-			System.out.println(events[indexFound].getEventId());
-
-		resp=null;
-
-		while (resp==null)
-			resp = GlobalAPI.getEvents(apiContext, events[indexFound].getEventId());
-
-		events = resp.getEventItems().getBFEvent();
-
-		for(int i=0;i<events.length;i++)
-		{
-			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-			
-			System.out.println("#############: "+events[i].getStartTime());
-			
-			System.out.println(dateFormat.format(new Date(events[i].getStartTime().getTimeInMillis()))+" \""+events[i].getEventName()+"\"");
-			
-
-			String sret=ExchangeAPI.getAllMarkets(selectedExchange, apiContext, new int[]{events[i].getEventId()});	
-			
-			System.out.println(sret);
-		
-			//todayGames.add(new EventData(start)[i]);
-			//System.out.println(events[i].getStartTime().toString()); //dá 0 em tempo
-		}                                                            
-
-		/*
-			// Get available events of this type
-			Market selectedMarket = null;
-			int eventId = types[typeChoice].getId();
-			while (selectedMarket == null) {
-				GetEventsResp resp = GlobalAPI.getEvents(apiContext, eventId);
-				BFEvent[] events = resp.getEventItems().getBFEvent();
-				if (events == null) {
-					events = new BFEvent[] {};
-				} else {
-					// The API returns Coupons as event names, but Coupons don't contain markets so we remove any
-					// events that are Coupons.
-					ArrayList<BFEvent> nonCouponEvents = new ArrayList<BFEvent>(events.length);
-					for(BFEvent e: events) {
-						if(!e.getEventName().equals("Coupons")) {
-							nonCouponEvents.add(e);
-						}
-					}
-					events = (BFEvent[]) nonCouponEvents.toArray(new BFEvent[]{});
-				}
-				MarketSummary[] markets = resp.getMarketItems().getMarketSummary();
-				if (markets == null) {
-					markets = new MarketSummary[] {};
-				}
-				int choice = Display.getChoiceAnswer("Choose a Market or Event:", events, markets);
-
-				// Exchange ID of 1 is the UK, 2 is AUS
-				if (choice < events.length) {
-					eventId = events[choice].getEventId(); 
-				} else {
-					choice -= events.length;
-					selectedExchange = markets[choice].getExchangeId() == 1 ? Exchange.UK : Exchange.AUS;
-					selectedMarket = ExchangeAPI.getMarket(selectedExchange, apiContext, markets[choice].getMarketId());
-				}				
-			}*/
-
-	}
-
-	private Market chooseMarket(BFEvent event) throws Exception {
-
-		Market selectedMarket=null;
-		GetEventsResp resp = GlobalAPI.getEvents(apiContext, event.getEventId());
-
-		MarketSummary[] markets = resp.getMarketItems().getMarketSummary();
-
-		if (markets == null) {
-			return null;
-		}
-
-		int indexFound=-1;
-
-		for (int i = 0; i < markets.length; i++) {
-			if (markets[i].getMarketName().contains(new String("Match Odds"))) {
-				System.out.println("\"" + markets[i].getMarketName()
-						+ "\" Market Found");
-				indexFound = i;
-			}
-			// todayGames.add(events[i]);
-		}
-
-		if (indexFound == -1) 
-		{
-			System.out.println("Match Odds market not fount in envent"+event.getEventName());
-			return null;
-		}
-		selectedMarket = ExchangeAPI.getMarket(selectedExchange, apiContext, markets[indexFound].getMarketId());
-
-		return selectedMarket;
-	}
-
 	private void refresh()
 	{
 		Calendar now= Calendar.getInstance();
 		Calendar nowPlusTenSecs = (Calendar) now.clone();
 		nowPlusTenSecs.add(Calendar.SECOND, 10);
 		
-		System.out.println("running");
-		
-	/*	for (BFEvent bfe:todayGames)
+		for(EventData ed:todayGames)
 		{
-			Calendar eventMinus1M= (Calendar) bfe.getStartTime().clone();
+			Calendar eventMinus1M= (Calendar) ed.getStartTime().clone();
 			eventMinus1M.add(Calendar.MINUTE, -1);
-			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(bfe))
+			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(ed))
 			{
-				eventsInformed.add(bfe);
-				
-				GetEventsResp resp=null;
-				MarketSummary[] markets = null;
-				int indexFound = -1;
-				try {
-					resp = GlobalAPI.getEvents(CorrectScoreMainFrame.apiContext,
-							bfe.getEventId());
-					markets = resp.getMarketItems().getMarketSummary();
-
-					for (int i = 0; i < markets.length; i++) {
-						if (markets[i].getMarketName().contains(new String("Match Odds"))) {
-							
-							indexFound = i;
-						}
-						// todayGames.add(events[i]);
-					}
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				eventsInformed.add(ed);
+				System.out.println(" Game processing :"+ed.getEventName());
 				Market matchOddsMarket = null;
-				
-				if(indexFound!=-1)
-				{
-					try {
-						matchOddsMarket = ExchangeAPI.getMarket(
-								CorrectScoreMainFrame.selectedExchange,
-								CorrectScoreMainFrame.apiContext,
-								markets[indexFound].getMarketId());
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						
-						e.printStackTrace();
-						
-					}
+				try {
+					matchOddsMarket = ExchangeAPI.getMarket(
+							selectedExchange,
+							apiContext,
+							ed.getMatchOddsId());
+				} catch (Exception e) {
+					e.printStackTrace();	
 				}
 				
 				if(matchOddsMarket!=null)
@@ -270,13 +206,10 @@ public class NextPreLiveMO extends MarketProvider{
 				}
 			}
 		}
-		*/
-
 	}
 
 	private void informListeners()
 	{
-
 		for(MarketProviderListerner mpl:listeners)
 			mpl.newMarketSelected(this, currentMarket);
 	}
@@ -300,6 +233,12 @@ public class NextPreLiveMO extends MarketProvider{
 
 	}
 
+	@Override
+	public Vector<Market> getCurrentSelectedMarkets() {
+		// TODO Auto-generated method stub
+		return currentMarkets;
+	}
+
 
 	//---------------------------------thread -----
 	private class MOMPThread extends Object implements Runnable {
@@ -313,18 +252,10 @@ public class NextPreLiveMO extends MarketProvider{
 
 			while (!stopRequested) {
 				try {
-
-					refresh(); /// connect and get the data
-					//System.out.println("Not sync with MarketData");
-
-
-					//	refreshBets();
+					refresh(); 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
-
-
 
 				try {
 					Thread.sleep(updateInterval);
@@ -340,7 +271,6 @@ public class NextPreLiveMO extends MarketProvider{
 			if (runThread != null) {
 				runThread.interrupt();
 
-				// suspend()stop();
 			}
 		}
 	}
@@ -373,9 +303,6 @@ public class NextPreLiveMO extends MarketProvider{
 		return polling;
 	}
 
-	public static void main(String[] args) {
 
 
-
-	}
 }

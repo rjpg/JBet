@@ -4,15 +4,16 @@ import java.util.Calendar;
 
 public class EventData {
 
+	String eventName=null;
+	
 	public Calendar startTime;
-	
-	
+		
 	int matchOddsId;
-	int underOverId[]=new int[8];
+	int overUnderId[]=new int[9];
 	int correctScoreId;
 	
-	public EventData(Calendar start) {
-		startTime=start;
+	public EventData(String name) {
+		eventName=name;
 	}
 	
 	public Calendar getStartTime() {
@@ -31,12 +32,12 @@ public class EventData {
 		this.matchOddsId = matchOddsId;
 	}
 
-	public int[] getUnderOverId() {
-		return underOverId;
+	public int[] getOverUnderId() {
+		return overUnderId;
 	}
 
-	public void setUnderOverId(int index, int underOverId) {
-		this.underOverId[index] = underOverId;
+	public void setOverUnderId(int index, int underOverId) {
+		this.overUnderId[index] = underOverId;
 	}
 
 	public int getCorrectScoreId() {
@@ -47,5 +48,12 @@ public class EventData {
 		this.correctScoreId = correctScoreId;
 	}
 
-	
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
 }
