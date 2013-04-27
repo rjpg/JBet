@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Vector;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import DataRepository.MarketProvider;
 import DataRepository.MarketProviderListerner;
 import correctscore.CorrectScoreMainFrame;
@@ -30,7 +32,7 @@ public class NextPreLiveMO extends MarketProvider{
 	// THREAD
 	private MOMPThread as;
 	private Thread t;
-	protected int updateInterval = 400;
+	protected int updateInterval = 3000;
 	private boolean polling = false;
 
 	// API login
@@ -76,8 +78,6 @@ public class NextPreLiveMO extends MarketProvider{
 		
 		String sret=ExchangeAPI.getAllMarkets(selectedExchange, apiContext, new int[]{types[indexFound].getId()},from,to);	
 		
-		
-		
 		String[] markets=sret.split(":");
 		
 		String name="";
@@ -93,7 +93,9 @@ public class NextPreLiveMO extends MarketProvider{
 			{
 				name=name2;
 				System.out.println(name);
-				
+				edInprocess=findEventDataTodayGames(name);
+				if(edInprocess==null)
+				{
 				edInprocess=new EventData(name);
 				Calendar starttime=Calendar.getInstance();
 				
@@ -103,6 +105,8 @@ public class NextPreLiveMO extends MarketProvider{
 				System.out.println("Time : "+dateFormat.format(starttime.getTimeInMillis()));
 				edInprocess.setStartTime(starttime);
 				todayGames.add(edInprocess);
+				}
+				
 			}
 			
 			if(fields[1].equals("Match Odds"))
@@ -173,36 +177,67 @@ public class NextPreLiveMO extends MarketProvider{
 			}
 			
 		}
+		
+		int i=0;
+		for (EventData ed:todayGames)
+		{
+			System.out.println(i+" "+ed.getEventName()+" "+ed.getMatchOddsId()+" "+ed.getCorrectScoreId());
+			i++;
+		}
 	}
 	
+	private EventData findEventDataTodayGames(String name) {
+		for(EventData ed: todayGames)
+		{
+			if(ed.getEventName().equals(name))
+				return ed;
+		}
+		
+		return null;
+	}
+
+
 	private void refresh()
 	{
 		Calendar now= Calendar.getInstance();
 		Calendar nowPlusTenSecs = (Calendar) now.clone();
-		nowPlusTenSecs.add(Calendar.SECOND, 10);
+		nowPlusTenSecs.add(Calendar.SECOND, 20);
 		
 		for(EventData ed:todayGames)
 		{
 			Calendar eventMinus1M= (Calendar) ed.getStartTime().clone();
-			eventMinus1M.add(Calendar.MINUTE, -1);
+			eventMinus1M.add(Calendar.MINUTE, -2);
 			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(ed))
 			{
-				eventsInformed.add(ed);
-				System.out.println(" Game processing :"+ed.getEventName());
-				Market matchOddsMarket = null;
-				try {
-					matchOddsMarket = ExchangeAPI.getMarket(
-							selectedExchange,
-							apiContext,
-							ed.getMatchOddsId());
-				} catch (Exception e) {
-					e.printStackTrace();	
-				}
 				
-				if(matchOddsMarket!=null)
+				System.out.println(" Game processing :"+ed.getEventName()+ " MO Id : "+ed.getMatchOddsId());
+				if(ed.getMatchOddsId()!=0)
 				{
-					currentMarket=matchOddsMarket;
-					informListeners();
+					Market matchOddsMarket = null;
+					try {
+						matchOddsMarket = ExchangeAPI.getMarket(
+								selectedExchange,
+								apiContext,
+								ed.getMatchOddsId());
+					} catch (Exception e) {
+						e.printStackTrace();	
+					}
+					
+					try {
+						Thread.sleep(500);
+						System.out.println("Slepping ");
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					if(matchOddsMarket!=null)
+					{
+						System.out.println("Informing listeners : "+ed.getEventName()+ " MO Id : "+ed.getMatchOddsId());
+						eventsInformed.add(ed);
+						currentMarket=matchOddsMarket;
+						informListeners();
+					}
 				}
 			}
 		}

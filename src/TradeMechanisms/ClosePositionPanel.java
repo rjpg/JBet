@@ -188,6 +188,4 @@ public class ClosePositionPanel extends JPanel{
 		return (Integer)comboTimeForceClose.getSelectedItem();
 	}
 	
-	
-	
 }
