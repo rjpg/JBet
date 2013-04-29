@@ -395,7 +395,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	}
 	
 	
-	public void placing()
+	private void placing()
 	{
 		//System.out.println("placing");
 		if(betInProcess==null)
@@ -492,6 +492,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED || betInProcess.getErrorType()==BetData.ERROR_BALANCE_EXCEEDED)
 			{
 				this.setState(TradeMechanism.CRITICAL_ERROR);
+				this.setI_STATE(I_END);
 				end();
 				return;
 			} 
@@ -504,6 +505,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
 			this.setState(TradeMechanism.CRITICAL_ERROR);
+			this.setI_STATE(I_END);
 			end();
 			return;
 		}
@@ -725,14 +727,20 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		else
 			System.out.println("No Match");
 		
-		stopPolling();
-		
+		informListenersEnd();
 		
 		clean();
 		
 			
 	}
 	
+	private void informListenersEnd()
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
 	
 	public OddData getMatchedInfo()
 	{
@@ -909,7 +917,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		betCloseInfo=null;
 		
-		System.out.println("clean runned");
+		System.out.println("Close Position clean runned");
 	}
 
 	@Override

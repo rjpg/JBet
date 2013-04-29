@@ -62,7 +62,7 @@ public abstract class Bot implements MarketChangeListener{
 	public void setMd(MarketData mdA) {
 		if(this.md!=null)
 		{
-			System.out.println("Remove listener");
+			//System.out.println("Remove listener");
 			md.removeMarketChangeListener(this);
 			md.removeBotTrading(this);
 		}
