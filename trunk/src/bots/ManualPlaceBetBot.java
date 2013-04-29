@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import TradeMechanisms.ClosePosition;
 import TradeMechanisms.ClosePositionPanel;
+import TradeMechanisms.OpenPosition;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
@@ -27,6 +28,7 @@ import main.Manager;
 import main.Parameters;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.RunnersData;
 import DataRepository.Scalping;
 import DataRepository.Swing;
@@ -84,10 +86,11 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			actionsPanel.setLayout(new BorderLayout());
 			
 			JPanel auxPanel=new JPanel();
-			auxPanel.setLayout(new GridLayout(3,1));
+			auxPanel.setLayout(new GridLayout(4,1));
 			auxPanel.add(getPlaceButton());
 			auxPanel.add(getCancelButton());
 			auxPanel.add(getClosePositionButton());
+			auxPanel.add(getOpenPositionButton());
 			actionsPanel.add(auxPanel,BorderLayout.CENTER);
 			
 		}
@@ -224,10 +227,10 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	
 	public JButton getOpenPositionButton()
 	{
-		if(closePositionButton==null)
+		if(openPositionButton==null)
 		{
-			closePositionButton=new JButton("Close Position");
-			closePositionButton.addActionListener(new ActionListener() {
+			openPositionButton=new JButton("Open Position");
+			openPositionButton.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -236,16 +239,16 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					BetData bd=closePanel.createBetData();
 					getMd().getBetManager().placeBet(bd);
 					
-					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose());
+					OpenPosition cp=new OpenPosition(ManualPlaceBetBot.this, bd, 10, TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					
 					//cp.addTradeMechanismListener(ManualPlaceBetBot.this);
 					
-					msgjf.writeMessageText("Close Position caled",Color.BLUE);
+					msgjf.writeMessageText("Open Position caled",Color.BLUE);
 				}
 			});
 			
 		}
-		return closePositionButton;
+		return openPositionButton;
 	}
 	
 	public JButton getJumpButton()
@@ -280,7 +283,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 //		
 		if( marketEventType==MarketChangeListener.MarketNew)
 		{
-			System.out.println("Market NEW");
+			//System.out.println("Market NEW");
 			setMd(md);
 			betPanel.reset(getMd());
 			betPanel2.reset(getMd());
@@ -317,11 +320,40 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		System.out.println("Tm state : "+tm.getState());
+	}
+	
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
 		if(TradeMechanismUtils.isTradeMechanismFinalState(state))
 		{
-			System.out.println("Trade mecanism has ended");
-			tm.removeTradeMechanismListener(this);
+			System.out.println("Trade mecanism ended in a final state");	
 		}
+		else
+		{
+			System.out.println("Trade mecanism did not end in a final state");
+		}
+
+		System.out.println("Tm state : "+tm.getState());
+		
+		if(tm instanceof OpenPosition)
+		{
+			OddData od=((OpenPosition)tm).getMatchedInfo();
+			if(od==null)
+				System.out.println("Nothing Matched ");
+			else
+				System.out.println("Tm Matched Info : "+od.getAmount() +" @ "+ od.getOdd());
+		}
+		
+		if(tm instanceof ClosePosition)
+		{
+			OddData od=((ClosePosition)tm).getMatchedInfo();
+			if(od==null)
+				System.out.println("Nothing Matched ");
+			else
+				System.out.println("Tm Matched Info : "+od.getAmount() +" @ "+ od.getOdd());
+		}
+		
+		tm.removeTradeMechanismListener(this);
 	}
 
 	@Override

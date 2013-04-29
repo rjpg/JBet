@@ -4,214 +4,433 @@ import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.OddData;
+import DataRepository.Utils;
 import TradeMechanisms.ClosePosition.ClosePositionThread;
 import bets.BetData;
 import bets.BetManager;
 
 public class OpenPosition extends TradeMechanism implements MarketChangeListener{
 	// States
-		private static final int I_PLACING = 0;
-		private static final int I_END = 1;
+	private static final int I_PLACING = 0;
+	private static final int I_END = 1;
+
+	private int I_STATE=I_PLACING;
+
+	// dynamic vars
+	private int waitFramesNormal=20;
+	private BetData betInProcess;
+	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
+
+	// this
+	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
+	private BetData betOpenInfo=null;
+	private MarketData md;
+
+	// THREAD
+	private OpenPositionThread as;
+	private Thread t;
+	protected int updateInterval = 500;
+	private boolean polling = false;
+
+
+
+	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA, int updateIntervalA) {
+		super();
+
+		if(botA!=null)
+			addTradeMechanismListener(botA);
+
+		betOpenInfo=betOpenInfoA;
+		waitFramesNormal=waitFramesNormalA;
+		updateInterval=updateIntervalA;
+
+		md=betOpenInfoA.getRd().getMarketData();
+
+		md.addTradingMechanismTrading(this);
+
+		initialize();
+
+	}
+
+
+	private void initialize()
+	{
+		setState(TradeMechanism.NOT_OPEN);
+
+		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			md.addMarketChangeListener(this);
+
+
+		betInProcess=betOpenInfo;
+
+		startPolling();
+
+	}
+
+	private void setState(int state)
+	{
+		if(STATE==state) return;
+
+		STATE=state;
+
+		for(TradeMechanismListener tml: listeners)
+		{
+			tml.tradeMechanismChangeState(this, STATE);
+		}
+	}
+
+	public int getI_STATE() {
+		return I_STATE;
+	}
+
+	public void setI_STATE(int i_STATE) {
+		I_STATE = i_STATE;
+	}
+
+
+	public void addTradeMechanismListener(TradeMechanismListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	public void removeTradeMechanismListener(TradeMechanismListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+
+	private void refresh()
+	{
+		System.out.println("refresh.. listeners number :"+listeners.size());
+		waitFramesNormal--;
 		
-		private int I_STATE=I_PLACING;
+		if(waitFramesNormal<0 && betInProcess!=null )
+			md.getBetManager().cancelBet(betInProcess);
 		
-		// dynamic vars
-		private int waitFramesNormal=20;
-		private BetData betInProcess;
-				
-		// this
-		private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
-		private BetData betOpenInfo=null;
-		private MarketData md;
-		
-		// THREAD
-		private OpenPositionThread as;
-		private Thread t;
-		protected int updateInterval = 500;
-		private boolean polling = false;
-		
-		
-		
-		public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA, int updateIntervalA) {
-			super();
-			
-			if(botA!=null)
-				addTradeMechanismListener(botA);
-			
-			betOpenInfo=betOpenInfoA;
-			waitFramesNormal=waitFramesNormalA;
-			updateInterval=updateIntervalA;
-			
+		switch (getI_STATE()) {
+		case I_PLACING: placing(); break;
+		case I_END    : end(); break;
+		default: end(); break;
+		}
+	}
+
+	private void placing()
+	{
+		//System.out.println("placing");
+		if(betInProcess==null)
+		{
+			this.setI_STATE(I_END);
+			refresh();
+			return;
 		}
 
-		
-		private void initialize()
+		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
-			setState(TradeMechanism.NOT_OPEN);
-			
-			if(updateInterval!=TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-				md.addMarketChangeListener(this);
-			
-			
-			betInProcess=betOpenInfo;
+			md.getBetManager().placeBet(betInProcess);
+		}
+		else if(betInProcess.getState()==BetData.CANCELED )
+		{
+			betInProcess=null;
 
-			startPolling();
+			this.setI_STATE(I_END);
+			refresh();
+			return;
+		}
+		else if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
+		{
+			setState(TradeMechanism.PARTIAL_OPEN);
+			historyBetsMatched.add(betInProcess);
+
+			betInProcess=null;
+			this.setI_STATE(I_END);
+			refresh();
+			return;
+		}
+		else if(betInProcess.getState()==BetData.MATCHED)
+		{
+			//System.out.println("matched");
+			historyBetsMatched.add(betInProcess);
+			setState(TradeMechanism.OPEN);
+
+			betInProcess=null;
+			this.setI_STATE(I_END);
+			refresh();
+		}
+		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
+		{
+
+			setState(TradeMechanism.PARTIAL_CLOSED);
 			
 		}
-		
-		private void setState(int state)
+		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
-			if(STATE==state) return;
-			
-			STATE=state;
-			
-			for(TradeMechanismListener tml: listeners)
+			// wait ... (do nothing)
+		}
+		else if(betInProcess.getState()==BetData.PLACING_ERROR)
+		{
+			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED || betInProcess.getErrorType()==BetData.ERROR_BALANCE_EXCEEDED)
 			{
-				tml.tradeMechanismChangeState(this, STATE);
-			}
-		}
-		
-		public void addTradeMechanismListener(TradeMechanismListener listener)
-		{
-			listeners.add(listener);
-		}
-		
-		public void removeTradeMechanismListener(TradeMechanismListener listener)
-		{
-			listeners.remove(listener);
-		}
-		
-		private void refresh()
-		{
-			System.out.println("refresh");
-		}
-		
-		@Override
-		public void forceClose() {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void forceCancel() {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public String getStatisticsFields() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		@Override
-		public String getStatisticsValues() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		@Override
-		public void clean() {
-			if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-				md.removeMarketChangeListener(this);
-			md.removeTradingMechanismTrading(this);
-			stopPolling();
-		}
-	
-		@Override
-		public void MarketChange(MarketData md, int marketEventType) {
-			if(marketEventType==MarketChangeListener.MarketUpdate)
-			{
-				if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-				{
-					refresh();
-					//System.out.println("Sync with MarketData");
-				}
-			}
-			
-			if(marketEventType==MarketChangeListener.MarketNew)
-			{
-				this.forceCancel();
-			}
-			
-		}
-		
-		//---------------------------------thread -----
-		public class OpenPositionThread extends Object implements Runnable {
-			private volatile boolean stopRequested;
-
-			private Thread runThread;
-
-			public void run() {
-				runThread = Thread.currentThread();
-				stopRequested = false;
-				
-				while (!stopRequested) {
-					try {
-						if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
-						{
-							refresh(); /// connect and get the data
-							System.out.println("Not sync with MarketData");
-						}
-					
-						//	refreshBets();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
-					
-					
-					
-					try {
-						Thread.sleep(updateInterval);
-					} catch (Exception e) {
-						// e.printStackTrace();
-					}
-				}
-			}
-
-			public void stopRequest() {
-				stopRequested = true;
-
-				if (runThread != null) {
-					runThread.interrupt();
-
-					// suspend()stop();
-				}
-			}
-		}
-		
-		
-		public void startPolling() {
-			System.out.println("*********************************************");
-			
-			if (polling)
+				this.setState(TradeMechanism.CRITICAL_ERROR);
+				this.setI_STATE(I_END);
+				end();
 				return;
-			
-			if(updateInterval!=TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			} 
+			else
 			{
-				as = new OpenPositionThread();
-				t = new Thread(as);
-				t.start();
+				betInProcess=new BetData(betOpenInfo.getRd(), betOpenInfo.getAmount(), betOpenInfo.getOddRequested(),betOpenInfo.getType(), betOpenInfo.isKeepInPlay());
+				md.getBetManager().placeBet(betInProcess);
+				refresh();
 			}
-			polling = true;
-			
+		}
+		else if(betInProcess.getState()==BetData.UNMONITORED)
+		{
+			this.setState(TradeMechanism.CRITICAL_ERROR);
+			this.setI_STATE(I_END);
+			end();
+			return;
 		}
 
-		public void stopPolling() {
-			if (!polling)
-				return;
-			
-			if(updateInterval!=TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-				as.stopRequest();
-			
-			polling = false;
+	}
 
-		}
+	private void end()
+	{
+		//if(!TradeMechanismUtils.isTradeMechanismFinalState(getState()))
+		//	setState(TradeMechanism.CLOSED);
+
+		md.removeTradingMechanismTrading(this);
+		stopPolling();
 		
-
-		public boolean isPolling() {
+		informListenersEnd();
 		
-			return polling;
-		}
+		clean();
 
 
+	}
 	
+	private void informListenersEnd()
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
+	
+	public OddData getMatchedInfo()
+	{
 		
+		OddData ret=null;
+		
+		
+		if(historyBetsMatched.size()==0)
+			return ret;
+		
+		Vector<BetData> bdB=new Vector<BetData>();
+		Vector<BetData> bdL=new Vector<BetData>();
+		
+		for(BetData bd:historyBetsMatched)
+		{
+			if(bd.getType()==BetData.BACK)
+				bdB.add(bd);
+			else
+				bdL.add(bd);
+		}
+		
+		double totalAmB=0;
+		double oddAvgB=0;
+		
+		if(bdB.size()!=0)
+		{
+		
+			Vector<Double> oddsB=new Vector<Double>();
+			Vector<Double> amsB=new Vector<Double>();
+			
+			for(BetData bd:bdB)
+			{
+				oddsB.add(bd.getOddMached());
+				amsB.add(bd.getMatchedAmount());
+				totalAmB+=bd.getMatchedAmount();
+			}
+			
+			oddAvgB=Utils.calculateOddAverage(oddsB.toArray(new Double[]{}), amsB.toArray(new Double[]{}));
+		}
+		
+		double totalAmL=0;
+		double oddAvgL=0;
+		
+		if(bdL.size()!=0)
+		{
+		
+			Vector<Double> oddsL=new Vector<Double>();
+			Vector<Double> amsL=new Vector<Double>();
+			
+			for(BetData bd:bdL)
+			{
+				oddsL.add(bd.getOddMached());
+				amsL.add(bd.getMatchedAmount());
+				totalAmL+=bd.getMatchedAmount();
+			}
+			
+			oddAvgL=Utils.calculateOddAverage(oddsL.toArray(new Double[]{}), amsL.toArray(new Double[]{}));
+		}
+		
+		if(totalAmL==0)
+			return new OddData(oddAvgB, totalAmB,BetData.BACK);
+		
+		if(totalAmB==0)
+			return new OddData(oddAvgL, totalAmL,BetData.LAY);
+		
+		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
+		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
+		
+		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
+		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.BACK);
+		
+		if(odB.getAmount()>odL.getAmount())
+			return odB;
+		else
+			return odL;
+		
+	}
+
+	@Override
+	public void forceClose() {
+		// TODO Auto-generated method stub
+
+	}
+	@Override
+	public void forceCancel() {
+		// TODO Auto-generated method stub
+
+	}
+	@Override
+	public String getStatisticsFields() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String getStatisticsValues() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void clean() {
+		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			md.removeMarketChangeListener(this);
+		md.removeTradingMechanismTrading(this);
+		stopPolling();
+
+		listeners.clear();
+		listeners=null;
+
+		betInProcess=null;
+
+		betOpenInfo=null;
+
+		System.out.println("Open Position clean runned");
+	}
+
+	@Override
+	public void MarketChange(MarketData md, int marketEventType) {
+		if(marketEventType==MarketChangeListener.MarketUpdate)
+		{
+			if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			{
+				refresh();
+				//System.out.println("Sync with MarketData");
+			}
+		}
+
+		if(marketEventType==MarketChangeListener.MarketNew)
+		{
+			this.forceCancel();
+		}
+
+	}
+
+	//---------------------------------thread -----
+	public class OpenPositionThread extends Object implements Runnable {
+		private volatile boolean stopRequested;
+
+		private Thread runThread;
+
+		public void run() {
+			runThread = Thread.currentThread();
+			stopRequested = false;
+
+			while (!stopRequested) {
+				try {
+					if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
+					{
+						refresh(); /// connect and get the data
+						System.out.println("Not sync with MarketData");
+					}
+
+					//	refreshBets();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+
+
+
+				try {
+					Thread.sleep(updateInterval);
+				} catch (Exception e) {
+					// e.printStackTrace();
+				}
+			}
+		}
+
+		public void stopRequest() {
+			stopRequested = true;
+
+			if (runThread != null) {
+				runThread.interrupt();
+
+				// suspend()stop();
+			}
+		}
+	}
+
+
+	public void startPolling() {
+		System.out.println("*********************************************");
+
+		if (polling)
+			return;
+
+		if(updateInterval!=TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+		{
+
+			System.out.println("using thread");
+
+			as = new OpenPositionThread();
+			t = new Thread(as);
+			t.start();
+		}
+		polling = true;
+
+	}
+
+	public void stopPolling() {
+		if (!polling)
+			return;
+
+		if(updateInterval!=TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+			as.stopRequest();
+
+		polling = false;
+
+	}
+
+
+	public boolean isPolling() {
+
+		return polling;
+	}
+
+
+
+
 }
