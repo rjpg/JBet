@@ -677,6 +677,8 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	
 	@Override
 	public void clean() {
+		
+		
 		getMd().removeMarketChangeListener(this);
 		
 		for(BetData bd:bets)

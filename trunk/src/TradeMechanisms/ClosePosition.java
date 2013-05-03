@@ -20,8 +20,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	// States
 	private static final int I_PLACING = 0;
-	private static final int I_HEDGE = 1;
-	private static final int I_END = 2;
+	private static final int I_END = 1;
 	
 	private int I_STATE=ClosePosition.I_PLACING;
 	
@@ -54,8 +53,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		betCloseInfo=betCloseInfoA;
 		stopLossTicks=stopLossTicksA;
-		waitFramesNormal=waitFramesNormalA;
-		waitFramesUntilForceClose=waitFramesUntilForceCloseA;
+		waitFramesNormal=waitFramesNormalA-1;
+		waitFramesUntilForceClose=waitFramesUntilForceCloseA+2;
 		updateInterval=updateIntervalA;
 		
 		if(betCloseInfoA.getType()==BetData.BACK)
@@ -104,9 +103,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	{
 		setState(TradeMechanism.OPEN);
 		
-		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-			md.addMarketChangeListener(this);
-		
+		//if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+		md.addMarketChangeListener(this);
 		
 		betInProcess=betCloseInfo;
 
@@ -138,9 +136,10 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		{
 		this.setI_STATE(I_END);
 		
+		setState(TradeMechanism.CANCELED);
+		
 		end();
 		
-		setState(TradeMechanism.CANCELED);
 		}
 		
 	}
@@ -205,129 +204,20 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		return actualOdd;
 	} 
 	
-	private double calculateAmountMissing()
-	{
-		Vector<Double> odds=new Vector<Double>();
-		Vector<Double> ams=new Vector<Double>();
-		double totalAm=0;
-		
-		Vector<Double> oddsX=new Vector<Double>();
-		Vector<Double> amsX=new Vector<Double>();
-		double totalAmX=0;
-		
-		if(historyBetsMatched.size()==0)
-			return betCloseInfo.getAmount();
-		
-		for(BetData bd:historyBetsMatched)
-		{
-			if(bd.getType()==betCloseInfo.getType())
-			{
-				odds.add(bd.getOddMached());
-				ams.add(bd.getMatchedAmount());
-				totalAm+=bd.getMatchedAmount();
-			}
-			else
-			{
-				oddsX.add(bd.getOddMached());
-				amsX.add(bd.getMatchedAmount());
-				totalAmX+=bd.getMatchedAmount();
-			}
-				
-		}
-		
-		double oddAvg=Utils.calculateOddAverage(odds.toArray(new Double[]{}), ams.toArray(new Double[]{}));
-		
-		double oddAvgX=Utils.calculateOddAverage(oddsX.toArray(new Double[]{}), amsX.toArray(new Double[]{}));
-		
-		double ret=0;
-		
-		if(betCloseInfo.getType()==BetData.BACK)
-		{
-			double amountToCloseBack=Utils.closeAmountLay(oddAvg, totalAm, betCloseInfo.getOddRequested());
-			
-			if(totalAmX>0)
-				amountToCloseBack-=Utils.closeAmountBack(oddAvgX, totalAmX,  betCloseInfo.getOddRequested());
-			
-			ret= betCloseInfo.getAmount()-amountToCloseBack;
-		}
-		else
-		{
-			double amountToCloseLay=Utils.closeAmountBack(oddAvg, totalAm, betCloseInfo.getOddRequested());
-			
-			if(totalAmX>0)
-				amountToCloseLay-=Utils.closeAmountLay(oddAvgX, totalAmX,  betCloseInfo.getOddRequested());
 
-			
-			ret= betCloseInfo.getAmount()-amountToCloseLay;
-		}
-		
-		return ret;
-	}
-	
 	private BetData createBetForOdd(double odd)
 	{
-		BetData ret=null;
-		
-		double miss=calculateAmountMissing();
-		
-		
-		if(miss==0)
-		{
-			return null; // All closed
-		} else if(miss<0)
-		{
-			double am=0;
-			if(betCloseInfo.getType()==BetData.BACK)
-			{
-				am=Utils.closeAmountLay(betCloseInfo.getOddRequested(), Math.abs(miss), odd);
-				am=Utils.convertAmountToBF(am);
-				if(am==0)
-					return null;
+	
+		Vector<OddData> odv=getMatchedOddDataVector();
 				
-				ret=new BetData(betCloseInfo.getRd(), am, odd, BetData.LAY, betCloseInfo.isKeepInPlay());
-				return ret;
-				
-			}
-			else
-			{
-				//System.err.println("BACK MISSING!!!!!!!!!!!!!!   : "+miss);
-				am=Utils.closeAmountBack(betCloseInfo.getOddRequested(), Math.abs(miss), odd);
-				am=Utils.convertAmountToBF(am);
-				if(am==0)
-					return null;
-				
-				ret=new BetData(betCloseInfo.getRd(), am, odd, BetData.BACK, betCloseInfo.isKeepInPlay());
-				return ret;
-			}
-			
-			
-			
-		} else 
-		{
-			double am=0;
-			
-			if(betCloseInfo.getType()==BetData.BACK)
-			{
-				am=Utils.closeAmountBack(betCloseInfo.getOddRequested(), miss, odd);
-				am=Utils.convertAmountToBF(am);
-				if(am==0)
-					return null;
-				
-			}
-			else
-			{
-				am=Utils.closeAmountLay(betCloseInfo.getOddRequested(), miss, odd);
-				am=Utils.convertAmountToBF(am);
-				if(am==0)
-					return null;
-			}
-			
-			
-			ret=new BetData(betCloseInfo.getRd(), am, odd, betCloseInfo.getType(), betCloseInfo.isKeepInPlay());
-			return ret;
+		OddData odMissing=BetUtils.getGreening(odv,betCloseInfo.getOddDataOriginal(),odd);
 		
-		}
-
+		double am=Utils.convertAmountToBF(odMissing.getAmount());
+		if(am==0)
+			return null;
+		else		
+			return new BetData(betCloseInfo.getRd(), odMissing, betCloseInfo.isKeepInPlay());
+		
 	}
 	
 	/**
@@ -387,7 +277,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		switch (getI_STATE()) {
 	        case I_PLACING: placing(); break;
-	        case I_HEDGE  : hedge(); break;
 	        case I_END    : end(); break;
 	        default: end(); break;
 		}
@@ -397,41 +286,16 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void placing()
 	{
-		//System.out.println("placing");
-		if(betInProcess==null)
-		{
-			betInProcess=createBetForOdd(targetOdd);
-			
-			if(betInProcess==null)   // nothing to close
-			{
-				this.setI_STATE(I_END);
-				return;
-			}
-			if(betInProcess.getType()!=betCloseInfo.getType())
-			{
-				betInProcess=null;
-				this.setI_STATE(I_HEDGE);
-				refresh();
-				return ;
-			}
-		}
 		
-		if(betInProcess.getState()==BetData.NOT_PLACED)
+		if(betInProcess==null || betInProcess.getState()==BetData.NOT_PLACED)
 		{
-			//md.getBetManager().placeBet(betInProcess);
 			betInProcess=createBetForOdd(targetOdd);
 			
 			if(betInProcess==null)   // nothing to close
 			{
 				this.setI_STATE(I_END);
-				return;
-			}
-			if(betInProcess.getType()!=betCloseInfo.getType())
-			{
-				betInProcess=null;
-				this.setI_STATE(I_HEDGE);
 				refresh();
-				return ;
+				return;
 			}
 			
 			md.getBetManager().placeBet(betInProcess);
@@ -453,33 +317,29 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.MATCHED)
 		{
-			//System.out.println("matched");
 			historyBetsMatched.add(betInProcess);
 			setState(TradeMechanism.PARTIAL_CLOSED);
+		
+			this.forceClose(); // hedge at best offer
 			
 			betInProcess=null;
-			setI_STATE(I_HEDGE);
 			refresh();
 		}
-		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
+		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED )
 		{
 			
-			setState(TradeMechanism.PARTIAL_CLOSED);
-			//setI_STATE(ClosePosition.I_WAIT);
-			
+			setState(TradeMechanism.PARTIAL_CLOSED); // difference from UNMATCHED
+				
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
 				md.getBetManager().cancelBet(betInProcess);
-				refresh(); // to go faster (dont wait for update)
+				refresh(); 
 				return;
 			}
-			
-				
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
-			//setI_STATE(ClosePosition.I_WAIT);
-			
+	
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
 				md.getBetManager().cancelBet(betInProcess);
@@ -504,209 +364,15 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
+			System.out.println("unmonitored");
 			this.setState(TradeMechanism.CRITICAL_ERROR);
 			this.setI_STATE(I_END);
 			end();
 			return;
 		}
 	
+		System.out.println(BetUtils.printBet(betInProcess));
 	}
-	
-	/*private void  waitMatch()
-	{
-		if(betInProcess==null)
-		{
-			setI_STATE(I_PLACING);
-			refresh();
-			return;
-		}
-		
-		
-		if(betInProcess.getState()==BetData.NOT_PLACED)
-		{
-			betInProcess = null;
-			setI_STATE(I_PLACING);
-			refresh();
-			return;
-		}
-		else if(betInProcess.getState()==BetData.CANCELED )
-		{
-			betInProcess=null;
-			setI_STATE(I_PLACING);
-			refresh();
-			return;
-		}
-		else if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
-		{
-			setState(TradeMechanism.PARTIAL_CLOSED);
-			historyBetsMatched.add(betInProcess);
-			
-			betInProcess=null;
-			setI_STATE(I_PLACING);
-			refresh();
-			return;
-		}
-		else if(betInProcess.getState()==BetData.MATCHED)
-		{
-			historyBetsMatched.add(betInProcess);
-			setState(TradeMechanism.PARTIAL_CLOSED);
-			
-			betInProcess=null;
-			setI_STATE(I_HEDGE);
-			refresh();
-		}
-		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
-		{
-			setState(TradeMechanism.PARTIAL_CLOSED);
-			
-			if(targetOdd!=betInProcess.getOddRequested())
-			{
-				int resultCancel=md.getBetManager().cancelBet(betInProcess);
-				if(resultCancel==0)
-				{
-					setI_STATE(I_PLACING);  
-					refresh();
-					return;
-				}
-				
-			}
-		}
-		else if(betInProcess.getState()==BetData.UNMATCHED)
-		{
-			if(targetOdd!=betInProcess.getOddRequested())
-			{
-				int resultCancel=md.getBetManager().cancelBet(betInProcess);
-				if(resultCancel==0)
-				{
-					setI_STATE(I_PLACING); //mantem o estado porque o cancel ia ser igual 
-					refresh();
-					return;
-				}
-				
-			}
-		}
-		else if(betInProcess.getState()==BetData.UNMONITORED)
-		{
-			this.setState(TradeMechanism.CRITICAL_ERROR);
-			end();
-			return;
-		}
-		
-		
-	}*/
-	
-	private void hedge()
-	{
-		if(betInProcess==null)
-		{
-			betInProcess=createBetForOdd(getActualOdd());
-			
-			if(betInProcess==null)   // nothing to close
-			{
-				this.setI_STATE(I_END);
-				refresh();
-				return;
-			}
-			
-			if(betInProcess.getType()==BetData.BACK)
-			{
-				betInProcess=createBetForOdd(Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
-			}
-			else
-			{
-				betInProcess=createBetForOdd(Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
-			}
-			
-			if(betInProcess==null)   // nothing to close
-			{
-				this.setI_STATE(I_END);
-				refresh();
-				return;
-			}
-			
-			
-		}
-		
-		
-		if(betInProcess.getState()==BetData.NOT_PLACED)
-		{
-			//System.out.println("Hedge :"+betInProcess.getOddRequested());
-			//System.err.println("getOddBackFrame :"+Utils.getOddBackFrame(betCloseInfo.getRd(), 0));
-			//System.err.println("getOddLayFrame :"+Utils.getOddLayFrame(betCloseInfo.getRd(), 0));
-			md.getBetManager().placeBet(betInProcess);
-			
-		}
-		else if(betInProcess.getState()==BetData.CANCELED )
-		{
-			betInProcess=null;
-			refresh();
-			return;
-		}
-		else if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
-		{
-			setState(TradeMechanism.PARTIAL_CLOSED);
-			historyBetsMatched.add(betInProcess);
-			
-			betInProcess=null;
-			refresh();
-			return;
-		}
-		else if(betInProcess.getState()==BetData.MATCHED)
-		{
-			historyBetsMatched.add(betInProcess);
-			
-			this.setI_STATE(I_END);
-			refresh();
-			return;
-			
-		}
-		else if(betInProcess.getState()==BetData.UNMATCHED || betInProcess.getState()==BetData.PARTIAL_MATCHED)
-		{
-			double bestPrice=Utils.getOddLayFrame(betCloseInfo.getRd(), 0);
-			if(betInProcess.getType()==BetData.LAY)
-			{
-				bestPrice=Utils.getOddBackFrame(betCloseInfo.getRd(), 0);
-				if(bestPrice<betInProcess.getOddRequested())   // to work better in simulation
-					bestPrice=betInProcess.getOddRequested();
-			}
-			else
-				if(bestPrice>betInProcess.getOddRequested())   // to work better in simulation
-					bestPrice=betInProcess.getOddRequested();
-
-			
-			if(bestPrice!=betInProcess.getOddRequested())
-			{
-				md.getBetManager().cancelBet(betInProcess);
-				refresh();
-				return;
-			}
-		}	
-		else if(betInProcess.getState()==BetData.PLACING_ERROR)
-		{
-			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED || betInProcess.getErrorType()==BetData.ERROR_BALANCE_EXCEEDED)
-			{
-				this.setState(TradeMechanism.CRITICAL_ERROR);
-				end();
-				return;
-			} 
-			else
-			{
-				betInProcess=null;
-				refresh();
-				return;
-			}
-		}
-		else if(betInProcess.getState()==BetData.UNMONITORED)
-		{
-			this.setState(TradeMechanism.CRITICAL_ERROR);
-			end();
-			return;
-		}
-		
-	}
-	
-	
-	
 	
 	private void end()
 	{
@@ -716,22 +382,23 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		md.removeTradingMechanismTrading(this);
 		stopPolling();
 		
-		OddData od=getMatchedInfo();
-		if(od!=null)
-		{
-			if(od.getType()==BetData.BACK)
-				System.out.println("Final Match : "+od.getAmount()+" @ "+od.getOdd()+" Back");
-			else
-				System.out.println("Final Match : "+od.getAmount()+" @ "+od.getOdd()+" Lay");
-		}
-		else
-			System.out.println("No Match");
-		
 		informListenersEnd();
 		
 		clean();
-		
 			
+	}
+	
+	public  Vector<OddData> getMatchedOddDataVector()
+	{
+		Vector<OddData> ret=new Vector<OddData>();
+		
+		for(BetData bd:historyBetsMatched)
+		{
+			//System.out.println("Bet List : "+bd.getOddDataMatched());
+			ret.add(bd.getOddDataMatched());
+		}
+		
+		return ret;
 	}
 	
 	private void informListenersEnd()
@@ -742,82 +409,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 	}
 	
-	public OddData getMatchedInfo()
-	{
-		
-		OddData ret=null;
-		
-		
-		if(historyBetsMatched.size()==0)
-			return ret;
-		
-		Vector<BetData> bdB=new Vector<BetData>();
-		Vector<BetData> bdL=new Vector<BetData>();
-		
-		for(BetData bd:historyBetsMatched)
-		{
-			if(bd.getType()==BetData.BACK)
-				bdB.add(bd);
-			else
-				bdL.add(bd);
-		}
-		
-		double totalAmB=0;
-		double oddAvgB=0;
-		
-		if(bdB.size()!=0)
-		{
-		
-			Vector<Double> oddsB=new Vector<Double>();
-			Vector<Double> amsB=new Vector<Double>();
-			
-			for(BetData bd:bdB)
-			{
-				oddsB.add(bd.getOddMached());
-				amsB.add(bd.getMatchedAmount());
-				totalAmB+=bd.getMatchedAmount();
-			}
-			
-			oddAvgB=Utils.calculateOddAverage(oddsB.toArray(new Double[]{}), amsB.toArray(new Double[]{}));
-		}
-		
-		double totalAmL=0;
-		double oddAvgL=0;
-		
-		if(bdL.size()!=0)
-		{
-		
-			Vector<Double> oddsL=new Vector<Double>();
-			Vector<Double> amsL=new Vector<Double>();
-			
-			for(BetData bd:bdL)
-			{
-				oddsL.add(bd.getOddMached());
-				amsL.add(bd.getMatchedAmount());
-				totalAmL+=bd.getMatchedAmount();
-			}
-			
-			oddAvgL=Utils.calculateOddAverage(oddsL.toArray(new Double[]{}), amsL.toArray(new Double[]{}));
-		}
-		
-		if(totalAmL==0)
-			return new OddData(oddAvgB, totalAmB,BetData.BACK);
-		
-		if(totalAmB==0)
-			return new OddData(oddAvgL, totalAmL,BetData.LAY);
-		
-		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
-		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
-		
-		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
-		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.BACK);
-		
-		if(odB.getAmount()>odL.getAmount())
-			return odB;
-		else
-			return odL;
-		
-	}
+	
 
 	//---------------------------------thread -----
 	public class ClosePositionThread extends Object implements Runnable {
@@ -902,8 +494,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 
 	@Override
 	public void clean() {
-		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
-			md.removeMarketChangeListener(this);
+		//if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
+		md.removeMarketChangeListener(this);
 		md.removeTradingMechanismTrading(this);
 		stopPolling();
 		
@@ -935,9 +527,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		{
 			this.forceCancel();
 		}
-		
 	}
-	
-	
 
 }
