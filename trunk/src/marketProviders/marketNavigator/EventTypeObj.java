@@ -1,4 +1,4 @@
-package marketNavigator;
+package marketProviders.marketNavigator;
 
 import generated.global.BFGlobalServiceStub.EventType;
 

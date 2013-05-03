@@ -1,4 +1,4 @@
-package marketNavigator;
+package marketProviders.marketNavigator;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.global.BFGlobalServiceStub.BFEvent;
