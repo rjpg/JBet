@@ -51,6 +51,14 @@ public class OddData {
 		this.type = type;
 	}
 	
+	
+	@Override
+	public String toString() {
+		if(type==BetData.BACK)
+			return amount+" @ "+odd+" (Back)";
+		else
+			return amount+" @ "+odd+" (LAY)";
+	}
 //	public int getDepth() {
 //		return depth;
 //	}

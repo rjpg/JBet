@@ -11,8 +11,13 @@ import generated.exchange.BFExchangeServiceStub.PlaceBets;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
+
+import sun.nio.cs.ext.MacHebrew;
+import sun.nio.cs.ext.MacThai;
 
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.Utils;
 import demo.handler.ExchangeAPI;
 
@@ -198,6 +203,9 @@ public class BetUtils {
 	
 	public static String printBet(BetData bd)
 	{
+		
+		if(bd==null) return null;
+		
 		String ret="\n";
 		ret+="--- Bet Id: "+bd.getBetID()+" ---\n";
 		
@@ -308,4 +316,183 @@ public class BetUtils {
 		else
 			return false;
 	}
+	
+	public static OddData getOpenInfo(Vector <OddData> vod)
+	{
+		
+		OddData ret=null;
+		
+		
+		if(vod==null || vod.size()==0)
+			return ret;
+		
+		Vector<OddData> bdB=new Vector<OddData>();
+		Vector<OddData> bdL=new Vector<OddData>();
+		
+		for(OddData bd:vod)
+		{
+			if(bd.getType()==BetData.BACK)
+				bdB.add(bd);
+			else //Lay
+				bdL.add(bd);
+		}
+		
+		double totalAmB=0;
+		double oddAvgB=0;
+		
+		if(bdB.size()!=0)
+		{
+		
+			Vector<Double> oddsB=new Vector<Double>();
+			Vector<Double> amsB=new Vector<Double>();
+			
+			for(OddData bd:bdB)
+			{
+				oddsB.add(bd.getOdd());
+				amsB.add(bd.getAmount());
+				totalAmB+=bd.getAmount();
+			}
+			
+			oddAvgB=Utils.calculateOddAverage(oddsB.toArray(new Double[]{}), amsB.toArray(new Double[]{}));
+		}
+		
+		double totalAmL=0;
+		double oddAvgL=0;
+		
+		if(bdL.size()!=0)
+		{
+		
+			Vector<Double> oddsL=new Vector<Double>();
+			Vector<Double> amsL=new Vector<Double>();
+			
+			for(OddData bd:bdL)
+			{
+				oddsL.add(bd.getOdd());
+				amsL.add(bd.getAmount());
+				totalAmL+=bd.getAmount();
+			}
+			
+			oddAvgL=Utils.calculateOddAverage(oddsL.toArray(new Double[]{}), amsL.toArray(new Double[]{}));
+		}
+		
+		if(totalAmL==0)
+			return new OddData(oddAvgB, totalAmB,BetData.BACK);
+		
+		if(totalAmB==0)
+			return new OddData(oddAvgL, totalAmL,BetData.LAY);
+		
+		//System.out.println("Odd Avg L :"+oddAvgL+ " Total Am L : "+totalAmL); 
+		//System.out.println("Odd Avg B :"+oddAvgB+ " Total Am B : "+totalAmB); 
+		
+		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
+		//System.out.println("Am to reduce B :"+amToReduce); 
+		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
+		
+		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
+		//System.out.println("Am to reduce L :"+amToReduce);
+		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.LAY);
+		
+		if(odB.getAmount()>odL.getAmount())
+			return odB;
+		else
+			return odL;
+	}
+	
+	private static OddData calculateMissing(OddData odPretended,OddData odHave)
+	{
+		
+		double ret=0;
+		if(odHave==null)
+		{
+			return odPretended;
+		}
+		
+		if(odPretended==null)
+			if(odHave.getType()==BetData.BACK)
+				return new OddData(odHave.getOdd(),odHave.getAmount(),BetData.LAY);
+			else
+				return new OddData(odHave.getOdd(),odHave.getAmount(),BetData.BACK);
+					
+			
+		if(odPretended.getType()==BetData.BACK && odHave.getType()==BetData.BACK)
+		{
+			double amountToCloseBack=Utils.closeAmountLay(odHave.getOdd(), odHave.getAmount(), odPretended.getOdd());
+			
+			ret= odPretended.getAmount()-amountToCloseBack;
+			
+			if(ret>0)
+				return new OddData(odPretended.getOdd(),ret,BetData.BACK);
+			else
+				return new OddData(odPretended.getOdd(),Math.abs(ret),BetData.LAY);
+		}
+		else if(odPretended.getType()==BetData.BACK && odHave.getType()==BetData.LAY)
+		{
+			double amountToCloseLay=Utils.closeAmountBack(odHave.getOdd(), odHave.getAmount(), odPretended.getOdd());
+			
+			ret= odPretended.getAmount()+amountToCloseLay;
+			
+			if(ret>0)
+				return new OddData(odPretended.getOdd(),ret,BetData.BACK);
+			else
+				return new OddData(odPretended.getOdd(),Math.abs(ret),BetData.LAY);
+		}
+		else if(odPretended.getType()==BetData.LAY && odHave.getType()==BetData.BACK)
+		{
+			double amountToCloseBack=Utils.closeAmountLay(odHave.getOdd(), odHave.getAmount(), odPretended.getOdd());
+			
+			ret= odPretended.getAmount()+amountToCloseBack;
+			
+			if(ret>0)
+				return new OddData(odPretended.getOdd(),ret,BetData.LAY);
+			else
+				return new OddData(odPretended.getOdd(),Math.abs(ret),BetData.BACK);
+		}
+		else //if(odPretended.getType()==BetData.LAY && odHave.getType()==BetData.LAY)
+		{
+			double amountToCloseLay=Utils.closeAmountBack(odHave.getOdd(), odHave.getAmount(), odPretended.getOdd());
+			
+			ret= odPretended.getAmount()-amountToCloseLay;
+			
+			if(ret>0)
+				return new OddData(odPretended.getOdd(),ret,BetData.LAY);
+			else
+				return new OddData(odPretended.getOdd(),Math.abs(ret),BetData.BACK);
+		}
+		
+	}
+	
+	public static OddData getGreening(Vector<OddData> vod,OddData pretended, double oddGreening )
+	{
+			
+		OddData odaux=getOpenInfo(vod);
+		
+		OddData odmissing=calculateMissing(odaux,pretended);
+		
+		return calculateMissing(new OddData(oddGreening,0),odmissing);
+		
+		
+	}
+	
+	public static void main(String[] args) {
+		OddData od1=new OddData(10, 30, BetData.LAY);
+		OddData od2=new OddData(10, 0, BetData.BACK);
+		OddData od3=new OddData(10, 10, BetData.LAY);
+		
+		Vector<OddData> odv=new Vector<OddData>();
+		
+		
+		//odv.add(od1);
+		//odv.add(od2);
+		odv.add(od3);
+		
+		OddData odret=getOpenInfo(odv);
+		System.out.println("Total : "+odret);
+		//System.out.println("Lyability "+(odret.getAmount()*(odret.getOdd())));
+		
+		//OddData odret2=getGreening(odv,new OddData(40,4,BetData.BACK), 40 );
+		//System.out.println("Close : "+Utils.convertAmountToBF(odret2.getAmount())+" @ "+odret2.getOdd()+ " "+odret2.getType());
+		
+		System.out.println(getGreening(odv,od1,10.00));
+	}
+	
 }

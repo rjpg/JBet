@@ -4,6 +4,7 @@ import generated.exchange.BFExchangeServiceStub.GetMarket;
 
 import java.util.Calendar;
 
+import DataRepository.OddData;
 import DataRepository.RunnersData;
 
 public class BetData {
@@ -88,6 +89,15 @@ public class BetData {
 		this.amount=amountA;
 		this.oddRequested=oddA;
 		this.type=typeA;
+		this.keepInPlay=IPA;
+	}
+	
+	public BetData (RunnersData rdA, OddData od,boolean IPA)
+	{
+		this.rd=rdA;
+		this.amount=od.getAmount();
+		this.oddRequested=od.getOdd();
+		this.type=od.getType();
 		this.keepInPlay=IPA;
 	}
 	
@@ -249,6 +259,14 @@ public class BetData {
 		LastVolumeUpdate = lastVolumeUpdate;
 	}
 
-
+	public OddData getOddDataMatched()
+	{
+		return new OddData(getOddMached(), getMatchedAmount(),getType());
+	}
+	
+	public OddData getOddDataOriginal()
+	{
+		return new OddData(getOddRequested(), getAmount(),getType());
+	}
 	
 }
