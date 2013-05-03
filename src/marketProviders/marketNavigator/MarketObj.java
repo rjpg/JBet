@@ -1,4 +1,4 @@
-package marketNavigator;
+package marketProviders.marketNavigator;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
