@@ -1,4 +1,4 @@
-package TradeMechanisms;
+package TradeMechanisms.close;
 
 import generated.exchange.BFExchangeServiceStub.GetMarket;
 
@@ -9,6 +9,9 @@ import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.Swing;
 import DataRepository.Utils;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.TradeMechanismUtils;
 import bets.BetData;
 import bets.BetManager;
 import bets.BetUtils;
@@ -37,6 +40,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private int stopLossTicks=1;
 	private double oddStopLoss=0;
 	private MarketData md;
+	private boolean forceCloseOnStopLoss=true;
 	
 	// THREAD
 	private ClosePositionThread as;
@@ -44,7 +48,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
-	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA)
 	{
 		super();
 		
@@ -56,6 +61,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		waitFramesNormal=waitFramesNormalA-1;
 		waitFramesUntilForceClose=waitFramesUntilForceCloseA+2;
 		updateInterval=updateIntervalA;
+		forceCloseOnStopLoss=forceCloseOnStopLossA;
+		
+		System.out.println("Force : "+forceCloseOnStopLoss);
 		
 		if(betCloseInfoA.getType()==BetData.BACK)
 		{
@@ -79,9 +87,21 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		initialize();	
 	}
 	
+	
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,false);	
+	}
+	
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
 	{
 		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+	}
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, boolean forceCloseOnStopLossA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,TradeMechanism.SYNC_MARKET_DATA_UPDATE,forceCloseOnStopLossA);
 	}
 
 	public ClosePosition(BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA)
@@ -124,6 +144,14 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 	}
 	
+
+	public void forceCloseStopLoss() {
+		if(forceCloseOnStopLoss)
+			forceClose();
+		else
+			waitFramesNormal=0;
+	}
+	
 	@Override
 	public void forceClose() {
 		waitFramesNormal=0;
@@ -137,6 +165,19 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		this.setI_STATE(I_END);
 		
 		setState(TradeMechanism.CANCELED);
+		
+		end();
+		
+		}
+		
+	}
+	
+	public void unmonitored() {
+		if(!TradeMechanismUtils.isTradeMechanismFinalState(this.getState()))
+		{
+		this.setI_STATE(I_END);
+		
+		setState(TradeMechanism.UNMONITORED);
 		
 		end();
 		
@@ -250,13 +291,13 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	{
 		if(betCloseInfo.getType()==BetData.BACK)
 		{
-			if(getActualOdd()<=oddStopLoss)
-				forceClose();
+			if(getActualOdd()<oddStopLoss)
+				forceCloseStopLoss();
 		}
 		else
 		{
-			if(getActualOdd()>=oddStopLoss)
-				forceClose();
+			if(getActualOdd()>oddStopLoss)
+				forceCloseStopLoss();
 		}
 			
 		int state = processFrames();
@@ -364,14 +405,14 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
-			System.out.println("unmonitored");
-			this.setState(TradeMechanism.CRITICAL_ERROR);
+			//System.out.println("unmonitored");
+			this.setState(TradeMechanism.UNMONITORED);
 			this.setI_STATE(I_END);
 			end();
 			return;
 		}
 	
-		System.out.println(BetUtils.printBet(betInProcess));
+		//System.out.println(BetUtils.printBet(betInProcess));
 	}
 	
 	private void end()
@@ -525,7 +566,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		if(marketEventType==MarketChangeListener.MarketNew)
 		{
-			this.forceCancel();
+			this.unmonitored();
 		}
 	}
 

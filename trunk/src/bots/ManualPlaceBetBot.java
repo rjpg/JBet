@@ -12,12 +12,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import TradeMechanisms.ClosePosition;
-import TradeMechanisms.ClosePositionPanel;
-import TradeMechanisms.OpenPosition;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
+import TradeMechanisms.close.ClosePosition;
+import TradeMechanisms.close.ClosePositionPanel;
+import TradeMechanisms.open.OpenPosition;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
@@ -213,7 +213,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					BetData bd=closePanel.createBetData();
 					getMd().getBetManager().placeBet(bd);
 					
-					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose());
+					ClosePosition cp=new ClosePosition(ManualPlaceBetBot.this, bd, closePanel.getTicksStopLoss(), closePanel.getTimeBestOffer(), closePanel.getTimeForceClose(),closePanel.isforceCloseOnStopLoss());
 					
 					//cp.addTradeMechanismListener(ManualPlaceBetBot.this);
 					
@@ -239,7 +239,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					BetData bd=closePanel.createBetData();
 					getMd().getBetManager().placeBet(bd);
 					
-					OpenPosition cp=new OpenPosition(ManualPlaceBetBot.this, bd, 10, TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+					OpenPosition cp=new OpenPosition(ManualPlaceBetBot.this, bd, closePanel.getTimeBestOffer());
 					
 					//cp.addTradeMechanismListener(ManualPlaceBetBot.this);
 					

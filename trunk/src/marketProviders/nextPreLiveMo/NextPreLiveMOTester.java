@@ -1,6 +1,9 @@
-package marketProviders;
+package marketProviders.nextPreLiveMo;
 
 import java.util.Vector;
+
+import marketProviders.MarketProvider;
+import marketProviders.MarketProviderListerner;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -12,8 +15,6 @@ import demo.util.APIContext;
 import demo.util.Display;
 import generated.exchange.BFExchangeServiceStub.Market;
 import DataRepository.MarketData;
-import DataRepository.MarketProvider;
-import DataRepository.MarketProviderListerner;
 
 public class NextPreLiveMOTester implements MarketProviderListerner{
 

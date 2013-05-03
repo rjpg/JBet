@@ -1289,9 +1289,10 @@ public class Utils {
         	}
         
         
-        System.out.println("AM:"+Utils.closeAmountBack(11.5, 1000,  9.8));
+        System.out.println("AM:"+Utils.closeAmountLay(8.8, 1000,   9.884166553597792));
         
-        
+        //890.3128 @ 9.884166553597792 (LAY)
+        //487.5591 @ 9.844960334039504 (LAY)
         //1173.469387755102 @ 9.8 (Back)
         //988.2906482892269 @ 9.511372 (Back)
         //989.225648895193 @ 9.502381999999999 (Back)

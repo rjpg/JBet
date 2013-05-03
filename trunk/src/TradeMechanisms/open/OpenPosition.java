@@ -1,4 +1,4 @@
-package TradeMechanisms;
+package TradeMechanisms.open;
 
 import java.util.Vector;
 
@@ -6,7 +6,9 @@ import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.Utils;
-import TradeMechanisms.ClosePosition.ClosePositionThread;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.close.ClosePosition.ClosePositionThread;
 import bets.BetData;
 import bets.BetManager;
 
@@ -53,7 +55,11 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 
 	}
 
+	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA) {
+		this(botA, betOpenInfoA, waitFramesNormalA, TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+	}
 
+	
 	private void initialize()
 	{
 		setState(TradeMechanism.NOT_OPEN);
@@ -160,7 +166,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
 
-			setState(TradeMechanism.PARTIAL_CLOSED);
+			setState(TradeMechanism.PARTIAL_OPEN);
 			
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
@@ -185,7 +191,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
-			this.setState(TradeMechanism.CRITICAL_ERROR);
+			this.setState(TradeMechanism.UNMONITORED);
 			this.setI_STATE(I_END);
 			end();
 			return;

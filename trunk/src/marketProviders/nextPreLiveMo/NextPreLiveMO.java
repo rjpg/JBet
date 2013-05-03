@@ -1,4 +1,4 @@
-package marketProviders;
+package marketProviders.nextPreLiveMo;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.global.BFGlobalServiceStub.EventType;
@@ -7,10 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Vector;
 
+import marketProviders.MarketProvider;
+import marketProviders.MarketProviderListerner;
+
 import com.sun.xml.internal.bind.v2.TODO;
 
-import DataRepository.MarketProvider;
-import DataRepository.MarketProviderListerner;
 import correctscore.CorrectScoreMainFrame;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
