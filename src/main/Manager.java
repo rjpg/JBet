@@ -22,6 +22,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import marketNavigator.MarketNavigator;
+import marketProviders.MarketProvider;
+import marketProviders.MarketProviderListerner;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -29,8 +31,6 @@ import org.apache.log4j.Logger;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
-import DataRepository.MarketProvider;
-import DataRepository.MarketProviderListerner;
 import GUI.MarketMainFrame;
 import bots.BaseOfBot;
 import bots.BotAmountCat;

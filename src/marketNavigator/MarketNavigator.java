@@ -23,9 +23,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import main.Parameters;
+import marketProviders.MarketProvider;
+import marketProviders.MarketProviderListerner;
 import DataRepository.MarketData;
-import DataRepository.MarketProvider;
-import DataRepository.MarketProviderListerner;
 import GUI.MarketMainFrame;
 
 import demo.handler.ExchangeAPI;

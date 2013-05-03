@@ -1,4 +1,4 @@
-package TradeMechanisms;
+package TradeMechanisms.close;
 
 
 
@@ -41,6 +41,8 @@ public class ClosePositionPanel extends JPanel{
 	
 	public JCheckBox checkIP;
 	
+	public JCheckBox forceCloseOnStopLoss;
+	
 
 	//public Market market = null;
 	public MarketData md =null;
@@ -69,6 +71,8 @@ public class ClosePositionPanel extends JPanel{
 		
 		checkIP=new JCheckBox("IP",false);
 		
+		forceCloseOnStopLoss=new JCheckBox("Froce Close on Stop Loss",false);
+		
 		comboStopLossTicks=new JComboBox<Integer>(ticksStopLoss);
 		comboTimeBestOffer=new JComboBox<Integer>(timeBestOffer);
 		comboTimeForceClose=new JComboBox<Integer>(timeForceClose);
@@ -83,6 +87,7 @@ public class ClosePositionPanel extends JPanel{
 		this.add(comboStopLossTicks);
 		this.add(comboTimeBestOffer);
 		this.add(comboTimeForceClose);
+		this.add(forceCloseOnStopLoss);
 		
 		
 		
@@ -186,6 +191,11 @@ public class ClosePositionPanel extends JPanel{
 	public int getTimeForceClose()
 	{
 		return (Integer)comboTimeForceClose.getSelectedItem();
+	}
+	
+	public boolean isforceCloseOnStopLoss()
+	{
+		return forceCloseOnStopLoss.isSelected();
 	}
 	
 }
