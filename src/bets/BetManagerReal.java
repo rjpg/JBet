@@ -1227,7 +1227,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		System.out.println("Error : "+s);
 	}
 	//---------------------------------thread -----
-	public class BetsManagerThread extends Object implements Runnable {
+	private class BetsManagerThread extends Object implements Runnable {
 		private volatile boolean stopRequested;
 
 		private Thread runThread;

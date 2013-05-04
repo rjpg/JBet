@@ -1,7 +1,7 @@
 package TradeMechanisms.dutching;
 
+import DataRepository.OddData;
 import DataRepository.RunnersData;
-import bets.BetData;
 
 public class DutchingRunnerOptions {
 
@@ -9,16 +9,29 @@ public class DutchingRunnerOptions {
 	private RunnersData rd=null;
 
 	// open type
-	private BetData bet=null;
-	private int timeWaitOpen=10;
+	private OddData oddDataInfo=null;
 			
 	// close type and also open type (in case of not completed open)
 	private int timeHoldForceClose=10;
-	private boolean forceClose=false;
+	
 		
-	public DutchingRunnerOptions() {
+	public DutchingRunnerOptions(RunnersData runnerA,OddData oddDataInfoA,int timeWaitOpenA,int timeHoldForceCloseA) 
+	{
+		open=true;
+		rd=runnerA;
+		oddDataInfo=oddDataInfoA;
+		timeHoldForceClose=timeHoldForceCloseA;
 			
 	}
+	
+	public DutchingRunnerOptions(RunnersData runnerA,int timeHoldForceCloseA,boolean forceCloseA) 
+	{
+		open=true;
+		rd=runnerA;
+		timeHoldForceClose=timeHoldForceCloseA;
+			
+	}
+
 	
 	public boolean isOpen() {
 		return open;
@@ -26,14 +39,6 @@ public class DutchingRunnerOptions {
 
 	public void setOpen(boolean open) {
 		this.open = open;
-	}
-
-	public int getTimeWaitOpen() {
-		return timeWaitOpen;
-	}
-
-	public void setTimeWaitOpen(int timeWaitOpen) {
-		this.timeWaitOpen = timeWaitOpen;
 	}
 
 	public int getTimeHoldForceClose() {
@@ -44,17 +49,22 @@ public class DutchingRunnerOptions {
 		this.timeHoldForceClose = timeHoldForceClose;
 	}
 
-	public boolean isForceClose() {
-		return forceClose;
+	public RunnersData getRd() {
+		return rd;
 	}
 
-	public void setForceClose(boolean forceClose) {
-		this.forceClose = forceClose;
+	public void setRd(RunnersData rd) {
+		this.rd = rd;
 	}
 
-	public BetData getBet() {
-		return bet;
+	public OddData getOddDataInfo() {
+		return oddDataInfo;
 	}
+
+	public void setOddDataInfo(OddData oddDataInfo) {
+		this.oddDataInfo = oddDataInfo;
+	}
+
 
 	
 }
