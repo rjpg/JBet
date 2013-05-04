@@ -8,7 +8,6 @@ import DataRepository.OddData;
 import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
-import TradeMechanisms.close.ClosePosition.ClosePositionThread;
 import bets.BetData;
 import bets.BetManager;
 
@@ -355,7 +354,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	}
 
 	//---------------------------------thread -----
-	public class OpenPositionThread extends Object implements Runnable {
+	private class OpenPositionThread extends Object implements Runnable {
 		private volatile boolean stopRequested;
 
 		private Thread runThread;

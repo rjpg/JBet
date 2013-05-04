@@ -15,7 +15,6 @@ import TradeMechanisms.TradeMechanismUtils;
 import bets.BetData;
 import bets.BetManager;
 import bets.BetUtils;
-import bets.BetManagerReal.BetsManagerThread;
 import bots.Bot;
 
 public class ClosePosition extends TradeMechanism implements MarketChangeListener{
@@ -453,7 +452,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 
 	//---------------------------------thread -----
-	public class ClosePositionThread extends Object implements Runnable {
+	private class ClosePositionThread extends Object implements Runnable {
 		private volatile boolean stopRequested;
 
 		private Thread runThread;

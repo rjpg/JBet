@@ -4,16 +4,23 @@ import java.util.Vector;
 
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.close.ClosePosition;
+import TradeMechanisms.open.OpenPosition;
 
 public class Dutching extends TradeMechanism {
 	
 	private Vector<DutchingRunnerOptions> vdro=new Vector<DutchingRunnerOptions>();
 	
-	private double globalStake=0;
+	private Vector<OpenPosition> openTMs=new Vector<OpenPosition>();
+	private Vector<ClosePosition> closeTMs=new Vector<ClosePosition>();
 	
-	public Dutching(Vector<DutchingRunnerOptions> vdroA,double globalStakeA) {
+	private double globalStake=0;
+	private int timeWaitOpen=10;
+	
+	public Dutching(Vector<DutchingRunnerOptions> vdroA,double globalStakeA, int timeWaitOpenA) {
 		vdro=vdroA;
 		globalStake=globalStakeA;
+		timeWaitOpen=timeWaitOpenA;
 	}
 	
 	

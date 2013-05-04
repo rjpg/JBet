@@ -1,4 +1,4 @@
-package bots;
+package bots.dutchinBot;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
+
+import bots.Bot;
 
 import main.Parameters;
 import correctscore.MessageJFrame;
@@ -19,7 +21,7 @@ import GUI.MyChart2D;
 
 public class BotDutching extends Bot{
 
-public int number=5;
+	public int number=5;
 
 	public static int PAST_FRAMES=240;
 	
