@@ -58,7 +58,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		updateInterval=updateIntervalA;
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
 		
-		System.out.println("Force : "+forceCloseOnStopLoss);
+		//System.out.println("Force : "+forceCloseOnStopLoss);
 		
 		if(betCloseInfoA.getType()==BetData.BACK)
 		{

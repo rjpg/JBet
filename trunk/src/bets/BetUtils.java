@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
+import org.encog.mathutil.Equilateral;
+
 import sun.nio.cs.ext.MacHebrew;
 import sun.nio.cs.ext.MacThai;
 
@@ -317,7 +319,19 @@ public class BetUtils {
 			return false;
 	}
 	
-	public static OddData getOpenInfo(Vector <OddData> vod)
+	
+	public static OddData getOpenInfoBetData(Vector<BetData> vbd)
+	{
+		Vector <OddData> vod=new Vector<>();
+		for(BetData bd:vbd)
+		{
+			vod.add(bd.getOddDataMatched());
+		}
+		
+		return getOpenInfo(vod);
+	}
+	
+	public static OddData getOpenInfo(Vector<OddData> vod)
 	{
 		
 		OddData ret=null;
@@ -398,7 +412,7 @@ public class BetUtils {
 			return odL;
 	}
 	
-	private static OddData calculateMissing(OddData odPretended,OddData odHave)
+	public static OddData calculateMissing(OddData odPretended,OddData odHave)
 	{
 		
 		double ret=0;
@@ -473,17 +487,26 @@ public class BetUtils {
 		
 	}
 	
+	public static OddData getEquivalent(OddData od,double odd)
+	{
+		
+		OddData aux=calculateMissing(new OddData(odd,0,od.getType()), od);
+		aux.setType(od.getType());
+		return aux;
+		
+	}
+	
 	public static void main(String[] args) {
-		OddData od1=new OddData(10, 30, BetData.LAY);
+		OddData od1=new OddData(100, 1, BetData.BACK);
 		OddData od2=new OddData(10, 0, BetData.BACK);
-		OddData od3=new OddData(10, 10, BetData.LAY);
+		OddData od3=new OddData(100, 1, BetData.LAY);
 		
 		Vector<OddData> odv=new Vector<OddData>();
 		
 		
 		//odv.add(od1);
 		//odv.add(od2);
-		odv.add(od3);
+		//odv.add(od3);
 		
 		OddData odret=getOpenInfo(odv);
 		System.out.println("Total : "+odret);
@@ -493,6 +516,8 @@ public class BetUtils {
 		//System.out.println("Close : "+Utils.convertAmountToBF(odret2.getAmount())+" @ "+odret2.getOdd()+ " "+odret2.getType());
 		
 		System.out.println(getGreening(odv,od1,10.00));
+		
+		System.out.println(getEquivalent(od3, 10));
 	}
 	
 }
