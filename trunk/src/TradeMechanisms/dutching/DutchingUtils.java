@@ -111,7 +111,7 @@ public class DutchingUtils {
 
 		
 		
-		od1.setAmount(od1.getAmount()-1);
+		od1.setAmount(od1.getAmount());
 		System.out.println(calculateGlobalStake(od1, calculateMargin(odv)));
 		
 		

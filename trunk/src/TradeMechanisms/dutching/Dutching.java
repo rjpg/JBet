@@ -36,7 +36,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 	private Vector<DutchingRunnerOptions> vdro=new Vector<DutchingRunnerOptions>();
 	
 	private Vector<DutchingRunnerOptions> vdroOpen=new Vector<DutchingRunnerOptions>();
-	private Vector<DutchingRunnerOptions> vdroClose=new Vector<DutchingRunnerOptions>();
+	
 	
 	boolean ended=false;
 	
@@ -97,12 +97,12 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			}
 			else
 			{
-				double oddBack=Utils.getOddBackFrame(dro.getRd(),0);
+				double oddBack=Utils.getOddBackFrame(dro.getRd(),0); // actual odd Back to close
 				
 				OddData od=new OddData(oddBack,0.01,BetData.BACK,dro.getRd());
 				vod.add(od);
 				dro.setOddData(od);
-				vdroClose.add(dro);
+				
 			}
 			
 			DutchingUtils.calculateAmounts(vod, globalStake);
@@ -264,8 +264,8 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 				BetData bd=new BetData(dro.getRd(), dro.getOddData(),useKeeps);
 				betsClose.add(bd);
 			}
-			
 		}
+		
 		
 		md.getBetManager().placeBets(betsClose);
 		
@@ -358,16 +358,17 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			{
 				OddData odBigest=BetUtils.getOpenInfoBetData(droBigestMatch.getOpen().getMatchedInfo());
 				
-				droBigestMatch.setOddData(BetUtils.getEquivalent(odBigest, droBigestMatch.getOddOpenInfo()));
-				
 				Vector<OddData> vod=new Vector<OddData>();
 				for(DutchingRunnerOptions dro:vdro)
 					vod.add(dro.getOddData());
-								
-				globalStake=DutchingUtils.calculateGlobalStake(odBigest, DutchingUtils.calculateMargin(vod));
+				
+				OddData equivalent= BetUtils.getEquivalent(odBigest, droBigestMatch.getOddOpenInfo());
+				globalStake=DutchingUtils.calculateGlobalStake(equivalent, DutchingUtils.calculateMargin(vod));
 				
 				DutchingUtils.calculateAmounts(vod, globalStake);
 			}
+			
+			//if(state==2) //do nothing just close
 			
 			setState(TradeMechanism.OPEN);
 			
