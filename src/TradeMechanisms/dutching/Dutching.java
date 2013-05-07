@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.Vector;
 
 import bets.BetData;
+import bets.BetUtils;
 
 import DataRepository.MarketData;
 import DataRepository.OddData;
@@ -76,7 +77,10 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			return;
 		}
 		
+		
+		
 		md=vdro.get(0).getRd().getMarketData();
+		md.addTradingMechanismTrading(this);
 		
 		boolean hasOpen=false;
 		
@@ -188,7 +192,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismEnded(TradeMechanism tm, int state) {
-		// TODO Auto-generated method stub
+		refresh();
 		
 	}
 
@@ -250,8 +254,33 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 	
 	private void close()
 	{
+		Vector<BetData> betsClose=new Vector<BetData>();
 		
-		//...
+		for(DutchingRunnerOptions dro:vdro)
+		{
+			OddData greening = BetUtils.getGreening(dro.getMatchedInfoOddData(), dro.getOddData(), dro.getActualOdd());
+			if(Utils.convertAmountToBF(greening.getAmount())>0)
+			{
+				BetData bd=new BetData(dro.getRd(), dro.getOddData(),useKeeps);
+				betsClose.add(bd);
+			}
+			
+		}
+		
+		md.getBetManager().placeBets(betsClose);
+		
+		for(DutchingRunnerOptions dro:vdro )
+		{
+			for(BetData bd:betsClose)
+			{
+				if(dro.getRd()==bd.getRd())
+				{
+					ClosePosition close=new ClosePosition(this, bd,1,0,dro.getTimeHoldForceClose(),false);
+					dro.setClose(close);
+				}
+			}
+		}
+
 		
 		setI_STATE(I_CLOSING);
 		refresh();
@@ -268,12 +297,18 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 		
 	}
 	
+	private boolean allOpenEndedProcessed=false;
 	private void processOpen()
 	{
 		
+		// 0 - none matched ( end - do not close nothing)
+		// 1 - some matched but not completed ( do close and recalculate globalstake)
+		// 2 - at least one completed matched ( do close)
+		int state=0; 
+		
 		boolean allEnded=true;
-		
-		
+
+		DutchingRunnerOptions droBigestMatch=vdroOpen.get(0);
 		for(DutchingRunnerOptions dro:vdroOpen )
 		{
 			if(!dro.getOpen().isEnded())
@@ -281,10 +316,62 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 				allEnded=false;
 			}
 			
+			if(dro.getOpen().getState()==TradeMechanism.OPEN)
+			{
+				setState(TradeMechanism.PARTIAL_OPEN);
+				state=2;
+			}
+			
+			if(dro.getOpen().getState()==TradeMechanism.PARTIAL_OPEN && state<1)
+			{
+				setState(TradeMechanism.PARTIAL_OPEN);
+				state=1;
+			} 
+			
+			OddData odNow=BetUtils.getOpenInfoBetData(dro.getOpen().getMatchedInfo());
+			OddData odBigest=BetUtils.getOpenInfoBetData(droBigestMatch.getOpen().getMatchedInfo());
+			if(odBigest==null)
+			{
+				odBigest=odNow;
+			}
+			else if (odNow!=null)
+			{
+				if(odNow.getAmount()*odNow.getOdd()>odBigest.getAmount()*odBigest.getOdd())
+					odBigest=odNow;
+			}
+			
 		}
 		
-		if(allEnded)
+		
+		if(allEnded && !allOpenEndedProcessed)
 		{
+			allOpenEndedProcessed=true;
+			
+			if(state==0)
+			{
+				setI_STATE(I_END);
+				refresh();
+				return;
+			}
+			
+			if(state==1) // recalculate global stake
+			{
+				OddData odBigest=BetUtils.getOpenInfoBetData(droBigestMatch.getOpen().getMatchedInfo());
+				
+				droBigestMatch.setOddData(BetUtils.getEquivalent(odBigest, droBigestMatch.getOddOpenInfo()));
+				
+				Vector<OddData> vod=new Vector<OddData>();
+				for(DutchingRunnerOptions dro:vdro)
+					vod.add(dro.getOddData());
+								
+				globalStake=DutchingUtils.calculateGlobalStake(odBigest, DutchingUtils.calculateMargin(vod));
+				
+				DutchingUtils.calculateAmounts(vod, globalStake);
+			}
+			
+			setState(TradeMechanism.OPEN);
+			
+			close();
 			
 		}
 			
@@ -293,14 +380,44 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 	
 	private void processClose()
 	{
+		boolean allEnded=true;
 		
+		for(DutchingRunnerOptions dro:vdro)
+			if(dro.getClose()!=null)
+			{
+				if(!dro.getClose().isEnded())
+					allEnded=false;
+			
+			
+				if(dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED || dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED)
+					setState(TradeMechanism.PARTIAL_CLOSED);
+			}
+		
+		if(allEnded)
+		{
+			setState(TradeMechanism.CLOSED);
+			setI_STATE(I_END);
+			refresh();
+		}
 	}
 	
 	private void end()
 	{
+		md.removeTradingMechanismTrading(this);
 		
+		ended=true;
+		
+		informListenersEnd();
+		
+		clean();
 	}
 
-	
+	private void informListenersEnd()
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
 	
 }

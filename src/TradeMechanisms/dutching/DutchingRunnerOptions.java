@@ -7,6 +7,7 @@ import TradeMechanisms.open.OpenPosition;
 import bets.BetData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
+import DataRepository.Utils;
 
 public class DutchingRunnerOptions {
 
@@ -19,7 +20,7 @@ public class DutchingRunnerOptions {
 	private int timeHoldForceClose=0;
 	
 	// dynamic vars
-	private OddData oddData=null; 
+	private OddData oddData=null; // to process global dutching
 	
 	private OpenPosition open=null;
 	private ClosePosition close=null;
@@ -111,4 +112,27 @@ public class DutchingRunnerOptions {
 		
 		return ret;
 	}
+	
+	protected Vector<OddData> getMatchedInfoOddData()
+	{
+		Vector<BetData> vbd=getMatchedInfo();
+		
+		Vector<OddData> ret=new Vector<OddData>();
+		
+		for(BetData bd:vbd)
+			ret.add(bd.getOddDataMatched());
+			
+		return ret;
+	}
+	
+	protected double getActualOdd()
+	{
+		double actualOdd=0;
+		actualOdd=Utils.getOddBackFrame(getRd(), 0);
+		if(actualOdd==0)
+			actualOdd=1.01;
+		
+		return actualOdd;
+	}
+	
 }
