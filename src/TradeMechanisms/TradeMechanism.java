@@ -1,6 +1,9 @@
 package TradeMechanisms;
 
 import java.awt.Color;
+import java.util.Vector;
+
+import bets.BetData;
 
 public abstract class TradeMechanism {
 	
@@ -31,10 +34,14 @@ public abstract class TradeMechanism {
 	
 	public abstract String getStatisticsValues();
 	
-	public abstract void clean();
-	
 	public abstract void addTradeMechanismListener(TradeMechanismListener listener);
 	
 	public abstract void removeTradeMechanismListener(TradeMechanismListener listener);
+	
+	public abstract Vector<BetData> getMatchedInfo();
+	
+	public abstract boolean isEnded();
+	
+	public abstract void clean();
 	
 }

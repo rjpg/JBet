@@ -22,7 +22,8 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	private int waitFramesNormal=20;
 	private BetData betInProcess;
 	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
-
+	private boolean ended=false;
+	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	private BetData betOpenInfo=null;
@@ -162,9 +163,9 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 			this.setI_STATE(I_END);
 			refresh();
 		}
+		
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
-
 			setState(TradeMechanism.PARTIAL_OPEN);
 			
 		}
@@ -206,6 +207,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		md.removeTradingMechanismTrading(this);
 		stopPolling();
 		
+		ended=true;
 		informListenersEnd();
 		
 		clean();
@@ -221,91 +223,29 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		}
 	}
 	
-	public OddData getMatchedInfo()
+	
+	public  Vector<OddData> getMatchedOddDataVector()
 	{
-		
-		OddData ret=null;
-		
-		
-		if(historyBetsMatched.size()==0)
-			return ret;
-		
-		Vector<BetData> bdB=new Vector<BetData>();
-		Vector<BetData> bdL=new Vector<BetData>();
+		Vector<OddData> ret=new Vector<OddData>();
 		
 		for(BetData bd:historyBetsMatched)
 		{
-			if(bd.getType()==BetData.BACK)
-				bdB.add(bd);
-			else
-				bdL.add(bd);
+			//System.out.println("Bet List : "+bd.getOddDataMatched());
+			ret.add(bd.getOddDataMatched());
 		}
 		
-		double totalAmB=0;
-		double oddAvgB=0;
-		
-		if(bdB.size()!=0)
-		{
-		
-			Vector<Double> oddsB=new Vector<Double>();
-			Vector<Double> amsB=new Vector<Double>();
-			
-			for(BetData bd:bdB)
-			{
-				oddsB.add(bd.getOddMached());
-				amsB.add(bd.getMatchedAmount());
-				totalAmB+=bd.getMatchedAmount();
-			}
-			
-			oddAvgB=Utils.calculateOddAverage(oddsB.toArray(new Double[]{}), amsB.toArray(new Double[]{}));
-		}
-		
-		double totalAmL=0;
-		double oddAvgL=0;
-		
-		if(bdL.size()!=0)
-		{
-		
-			Vector<Double> oddsL=new Vector<Double>();
-			Vector<Double> amsL=new Vector<Double>();
-			
-			for(BetData bd:bdL)
-			{
-				oddsL.add(bd.getOddMached());
-				amsL.add(bd.getMatchedAmount());
-				totalAmL+=bd.getMatchedAmount();
-			}
-			
-			oddAvgL=Utils.calculateOddAverage(oddsL.toArray(new Double[]{}), amsL.toArray(new Double[]{}));
-		}
-		
-		if(totalAmL==0)
-			return new OddData(oddAvgB, totalAmB,BetData.BACK);
-		
-		if(totalAmB==0)
-			return new OddData(oddAvgL, totalAmL,BetData.LAY);
-		
-		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
-		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
-		
-		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
-		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.BACK);
-		
-		if(odB.getAmount()>odL.getAmount())
-			return odB;
-		else
-			return odL;
-		
+		return ret;
 	}
-
+	
+	
 	@Override
 	public void forceClose() {
-		// TODO Auto-generated method stub
+		waitFramesNormal=0;
 
 	}
 	@Override
 	public void forceCancel() {
-		// TODO Auto-generated method stub
+		waitFramesNormal=0;
 
 	}
 	@Override
@@ -318,6 +258,18 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public Vector<BetData> getMatchedInfo()
+	{
+		return historyBetsMatched; 
+	}
+	
+	@Override
+	public boolean isEnded() {
+		return ended;
+	}
+	
 	@Override
 	public void clean() {
 		if(updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)

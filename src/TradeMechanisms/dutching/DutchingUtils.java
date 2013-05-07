@@ -94,8 +94,27 @@ public class DutchingUtils {
 		int i=0;
 		for(OddData od:odv)
 			System.out.println(od+" NET Profit/Loss : "+ netProfit[i++]);
+		
+			
+		od5.setOdd(od5.getOdd()-1);
+		
+		System.out.println(calculateMargin(odv));
+		
+		calculateAmounts(odv, 100);
+		
+		//od5.setAmount(0);
+		netProfit=calculateNetProfitLoss(odv);
+
+		i=0;
+		for(OddData od:odv)
+			System.out.println(od+" NET Profit/Loss : "+ netProfit[i++]);
+
+		
+		
 		od1.setAmount(od1.getAmount()-1);
 		System.out.println(calculateGlobalStake(od1, calculateMargin(odv)));
+		
+		
 		
 		od4.setAmount(od4.getAmount()+2);
 		System.out.println(od4);
