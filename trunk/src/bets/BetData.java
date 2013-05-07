@@ -92,13 +92,13 @@ public class BetData {
 		this.keepInPlay=IPA;
 	}
 	
-	public BetData (RunnersData rdA, OddData od,boolean IPA)
+	public BetData (RunnersData rdA, OddData od,boolean keepIP)
 	{
 		this.rd=rdA;
 		this.amount=od.getAmount();
 		this.oddRequested=od.getOdd();
 		this.type=od.getType();
-		this.keepInPlay=IPA;
+		this.keepInPlay=keepIP;
 	}
 	
 	public int getType() {
@@ -261,12 +261,12 @@ public class BetData {
 
 	public OddData getOddDataMatched()
 	{
-		return new OddData(getOddMached(), getMatchedAmount(),getType());
+		return new OddData(getOddMached(), getMatchedAmount(),getType(),getRd());
 	}
 	
 	public OddData getOddDataOriginal()
 	{
-		return new OddData(getOddRequested(), getAmount(),getType());
+		return new OddData(getOddRequested(), getAmount(),getType(),getRd());
 	}
 	
 }

@@ -1,13 +1,11 @@
 package TradeMechanisms.close;
 
-import generated.exchange.BFExchangeServiceStub.GetMarket;
-
 import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
-import DataRepository.Swing;
+import DataRepository.RunnersData;
 import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
@@ -15,7 +13,6 @@ import TradeMechanisms.TradeMechanismUtils;
 import bets.BetData;
 import bets.BetManager;
 import bets.BetUtils;
-import bots.Bot;
 
 public class ClosePosition extends TradeMechanism implements MarketChangeListener{
 
@@ -32,6 +29,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
 	private BetData betInProcess=null;
 	private double targetOdd=1.01;
+	private boolean ended=false;
 	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
@@ -52,8 +50,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	{
 		super();
 		
-		if(botA!=null)
-			addTradeMechanismListener(botA);
 		
 		betCloseInfo=betCloseInfoA;
 		stopLossTicks=stopLossTicksA;
@@ -163,6 +159,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		{
 		this.setI_STATE(I_END);
 		
+		if(betInProcess!=null)
+			md.getBetManager().cancelBet(betInProcess);
+		
 		setState(TradeMechanism.CANCELED);
 		
 		end();
@@ -196,7 +195,17 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		return null;
 	}
 	
+	@Override
+	public Vector<BetData> getMatchedInfo()
+	{
+		return historyBetsMatched; 
+	}
 	
+	@Override
+	public boolean isEnded() {
+		return ended;
+	}
+		
 	public int getI_STATE() {
 		return I_STATE;
 	}
@@ -333,6 +342,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 			if(betInProcess==null)   // nothing to close
 			{
+				setState(TradeMechanism.CLOSED);
 				this.setI_STATE(I_END);
 				refresh();
 				return;
@@ -416,11 +426,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void end()
 	{
-		if(!TradeMechanismUtils.isTradeMechanismFinalState(getState()))
-			setState(TradeMechanism.CLOSED);
-		
+				
 		md.removeTradingMechanismTrading(this);
 		stopPolling();
+		
+		ended=true;
 		
 		informListenersEnd();
 		
@@ -439,6 +449,13 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		
 		return ret;
+	}
+	
+	
+	
+	public RunnersData getRunner()
+	{
+		return betCloseInfo.getRd();
 	}
 	
 	private void informListenersEnd()
@@ -542,9 +559,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		listeners.clear();
 		listeners=null;
 		
-		historyBetsMatched.clear();
-		historyBetsMatched=null;
-		
 		betInProcess=null;
 		
 		betCloseInfo=null;
@@ -553,7 +567,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	}
 
 	@Override
-	public void MarketChange(MarketData md, int marketEventType) {
+	public void MarketChange(MarketData mdA, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 		{
 			if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
@@ -568,5 +582,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			this.unmonitored();
 		}
 	}
+
+
+
+	
 
 }

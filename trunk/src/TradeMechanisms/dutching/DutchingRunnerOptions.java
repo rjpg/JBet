@@ -1,32 +1,37 @@
 package TradeMechanisms.dutching;
 
+import java.util.Vector;
+
+import TradeMechanisms.close.ClosePosition;
+import TradeMechanisms.open.OpenPosition;
+import bets.BetData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
 
 public class DutchingRunnerOptions {
 
-	private boolean open=false;
 	private RunnersData rd=null;
 
-	// open type
-	private OddData oddDataInfo=null;
+	// open vars
+	private double oddOpenInfo=-1;
 			
 	// close type and also open type (in case of not completed open)
-	private int timeHoldForceClose=10;
+	private int timeHoldForceClose=0;
 	
-		
-	public DutchingRunnerOptions(RunnersData runnerA,OddData oddDataInfoA,int timeWaitOpenA,int timeHoldForceCloseA) 
+	// dynamic vars
+	private OddData oddData=null; 
+	
+	private OpenPosition open=null;
+	private ClosePosition close=null;
+	
+	public DutchingRunnerOptions(RunnersData runnerA,double oddOpenInfoA) 
 	{
-		open=true;
 		rd=runnerA;
-		oddDataInfo=oddDataInfoA;
-		timeHoldForceClose=timeHoldForceCloseA;
-			
+		oddOpenInfo=oddOpenInfoA;
 	}
 	
-	public DutchingRunnerOptions(RunnersData runnerA,int timeHoldForceCloseA,boolean forceCloseA) 
+	public DutchingRunnerOptions(RunnersData runnerA,int timeHoldForceCloseA) 
 	{
-		open=true;
 		rd=runnerA;
 		timeHoldForceClose=timeHoldForceCloseA;
 			
@@ -34,11 +39,10 @@ public class DutchingRunnerOptions {
 
 	
 	public boolean isOpen() {
-		return open;
-	}
-
-	public void setOpen(boolean open) {
-		this.open = open;
+		if(oddOpenInfo==-1)
+			return false;
+		else
+			return true;
 	}
 
 	public int getTimeHoldForceClose() {
@@ -57,14 +61,54 @@ public class DutchingRunnerOptions {
 		this.rd = rd;
 	}
 
-	public OddData getOddDataInfo() {
-		return oddDataInfo;
+	public double getOddOpenInfo() {
+		return oddOpenInfo;
 	}
 
-	public void setOddDataInfo(OddData oddDataInfo) {
-		this.oddDataInfo = oddDataInfo;
+	public void setOddOpenInfo(double oddOpenInfoA) {
+		this.oddOpenInfo = oddOpenInfoA;
 	}
 
+	protected OddData getOddData() {
+		return oddData;
+	}
 
+	protected void setOddData(OddData oddData) {
+		this.oddData = oddData;
+	}
+
+	protected OpenPosition getOpen() {
+		return open;
+	}
+
+	protected void setOpen(OpenPosition open) {
+		this.open = open;
+	}
+
+	protected ClosePosition getClose() {
+		return close;
+	}
+
+	protected void setClose(ClosePosition close) {
+		this.close = close;
+	}
 	
+	protected Vector<BetData> getMatchedInfo()
+	{
+		Vector<BetData> ret=new Vector<BetData>();
+		
+		if(open!=null)
+		{
+			for(BetData bd:open.getMatchedInfo())
+				ret.add(bd);
+		}
+		
+		if(close!=null)
+		{
+			for(BetData bd:close.getMatchedInfo())
+				ret.add(bd);
+		}
+		
+		return ret;
+	}
 }

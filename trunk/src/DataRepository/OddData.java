@@ -10,6 +10,8 @@ public class OddData {
 	//public double totalBSPLayLiability=0;
 	public int type = BetData.BACK; // optional 
 	
+	public RunnersData rd=null;
+	
 	public OddData(double oddA,double amountA)
 	{
 		odd=oddA;
@@ -24,6 +26,17 @@ public class OddData {
 		odd=oddA;
 		amount=amountA;
 		type=typeA;
+		//depth=depthA;
+		//totalBSPBackersStake=aTotalBSPBackersStake;
+		//totalBSPLayLiability=atotalBSPLayLiability;
+	}
+	
+	public OddData(double oddA,double amountA,int typeA,RunnersData rdA)
+	{
+		odd=oddA;
+		amount=amountA;
+		type=typeA;
+		rd=rdA;
 		//depth=depthA;
 		//totalBSPBackersStake=aTotalBSPBackersStake;
 		//totalBSPLayLiability=atotalBSPLayLiability;
@@ -51,13 +64,31 @@ public class OddData {
 		this.type = type;
 	}
 	
+	public RunnersData getRd() {
+		return rd;
+	}
+
+	public void setRd(RunnersData rd) {
+		this.rd = rd;
+	}
+	
 	
 	@Override
 	public String toString() {
-		if(type==BetData.BACK)
-			return amount+" @ "+odd+" (Back)";
+		if(rd==null)
+		{
+			if(type==BetData.BACK)
+				return amount+" @ "+odd+" (Back)";
+			else
+				return amount+" @ "+odd+" (LAY)";
+		}
 		else
-			return amount+" @ "+odd+" (LAY)";
+		{
+			if(type==BetData.BACK)
+				return rd.getName()+" : "+ amount+" @ "+odd+" (Back)";
+			else
+				return rd.getName()+" : "+amount+" @ "+odd+" (LAY)";
+		}
 	}
 //	public int getDepth() {
 //		return depth;

@@ -337,17 +337,19 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		
 		if(tm instanceof OpenPosition)
 		{
-			OddData od=((OpenPosition)tm).getMatchedInfo();
-			System.out.println("Tm Matched Info : "+od);
+			for(OddData od:((OpenPosition)tm).getMatchedOddDataVector())
+				System.out.println("Tm OpenPosition Matched List :"+od);
+			
+			System.out.println("Tm OpenPosition Matched Info : "+BetUtils.getOpenInfo(((OpenPosition)tm).getMatchedOddDataVector()));
 		}
 		
 		if(tm instanceof ClosePosition)
 		{
 			
 			for(OddData od:((ClosePosition)tm).getMatchedOddDataVector())
-				System.out.println(" Matched List :"+od);
+				System.out.println("Tm ClosePosition Matched List :"+od);
 			
-			System.out.println("Tm Matched Info : "+BetUtils.getOpenInfo(((ClosePosition)tm).getMatchedOddDataVector()));
+			System.out.println("Tm ClosePosition Matched Info : "+BetUtils.getOpenInfo(((ClosePosition)tm).getMatchedOddDataVector()));
 		}
 		
 		tm.removeTradeMechanismListener(this);
