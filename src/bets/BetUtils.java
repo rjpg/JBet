@@ -504,9 +504,9 @@ public class BetUtils {
 		Vector<OddData> odv=new Vector<OddData>();
 		
 		
-		//odv.add(od1);
-		//odv.add(od2);
-		//odv.add(od3);
+		odv.add(od1);
+		odv.add(od2);
+		odv.add(od3);
 		
 		OddData odret=getOpenInfo(odv);
 		System.out.println("Total : "+odret);

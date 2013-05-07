@@ -387,7 +387,4 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		return polling;
 	}
 
-
-
-
 }
