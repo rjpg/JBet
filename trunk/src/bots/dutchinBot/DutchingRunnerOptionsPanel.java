@@ -11,20 +11,24 @@ import javax.swing.JPanel;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
+import TradeMechanisms.dutching.DutchingRunnerOptions;
 
 public class DutchingRunnerOptionsPanel extends JPanel {
 	
 	RunnersData rd=null;
 	JLabel runnerName=new JLabel();
 	
+	// open
 	JCheckBox open=new JCheckBox("Open :",false);
-	static Integer[] ticksStopLoss={1,2,3,4,5,6,7,8,9,10};
-	JComboBox<Integer> comboStopLossTicks=new JComboBox<Integer>(ticksStopLoss);
+	static Integer[] ticksBestPriceOffset={0,1,2,3,4,5,6,7,8,9,10};
+	JComboBox<Integer> comboBestPriceOffset=new JComboBox<Integer>(ticksBestPriceOffset);
 	JPanel openPanel=new JPanel();
 	
-	public static Integer[] timeBestOffer={0,10,15,20,25,30,35,40,45,50};
-	JComboBox<Integer> comboTimeBestPrice=new JComboBox<Integer>(timeBestOffer);
+	//close
+	public static Integer[] timeHoldForceClose={0,10,15,20,25,30,35,40,45,50};
+	JComboBox<Integer> comboTimeHoldForceClose=new JComboBox<Integer>(timeHoldForceClose);
 	
+	//msg
 	MessagePanel msgPanel=new MessagePanel();
 	
 	JLabel backOdd=new JLabel();
@@ -57,13 +61,13 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 		
 		openPanel.setLayout(new BorderLayout());
 		openPanel.add(open,BorderLayout.WEST);
-		openPanel.add(comboStopLossTicks,BorderLayout.EAST);
+		openPanel.add(comboBestPriceOffset,BorderLayout.EAST);
 		
 		
 		aux.add(runnerName);
 		aux.add(backLayPanel);
 		aux.add(openPanel);
-		aux.add(comboTimeBestPrice);
+		aux.add(comboTimeHoldForceClose);
 		aux.add(stake);
 		
 		this.add(aux,BorderLayout.NORTH);
@@ -83,7 +87,43 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 	
 	public void setStake(double am)
 	{
-		stake.setText(""+Utils.convertAmountToBF(am));
+		stake.setText(""+Utils.convertAmountToBF(am)+" @ "+getWorkingOdd());
+	}
+	
+	public void updateOdds()
+	{
+		layOdd.setText(""+Utils.getOddLayFrame(rd, 0));
+		backOdd.setText(""+Utils.getOddBackFrame(rd, 0));
 	}
 
+	public double getOpenOdd()
+	{
+		double ret=0;
+		
+		ret=Utils.getOddLayFrame(rd, 0);
+		
+		ret=Utils.indexToOdd(Utils.oddToIndex(ret)+(Integer)(comboBestPriceOffset.getSelectedItem()));
+		
+		return ret;
+	}
+	
+	public double getWorkingOdd()
+	{
+		if(isOpen())
+			return getOpenOdd();
+		else
+			return Utils.getOddBackFrame(rd, 0);
+	}
+	
+	
+	public DutchingRunnerOptions getDutchingRunnerOptions()
+	{
+		DutchingRunnerOptions ret=null;
+		if(isOpen())
+			ret=new DutchingRunnerOptions(rd, getOpenOdd());
+		else
+			ret=new DutchingRunnerOptions(rd, (Integer)comboTimeHoldForceClose.getSelectedItem());
+		
+		return ret;
+	}
 }
