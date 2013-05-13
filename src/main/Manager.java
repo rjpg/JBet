@@ -44,7 +44,7 @@ import bots.NeuralBot;
 import bots.NeuralDataBot;
 import bots.StudyBot;
 import bots.WomNeighboursBot;
-import bots.dutchinBot.BotDutching;
+import bots.dutchinBot.ManualDutchingBot;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.handler.GlobalAPI;
@@ -174,7 +174,8 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				new ManualPlaceBetBot(md,this);
+				//new ManualPlaceBetBot(md,this);
+				new ManualDutchingBot(md);
 			}
 			
 			if(Parameters.mecanicBot)
@@ -199,7 +200,7 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if (Parameters.dutchingBot)
 			{
-				new BotDutching(md);
+				new ManualDutchingBot(md);
 			}
 
 			
@@ -292,12 +293,14 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if (Parameters.dutchingBot)
 			{
-				new BotDutching(md);
+				new ManualDutchingBot(md);
 			}
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				new ManualPlaceBetBot(md,this);
+				//new ManualPlaceBetBot(md,this);
+				new ManualDutchingBot(md);
+
 			}
 			
 			// /////////////////////after////////////////////////////////////////////

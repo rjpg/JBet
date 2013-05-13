@@ -25,12 +25,23 @@ public class DutchingRunnerOptions {
 	private OpenPosition open=null;
 	private ClosePosition close=null;
 	
+	
+	/**
+	 * Open constructor
+	 * @param runnerA
+	 * @param oddOpenInfoA
+	 */
 	public DutchingRunnerOptions(RunnersData runnerA,double oddOpenInfoA) 
 	{
 		rd=runnerA;
 		oddOpenInfo=oddOpenInfoA;
 	}
 	
+	/**
+	 * Close constructor
+	 * @param runnerA
+	 * @param timeHoldForceCloseA
+	 */
 	public DutchingRunnerOptions(RunnersData runnerA,int timeHoldForceCloseA) 
 	{
 		rd=runnerA;
