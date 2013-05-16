@@ -75,6 +75,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 		System.out.println("Stop loss Odd:"+oddStopLoss);
 		
+		addTradeMechanismListener(botA);
+		
 		md=betCloseInfoA.getRd().getMarketData();
 		
 		md.addTradingMechanismTrading(this);
@@ -160,8 +162,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		this.setI_STATE(I_END);
 		
 		if(betInProcess!=null)
-			md.getBetManager().cancelBet(betInProcess);
-		
+		{
+			if(betInProcess.getState()==BetData.UNMATCHED || betInProcess.getState()==BetData.PARTIAL_MATCHED)
+			{
+				md.getBetManager().cancelBet(betInProcess);
+			}
+		}
 		setState(TradeMechanism.CANCELED);
 		
 		end();
@@ -338,6 +344,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		if(betInProcess==null || betInProcess.getState()==BetData.NOT_PLACED)
 		{
+			System.out.println("Entrei 1");
 			betInProcess=createBetForOdd(targetOdd);
 			
 			if(betInProcess==null)   // nothing to close
@@ -352,12 +359,14 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.CANCELED )
 		{
+			System.out.println("Entrei 2");
 			betInProcess=null;
 			refresh();
 			return;
 		}
 		else if(betInProcess.getState()==BetData.PARTIAL_CANCELED)
 		{
+			System.out.println("Entrei 3");
 			setState(TradeMechanism.PARTIAL_CLOSED);
 			historyBetsMatched.add(betInProcess);
 			
@@ -367,6 +376,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.MATCHED)
 		{
+			System.out.println("Entrei 4");
 			historyBetsMatched.add(betInProcess);
 			setState(TradeMechanism.PARTIAL_CLOSED);
 		
@@ -377,7 +387,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED )
 		{
-			
+			System.out.println("Entrei 5");
 			setState(TradeMechanism.PARTIAL_CLOSED); // difference from UNMATCHED
 				
 			if(targetOdd!=betInProcess.getOddRequested())
@@ -389,6 +399,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
+			System.out.println("Entrei 6");
 	
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
@@ -399,6 +410,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.PLACING_ERROR)
 		{
+			System.out.println("Entrei 7");
 			if(betInProcess.getErrorType()==BetData.ERROR_MARKET_CLOSED || betInProcess.getErrorType()==BetData.ERROR_BALANCE_EXCEEDED)
 			{
 				this.setState(TradeMechanism.CRITICAL_ERROR);
@@ -414,6 +426,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
+			System.out.println("Entrei 8");
 			//System.out.println("unmonitored");
 			this.setState(TradeMechanism.UNMONITORED);
 			this.setI_STATE(I_END);
@@ -421,7 +434,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			return;
 		}
 	
-		//System.out.println(BetUtils.printBet(betInProcess));
+		System.out.println("XXX"+BetUtils.printBet(betInProcess));
 	}
 	
 	private void end()
@@ -432,6 +445,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		ended=true;
 		
+		//System.out.println("informing listeners of end");
 		informListenersEnd();
 		
 		clean();
@@ -460,8 +474,10 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void informListenersEnd()
 	{
+		//System.out.println("size : "+listeners.size());
 		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
 		{
+			//System.out.println("informing"+tml );
 			tml.tradeMechanismEnded(this, STATE);
 		}
 	}

@@ -107,14 +107,17 @@ public class BetUtils {
 			ret.setState(BetData.PARTIAL_MATCHED,BetData.SYSTEM);
 		
 		if(bet.getBetStatus()==BetStatusEnum.C)
+		{
 			if(bet.getMatchedSize()>0)  // Never happens otherwise is considered MATCHED, the UNMATCHED part disappears 
 				ret.setState(BetData.PARTIAL_CANCELED,BetData.SYSTEM); 
 			else
 				ret.setState(BetData.CANCELED,BetData.SYSTEM);
-		
+		}
 		
 		if(bet.getBetStatus()==BetStatusEnum.V) //Voided (?)
-			ret.setState(BetData.CANCELED,BetData.SYSTEM);
+			return null;
+			
+		//	ret.setState(BetData.CANCELED,BetData.SYSTEM);
 		//testar os voideds quando o mercado fica suspenso para ver se fica estado Cancelado "C" ou voided "V"
 		
 		//System.out.println("Bet State Number final: "+ret.getState());
@@ -497,16 +500,16 @@ public class BetUtils {
 	}
 	
 	public static void main(String[] args) {
-		OddData od1=new OddData(100, 1, BetData.BACK);
+		OddData od1=new OddData(6.0, 16.67, BetData.BACK);
 		OddData od2=new OddData(10, 0, BetData.BACK);
 		OddData od3=new OddData(100, 1, BetData.LAY);
 		
 		Vector<OddData> odv=new Vector<OddData>();
 		
 		
-		odv.add(od1);
-		odv.add(od2);
-		odv.add(od3);
+		//odv.add(od1);
+		//odv.add(od2);
+		//odv.add(od3);
 		
 		OddData odret=getOpenInfo(odv);
 		System.out.println("Total : "+odret);
@@ -515,9 +518,9 @@ public class BetUtils {
 		//OddData odret2=getGreening(odv,new OddData(40,4,BetData.BACK), 40 );
 		//System.out.println("Close : "+Utils.convertAmountToBF(odret2.getAmount())+" @ "+odret2.getOdd()+ " "+odret2.getType());
 		
-		System.out.println(getGreening(odv,od1,10.00));
+		System.out.println(Utils.convertAmountToBF(getGreening(odv,od1,5.7999).getAmount()));
 		
-		System.out.println(getEquivalent(od3, 10));
+		//System.out.println(getEquivalent(od3, 10));
 	}
 	
 }

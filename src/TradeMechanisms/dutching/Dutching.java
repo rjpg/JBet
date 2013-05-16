@@ -191,7 +191,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 
 
 	@Override
-	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+	public synchronized void  tradeMechanismEnded(TradeMechanism tm, int state) {
 		refresh();
 		
 	}
@@ -332,12 +332,13 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			OddData odBigest=BetUtils.getOpenInfoBetData(droBigestMatch.getOpen().getMatchedInfo());
 			if(odBigest==null)
 			{
-				odBigest=odNow;
+				droBigestMatch=dro;
 			}
 			else if (odNow!=null)
 			{
 				if(odNow.getAmount()*odNow.getOdd()>odBigest.getAmount()*odBigest.getOdd())
-					odBigest=odNow;
+					droBigestMatch=dro;
+					
 			}
 			
 		}
@@ -345,6 +346,9 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 		
 		if(allEnded && !allOpenEndedProcessed)
 		{
+			
+			System.out.println("All OPEN ENDED");
+			
 			allOpenEndedProcessed=true;
 			
 			if(state==0)
@@ -396,6 +400,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 		
 		if(allEnded)
 		{
+			System.out.println("All CLOSED ENDED");
 			setState(TradeMechanism.CLOSED);
 			setI_STATE(I_END);
 			refresh();
@@ -409,6 +414,8 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 		ended=true;
 		
 		informListenersEnd();
+		
+		System.out.println("Dutching All ended");
 		
 		clean();
 	}
