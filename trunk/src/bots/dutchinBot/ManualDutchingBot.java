@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -30,6 +32,7 @@ import GUI.MyChart2D;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.dutching.Dutching;
+import TradeMechanisms.dutching.DutchingRunnerOptions;
 import TradeMechanisms.dutching.DutchingUtils;
 
 public class ManualDutchingBot extends Bot implements TradeMechanismListener{
@@ -52,7 +55,9 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 	private JButton forceClose;
 	private JLabel margin;
 	private JLabel netPL;
-	
+	public static Double[] stakes={1.00,10.00,20.00,30.00,40.00,50.00,70.00,80.00,100.00,200.00,300.00,400.00,500.00,1000.00};
+	public JComboBox<Double> comboStake;
+		
 	
 	public ManualDutchingBot(MarketData md) {
 		super(md,"BotDutching - ");
@@ -75,13 +80,28 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 		actionsPanel.setLayout(new GridLayout(1,2));
 		
 		comboTimeWaitOpen=new JComboBox<Integer>(timeWaitOpen);		
+		comboStake=new JComboBox<Double>(stakes);
 		startButton=new JButton("Start");
 		cancelButton=new JButton("Cancel");
 		forceClose=new JButton("FC");
 		margin=new JLabel("100");
 		netPL=new JLabel("0.00");
 		
+		
+		startButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				msgPanel.writeMessageText("Starting process", Color.BLUE);
+				Vector<DutchingRunnerOptions> vdro=new Vector<DutchingRunnerOptions>();
+				for(DutchingRunnerOptionsPanel drop:vdrop)
+					vdro.add(drop.getDutchingRunnerOptions());
+				duching=new Dutching(vdro, (Double)(comboStake.getSelectedItem()), (Integer)(comboTimeWaitOpen.getSelectedItem()));
+			}
+		});
+		
 		actionsPanel.add(comboTimeWaitOpen);
+		actionsPanel.add(comboStake);
 		actionsPanel.add(startButton);
 		actionsPanel.add(cancelButton);
 		actionsPanel.add(margin);
@@ -97,8 +117,9 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 		frame.getContentPane().add(auxPanel,BorderLayout.CENTER);
 		frame.getContentPane().add(actionsPanel,BorderLayout.SOUTH);
 		
+		frame.setSize(800,400);
 		frame.setVisible(true);
-		
+		newMarket(getMd());
 	}
 	
 	public void update()
@@ -106,7 +127,7 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 		writeMsg("Minutes to start :"+getMinutesToStart(), Color.BLUE);
 		
 		Vector<OddData> vod=new Vector<OddData>();
-		
+		//if(vod.size()==0) return;
 		for(DutchingRunnerOptionsPanel drop:vdrop)
 		{
 			drop.updateOdds();
@@ -114,9 +135,28 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 		}
 		
 		margin.setText(Utils.convertAmountToBF(DutchingUtils.calculateMargin(vod))+"");
-		DutchingUtils.calculateAmounts(vod, 100);
+		DutchingUtils.calculateAmounts(vod, (Double)(comboStake.getSelectedItem()));
 		
-		for(DutchingRunnerOptionsPanel drop:vdrop)
+		double[] pl=DutchingUtils.calculateNetProfitLoss(vod);
+		
+		
+		
+		Vector<OddData> vodbf=new Vector<OddData>();
+		for(OddData od:vod)
+		{
+			vodbf.add(new OddData(od.getOdd(),Utils.convertAmountToBF(od.getAmount())));
+		}
+		
+		double[] plbf=DutchingUtils.calculateNetProfitLoss(vodbf);
+		
+		for(int i=0;i<vdrop.size();i++)
+		{
+			vdrop.get(i).setStake(vod.get(i).getAmount());
+			vdrop.get(i).setNet(pl[i]);
+			vdrop.get(i).setNetBf(plbf[i]);
+		}
+		
+		/*for(DutchingRunnerOptionsPanel drop:vdrop)
 		{
 			for(OddData od:vod)
 			{
@@ -124,7 +164,7 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 					drop.setStake(od.getAmount());
 			}
 		}
-		
+		*/
 		netPL.setText(Utils.convertAmountToBF(DutchingUtils.calculateNetProfitLoss(vod)[0])+"");
 		
 		
@@ -132,6 +172,7 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 		
 	public void newMarket(MarketData md)
 	{
+		System.out.println("*********************************");
 		setMd(md);
 		runnersOptionsPanel.removeAll();
 		runnersOptionsPanel.setLayout(new GridLayout(1,2));

@@ -5,6 +5,7 @@ import generated.exchange.BFExchangeServiceStub.BetStatusEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
 import generated.exchange.BFExchangeServiceStub.CancelBets;
 import generated.exchange.BFExchangeServiceStub.CancelBetsResult;
+import generated.exchange.BFExchangeServiceStub.CancelBetsResultEnum;
 import generated.exchange.BFExchangeServiceStub.MUBet;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsResult;
@@ -854,7 +855,17 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			}
 			else
 			{
-				System.out.println("error:"+betUpdateResult1[i].getResultCode());
+				System.out.println("error update amount:"+betUpdateResult1[i].getResultCode());
+				System.out.println("old size :"+betsUpdAPI1[i].getOldSize());
+				System.out.println("new size :"+betsUpdAPI1[i].getNewSize());
+				
+				System.out.println("old price :"+betsUpdAPI1[i].getOldPrice());
+				System.out.println("new price :"+betsUpdAPI1[i].getNewPrice());
+				
+				
+				betsUpdAPI1[i].setNewSize(Utils.convertAmountToBF(2.0+bds1[i].getAmount()));
+				System.out.println(betUpdateResult1[i].getNewPrice());
+				
 				if(betUpdateResult1[i].getResultCode()==UpdateBetsResultEnum.EVENT_CLOSED_CANNOT_MODIFY_BET)
 				{
 					bds1[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
@@ -976,8 +987,8 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			//System.out.println("ID: "+ bds1[i].getBetID());
 			betsUpdAPI1[i].setBetId(bds1[i].getBetID());
 			
-			betsUpdAPI1[i].setOldSize(bds1[i].getAmount());
-			betsUpdAPI1[i].setNewSize(bds1[i].getAmount());
+			betsUpdAPI1[i].setOldSize(Utils.convertAmountToBF(bds1[i].getAmount()));
+			betsUpdAPI1[i].setNewSize(Utils.convertAmountToBF(bds1[i].getAmount()));
 			
 			//System.out.println("bet:"+BetUtils.printBet(bds1[i]));
 		}
@@ -1054,7 +1065,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			}
 			else
 			{
-				System.out.println("error:"+betUpdateResult1[i].getResultCode());
+				System.out.println("error update odd:"+betUpdateResult1[i].getResultCode());
 				if(betUpdateResult1[i].getResultCode()==UpdateBetsResultEnum.EVENT_CLOSED_CANNOT_MODIFY_BET)
 				{
 					bds1[i].setState(BetData.PLACING_ERROR,BetData.PLACE);
@@ -1147,6 +1158,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 
 	public int cancelBets(Vector<BetData> cancelBets)
 	{
+		System.out.println("Cancel bet was called"); 
 		if(cancelBets.isEmpty()) return 0;
 		CancelBets canc[] = new CancelBets[cancelBets.size()];
 		
@@ -1155,7 +1167,9 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		for(int i=0;i<bds.length;i++)
 		{
 			canc[i]= new CancelBets();
-			if(bds[i].getBetID()==null)
+			//canc[i].setBetId(-1); 
+			
+			if(bds[i].getBetID()==null /*|| (bds[i].getState()!=BetData.UNMATCHED && bds[i].getState()!=BetData.PARTIAL_MATCHED)*/)
 				canc[i].setBetId(-1);     // force to make error of invalid bet ID
 			else
 				canc[i].setBetId(bds[i].getBetID());
@@ -1192,8 +1206,18 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			}
 			else
 			{
-				System.err.println("Failed to cancel bet("+betResult[i].getBetId()+ "): Problem was: "+betResult[i].getResultCode());
-				someNotCancel=true;
+				if(betResult[i].getResultCode()==CancelBetsResultEnum.TAKEN_OR_LAPSED)
+				{
+					//getBetById(ID)
+					System.out.println("Failed to cancel bet("+betResult[i].getBetId()+"taken or lapsed");
+					//bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
+					someNotCancel=true;
+				}
+				else
+				{
+					System.err.println("Failed to cancel bet("+betResult[i].getBetId()+ "): Problem was: "+betResult[i].getResultCode());
+					someNotCancel=true;
+				}
 			}
 		}
 		

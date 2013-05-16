@@ -1,12 +1,18 @@
 package bots.dutchinBot;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import DataRepository.RunnersData;
 import DataRepository.Utils;
@@ -35,6 +41,9 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 	JLabel layOdd=new JLabel();
 	JPanel backLayPanel=new JPanel(); 
 	
+	JLabel net=new JLabel();
+	JLabel netbf=new JLabel();
+	
 	JLabel stake=new JLabel("359.00 €");
 	
 	public DutchingRunnerOptionsPanel(RunnersData rdA) {
@@ -47,11 +56,11 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 	{
 		
 		this.setLayout(new BorderLayout());
-		
+		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		
 		JPanel aux=new JPanel();
-		aux.setLayout(new GridLayout(4,1));
+		aux.setLayout(new GridLayout(7,1));
 		
 		runnerName.setText(getRd().getName());
 		
@@ -63,12 +72,13 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 		openPanel.add(open,BorderLayout.WEST);
 		openPanel.add(comboBestPriceOffset,BorderLayout.EAST);
 		
-		
 		aux.add(runnerName);
 		aux.add(backLayPanel);
 		aux.add(openPanel);
 		aux.add(comboTimeHoldForceClose);
 		aux.add(stake);
+		aux.add(net);
+		aux.add(netbf);
 		
 		this.add(aux,BorderLayout.NORTH);
 		this.add(msgPanel,BorderLayout.CENTER);
@@ -87,7 +97,17 @@ public class DutchingRunnerOptionsPanel extends JPanel {
 	
 	public void setStake(double am)
 	{
-		stake.setText(""+Utils.convertAmountToBF(am)+" @ "+getWorkingOdd());
+		stake.setText(""+Utils.convertAmountToBF(am)+" @ "+getWorkingOdd()+" ("+am+")");
+	}
+	
+	public void setNet(double am)
+	{
+		net.setText("net:"+am);
+	}
+	
+	public void setNetBf(double am)
+	{
+		netbf.setText("net BF:"+Utils.convertAmountToBF(am));
 	}
 	
 	public void updateOdds()

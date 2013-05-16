@@ -10,6 +10,7 @@ import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import bets.BetData;
 import bets.BetManager;
+import bets.BetUtils;
 
 public class OpenPosition extends TradeMechanism implements MarketChangeListener{
 	// States
@@ -108,11 +109,20 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 
 	private void refresh()
 	{
-		System.out.println("refresh.. listeners number :"+listeners.size());
+		//System.out.println("refresh.. listeners number :"+listeners.size());
 		waitFramesNormal--;
 		
 		if(waitFramesNormal<0 && betInProcess!=null )
-			md.getBetManager().cancelBet(betInProcess);
+		{
+			if(betInProcess.getState()==BetData.UNMATCHED || betInProcess.getState()==BetData.PARTIAL_MATCHED)
+			{
+				
+				md.getBetManager().cancelBet(betInProcess);
+				System.out.println("to cancel cancel bet :"+BetUtils.printBet(betInProcess));
+			}
+			
+			System.out.println("NOT cancel bet :"+BetUtils.printBet(betInProcess));
+		}
 		
 		switch (getI_STATE()) {
 		case I_PLACING: placing(); break;
@@ -155,7 +165,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		}
 		else if(betInProcess.getState()==BetData.MATCHED)
 		{
-			//System.out.println("matched");
+			//System.out.println("matched : "+BetUtils.printBet(betInProcess));
 			historyBetsMatched.add(betInProcess);
 			setState(TradeMechanism.OPEN);
 

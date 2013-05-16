@@ -70,11 +70,12 @@ public class DutchingUtils {
 	
 	public static void main(String[] args) {
 		
-		OddData od1=new OddData(3.5, 0, BetData.BACK);
-		OddData od2=new OddData(3.4, 0, BetData.BACK);
-		OddData od3=new OddData(4.5, 0, BetData.BACK);
-		OddData od4=new OddData(7.5, 0, BetData.BACK);
-		OddData od5=new OddData(17, 0, BetData.BACK);
+		OddData od1=new OddData(9.8, 10.21, BetData.BACK);
+		OddData od2=new OddData(5.9, 16.96, BetData.BACK);
+		OddData od3=new OddData(4.4, 22.74, BetData.BACK);
+		OddData od4=new OddData(25, 4, BetData.BACK);
+		OddData od5=new OddData(5.8, 17.25, BetData.BACK);
+		OddData od6=new OddData(3.4, 29.42, BetData.BACK);
 		
 		Vector<OddData> odv=new Vector<OddData>();
 				
@@ -83,10 +84,11 @@ public class DutchingUtils {
 		odv.add(od3);
 		odv.add(od4);
 		odv.add(od5);
+		odv.add(od6);
 		
 		System.out.println(calculateMargin(odv));
 		
-		calculateAmounts(odv, 100);
+		//calculateAmounts(odv, 100);
 		
 		//od5.setAmount(0);
 		double netProfit[]=calculateNetProfitLoss(odv);
@@ -96,11 +98,11 @@ public class DutchingUtils {
 			System.out.println(od+" NET Profit/Loss : "+ netProfit[i++]);
 		
 			
-		od5.setOdd(od5.getOdd()-1);
+		//od5.setOdd(od5.getOdd()-1);
 		
 		System.out.println(calculateMargin(odv));
 		
-		calculateAmounts(odv, 100);
+		//calculateAmounts(odv, 100);
 		
 		//od5.setAmount(0);
 		netProfit=calculateNetProfitLoss(odv);

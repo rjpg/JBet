@@ -324,6 +324,9 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	}
 	
 	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		
+		System.out.println("Listenr end informed");
+		
 		if(TradeMechanismUtils.isTradeMechanismFinalState(state))
 		{
 			System.out.println("Trade mecanism ended in a final state");	

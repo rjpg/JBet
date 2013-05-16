@@ -486,13 +486,13 @@ public class ExchangeAPI {
 
         // Send the request to the Betfair Exchange Service.
         PlaceBetsResp resp =null;
-        //sem.acquire();
+        sem.acquire();
         try {
         	resp = getStub(exch).placeBets(msg).getResult();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        //sem.release();
+        sem.release();
         context.getUsage().addCall("placeBets");
         
         if(resp==null)
@@ -531,13 +531,13 @@ public class ExchangeAPI {
 
         // Send the request to the Betfair Exchange Service.
         UpdateBetsResp resp = null;
-        //sem.acquire();
+        sem.acquire();
         try {
             resp = getStub(exch).updateBets(msg).getResult();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        //sem.release();
+        sem.release();
         context.getUsage().addCall("updateBets");
         
         if(resp==null)
