@@ -325,7 +325,7 @@ public class BetUtils {
 	
 	public static OddData getOpenInfoBetData(Vector<BetData> vbd)
 	{
-		Vector <OddData> vod=new Vector<>();
+		Vector <OddData> vod=new Vector<OddData>();
 		for(BetData bd:vbd)
 		{
 			vod.add(bd.getOddDataMatched());
