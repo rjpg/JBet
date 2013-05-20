@@ -55,8 +55,8 @@ public class NextPreLiveMOTester implements MarketProviderListerner{
 			}
 		 */
 
-		this.setUsername("cocotaxi");
-		this.setPassword("merdamerda0");
+		this.setUsername("birinhos");
+		this.setPassword("6mgprldi777");
 
 
 		// Perform the login before anything else.
