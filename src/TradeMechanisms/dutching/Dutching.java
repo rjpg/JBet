@@ -261,7 +261,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			OddData greening = BetUtils.getGreening(dro.getMatchedInfoOddData(), dro.getOddData(), dro.getActualOdd());
 			if(Utils.convertAmountToBF(greening.getAmount())>0)
 			{
-				BetData bd=new BetData(dro.getRd(), dro.getOddData(),useKeeps);
+				BetData bd=new BetData(dro.getRd(), dro.getOddData(),useKeeps); // (1) use initial odddata to close 
 				betsClose.add(bd);
 			}
 		}
@@ -275,7 +275,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			{
 				if(dro.getRd()==bd.getRd())
 				{
-					ClosePosition close=new ClosePosition(this, bd,1,0,dro.getTimeHoldForceClose(),false);
+					ClosePosition close=new ClosePosition(this, bd,1,0,dro.getTimeHoldForceClose(),false); // using (1) we can parametrize the close
 					dro.setClose(close);
 				}
 			}
@@ -302,7 +302,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 	{
 		
 		// 0 - none matched ( end - do not close nothing)
-		// 1 - some matched but not completed ( do close and recalculate globalstake)
+		// 1 - some matched but not completed ( recalculate globalstake and do close)
 		// 2 - at least one completed matched ( do close)
 		int state=0; 
 		
@@ -394,7 +394,7 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 					allEnded=false;
 			
 			
-				if(dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED || dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED)
+				if(dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED || dro.getClose().getState()==TradeMechanism.CLOSED)
 					setState(TradeMechanism.PARTIAL_CLOSED);
 			}
 		
