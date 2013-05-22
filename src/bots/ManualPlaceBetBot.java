@@ -18,6 +18,7 @@ import TradeMechanisms.TradeMechanismUtils;
 import TradeMechanisms.close.ClosePosition;
 import TradeMechanisms.close.ClosePositionPanel;
 import TradeMechanisms.open.OpenPosition;
+import TradeMechanisms.swing.swingPanel;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
@@ -54,6 +55,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	public BetPanel betPanel2=null;
 	
 	public ClosePositionPanel closePanel=null;
+	public swingPanel swingPanel=null;
 	
 	//---------
 	
@@ -101,7 +103,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	{
 		JPanel placeBetsPanel=new JPanel();
 		
-		placeBetsPanel.setLayout(new GridLayout(3, 1));
+		placeBetsPanel.setLayout(new GridLayout(4, 1));
 		if(betPanel==null)
 		{
 			betPanel= new BetPanel(getMd());
@@ -122,6 +124,13 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		}
 		
 		placeBetsPanel.add(closePanel);
+		
+		if(swingPanel==null)
+		{
+			swingPanel=new swingPanel(getMd());	
+		}
+		
+		placeBetsPanel.add(swingPanel);
 		
 		return placeBetsPanel;
 	}

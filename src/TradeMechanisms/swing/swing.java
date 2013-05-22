@@ -3,47 +3,138 @@ package TradeMechanisms.swing;
 import java.awt.Color;
 import java.util.Vector;
 
+import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.RunnersData;
+import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.dutching.DutchingRunnerOptions;
+import TradeMechanisms.dutching.DutchingUtils;
+import TradeMechanisms.open.OpenPosition;
 import bets.BetData;
 
 public class swing extends TradeMechanism implements TradeMechanismListener{
 
+	private static final int I_OPENING = 0;
+	private static final int I_CLOSING = 1;
+	private static final int I_END = 2;
+	
+	private int I_STATE=I_OPENING;
+	
+	// data
+	private MarketData md;
+	
+	private boolean ended=false;
+	
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	
-	private RunnersData rd;
-	private double stakeSize;
-	private double entryOdd;
+	// args
 	private int waitFramesOpen;
 	private int waitFramesNormal;
 	private int waitFramesBestPrice;
-	private boolean directionBL;
 	private int ticksProfit;
 	private int ticksLoss;
+	private BetData betOpen=null;
+	private boolean forceCloseOnStopLoss=true;
+	// end args
 	
-	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA) {
+	private double closeOdd; 
+	private int ticksLossRelative;
+	
+	private OpenPosition open;
+	private OpenPosition close;
+
+	
+	public swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
+	{
 		super();
 		
-		rd=rdA;
-		stakeSize=stakeSizeA;
-		entryOdd=entryOddA;
+		if(betOpenA==null) return;
+		
+		betOpen=betOpenA;
+		
 		waitFramesOpen=waitFramesOpenA;
 		waitFramesNormal=waitFramesNormalA;
 		waitFramesBestPrice=waitFramesBestPriceA;
-		directionBL=directionBLA;
+		
+		ticksProfit=ticksProfitA;
+		ticksLoss=ticksLossA;
+		
+		forceCloseOnStopLoss=forceCloseOnStopLossA;
+		
+		if(listenerA!=null)
+			addTradeMechanismListener(listenerA);
+		
+		initialize();
+	}
+
+	
+	public swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA) {
+		this(listenerA, betOpenA, waitFramesOpenA,waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA,true);
+	}
+	
+	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
+		super();
+		
+		if(directionBLA)
+			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.BACK,ipKeepA);
+		else
+			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.LAY,ipKeepA);
+		
+		//this(listenerA,betOpen,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA);
+		waitFramesOpen=waitFramesOpenA;
+		waitFramesNormal=waitFramesNormalA;
+		waitFramesBestPrice=waitFramesBestPriceA;
 		ticksProfit=ticksProfitA;
 		ticksLoss=ticksLossA;
 		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 		
+		initialize();
 	}
 	
+	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
+		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true,false);
+	}
 	
+	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA) {
+		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true);
+	}
+		
 	public swing( RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA) {
 		this(null,rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA);
 	}
+	
+	public void initialize()
+	{
+		
+		ticksLossRelative=ticksProfit+ticksLoss;
+		
+		if(betOpen.getType()==BetData.BACK)
+		{
+			closeOdd=Utils.indexToOdd((Utils.oddToIndex( betOpen.getOddRequested())-ticksProfit));
+			if(closeOdd==-1) closeOdd=1.01;
+			
+			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)+ticksLossRelative)));
+		}
+		else
+		{
+			closeOdd=Utils.indexToOdd((Utils.oddToIndex(betOpen.getOddRequested())+ticksProfit));
+			if(closeOdd==-1) closeOdd=1000;
+			
+			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative)));
+		}
+		
+		
+		
+		open();
+		
+		
+	}
+	
+	//--------------------------------- TM --------------------------
 	
 	@Override
 	public void forceClose() {
@@ -89,8 +180,7 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public boolean isEnded() {
-		// TODO Auto-generated method stub
-		return false;
+		return ended;
 	}
 
 	@Override
@@ -98,17 +188,54 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 		// TODO Auto-generated method stub
 		
 	}
+	//--------------------------------- TM END --------------------------
 
+	private void setState(int state)
+	{
+		if(STATE==state) return;
+		
+		STATE=state;
+		
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismChangeState(this, STATE);
+		}
+	}
+	
 	//--------------------- TradeMechanismListener ------------------------
 	@Override
 	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
-		// TODO Auto-generated method stub
+		if(tm==open)
+		{
+			if (state==CRITICAL_ERROR)
+			{
+				setState(CRITICAL_ERROR);
+				setI_STATE(I_END);
+				refresh();
+			}
+			
+			if(state==PARTIAL_OPEN)
+				setState(PARTIAL_OPEN);
+		}
+		
+		if(tm==close)
+		{
+			if (state==TradeMechanism.CRITICAL_ERROR)
+			{
+				setState(CRITICAL_ERROR);
+				setI_STATE(I_END);
+				refresh();
+			}
+			
+			if(state==PARTIAL_CLOSED)
+				setState(PARTIAL_CLOSED);
+		}
 		
 	}
 
 	@Override
 	public void tradeMechanismEnded(TradeMechanism tm, int state) {
-		// TODO Auto-generated method stub
+		refresh();
 		
 	}
 
@@ -118,5 +245,63 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 		
 	}
 	//--------------------- End TradeMechanismListener ------------------------
+	private int getI_STATE() {
+		return I_STATE;
+	}
+
+	private void setI_STATE(int i_STATE) {
+		I_STATE = i_STATE;
+	}
 	
+	private void open()
+	{
+		open=new OpenPosition(this, betOpen, waitFramesOpen);
+	}
+	
+	private void close()
+	{
+		
+	}
+	
+	private void refresh()
+	{
+		switch (getI_STATE()) {
+	        case I_OPENING: processOpen(); break;
+	        case I_CLOSING: processClose(); break;
+	        case I_END    : end(); break;
+	        default: end(); break;
+		}
+		
+	}
+	
+	private void processOpen()
+	{
+		System.out.println("process Open");
+	}
+	
+	private void processClose()
+	{
+		
+	}
+	
+	private void end()
+	{
+		md.removeTradingMechanismTrading(this);
+		
+		ended=true;
+		
+		informListenersEnd();
+		
+		System.out.println("Swing ended");
+		
+		clean();
+	}
+	
+	private void informListenersEnd()
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
 }

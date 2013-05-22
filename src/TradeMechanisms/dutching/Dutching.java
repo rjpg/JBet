@@ -205,11 +205,11 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 
 	//---------------------------------------- implementation
 	
-	public int getI_STATE() {
+	private int getI_STATE() {
 		return I_STATE;
 	}
 
-	public void setI_STATE(int i_STATE) {
+	private void setI_STATE(int i_STATE) {
 		I_STATE = i_STATE;
 	}
 	
