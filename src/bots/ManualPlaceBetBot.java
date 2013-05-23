@@ -8,31 +8,24 @@ import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import main.Manager;
+import DataRepository.MarketChangeListener;
+import DataRepository.MarketData;
+import DataRepository.OddData;
+import DataRepository.RunnersData;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
 import TradeMechanisms.close.ClosePosition;
 import TradeMechanisms.close.ClosePositionPanel;
 import TradeMechanisms.open.OpenPosition;
-import TradeMechanisms.swing.swingPanel;
+import TradeMechanisms.swing.Swing;
+import TradeMechanisms.swing.SwingPanel;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
-
-import nextGoal.BetInterface;
-
-import main.Manager;
-import main.Parameters;
-import DataRepository.MarketChangeListener;
-import DataRepository.MarketData;
-import DataRepository.OddData;
-import DataRepository.RunnersData;
-import DataRepository.Scalping;
-import DataRepository.Swing;
 import correctscore.MessageJFrame;
 
 public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
@@ -44,6 +37,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	private JButton cancelButton=null;
 	private JButton closePositionButton=null;
 	private JButton openPositionButton=null;
+	private JButton swingButton=null;
+	
 	
 	private JButton jumpButton=null;
 	
@@ -55,13 +50,15 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	public BetPanel betPanel2=null;
 	
 	public ClosePositionPanel closePanel=null;
-	public swingPanel swingPanel=null;
+	public SwingPanel swingPanel=null;
 	
 	//---------
 	
 	
 	public BetData bet=null;
 	public BetData bet2=null;
+	
+	public Swing swing;
 	
 	public ManualPlaceBetBot(MarketData md, Manager managerA) {
 		super(md,"Manual Place Bet Bot");
@@ -88,11 +85,12 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			actionsPanel.setLayout(new BorderLayout());
 			
 			JPanel auxPanel=new JPanel();
-			auxPanel.setLayout(new GridLayout(4,1));
+			auxPanel.setLayout(new GridLayout(5,1));
 			auxPanel.add(getPlaceButton());
 			auxPanel.add(getCancelButton());
 			auxPanel.add(getClosePositionButton());
 			auxPanel.add(getOpenPositionButton());
+			auxPanel.add(getSwingButton());
 			actionsPanel.add(auxPanel,BorderLayout.CENTER);
 			
 		}
@@ -127,7 +125,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		
 		if(swingPanel==null)
 		{
-			swingPanel=new swingPanel(getMd());	
+			swingPanel=new SwingPanel(getMd());	
 		}
 		
 		placeBetsPanel.add(swingPanel);
@@ -260,6 +258,42 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		return openPositionButton;
 	}
 	
+	public JButton getSwingButton()
+	{
+		if(swingButton==null)
+		{
+			swingButton=new JButton("Swing");
+			swingButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					msgjf.writeMessageText("Swing caled",Color.BLUE);
+					
+					//swing=new Swing(listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA, ipKeepA)				
+					msgjf.writeMessageText("Market : "+swingPanel.getRunner().getMarketData().getName(),Color.BLACK);
+					msgjf.writeMessageText("Runner : "+swingPanel.getRunner().getName(),Color.BLACK);
+					msgjf.writeMessageText("Entry Stake : "+swingPanel.getStake(),Color.BLACK);
+					msgjf.writeMessageText("Entry Odd : "+swingPanel.getOdd(),Color.BLACK);
+					msgjf.writeMessageText("Frames Open : "+swingPanel.getTimeOpen(),Color.BLACK);
+					msgjf.writeMessageText("Frames Normal Close : "+swingPanel.getTimeClose(),Color.BLACK);
+					msgjf.writeMessageText("Frames Best Price : "+swingPanel.getTimeBestPrice(),Color.BLACK);
+					msgjf.writeMessageText("Direction : "+swingPanel.getBackLay(),Color.BLACK);
+					msgjf.writeMessageText("Ticks Profit : "+swingPanel.getTicksProfit(),Color.BLACK);
+					msgjf.writeMessageText("Ticks Stop Loss : "+swingPanel.getTicksStopLoss(),Color.BLACK);
+					msgjf.writeMessageText("Force Close Stop Loss : "+swingPanel.isforceCloseOnStopLoss(),Color.BLACK);
+					msgjf.writeMessageText("Use Keeps : "+swingPanel.isKeepIP(),Color.BLACK);
+					
+					msgjf.writeMessageText("--------- Open Bet ------------ ",Color.BLACK);
+					msgjf.writeMessageText(BetUtils.printBet(swingPanel.createBetData()),Color.BLACK);
+					
+					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP());
+				}
+			});
+			
+		}
+		return swingButton;
+	}
+	
 	public JButton getJumpButton()
 	{
 		if(jumpButton==null)
@@ -297,6 +331,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			betPanel.reset(getMd());
 			betPanel2.reset(getMd());
 			closePanel.reset(getMd());
+			swingPanel.reset(getMd());
 		}
 		else if( marketEventType==MarketChangeListener.MarketUpdate)
 		{

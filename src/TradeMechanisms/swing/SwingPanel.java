@@ -12,7 +12,7 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import bets.BetData;
 
-public class swingPanel extends JPanel{
+public class SwingPanel extends JPanel{
 
 	public static Double[] stakes={10.00,1.00,2.00,5.00,7.00,20.00,50.00,100.00,200.00,500.00,1000.00};
 	
@@ -22,9 +22,9 @@ public class swingPanel extends JPanel{
 	
 	public static Integer[] timeOpen={0,10,15,20,25,30,35,40,45,50};
 	
-	public static Integer[] timeBestOffer={0,10,15,20,25,30,35,40,45,50};
+	public static Integer[] timeClose={0,10,15,20,25,30,35,40,45,50};
 	
-	public static Integer[] timeForceClose={0,10,15,20,25,30,35,40,45,50};
+	public static Integer[] timeBestPrice={0,10,15,20,25,30,35,40,45,50};
 	
 	public static String[] backLay={"L","B"};
 	
@@ -39,8 +39,8 @@ public class swingPanel extends JPanel{
 	public JComboBox<Integer> comboStopLossTicks;
 	
 	public JComboBox<Integer> comboTimeOpen;
-	public JComboBox<Integer> comboTimeBestOffer;
-	public JComboBox<Integer> comboTimeForceClose;
+	public JComboBox<Integer> comboTimeClose;
+	public JComboBox<Integer> comboTimeBestPrice;
 	
 	public JCheckBox checkIP;
 	
@@ -50,7 +50,7 @@ public class swingPanel extends JPanel{
 	//public Market market = null;
 	public MarketData md =null;
 	
-	public swingPanel(MarketData MDa) {
+	public SwingPanel(MarketData MDa) {
 		super();
 		md=MDa;
 		//market=md.getSelectedMarket();
@@ -79,8 +79,8 @@ public class swingPanel extends JPanel{
 		comboProfitTicks=new JComboBox<Integer>(ticksProfit);
 		comboStopLossTicks=new JComboBox<Integer>(ticksStopLoss);
 		comboTimeOpen=new JComboBox<Integer>(timeOpen);
-		comboTimeBestOffer=new JComboBox<Integer>(timeBestOffer);
-		comboTimeForceClose=new JComboBox<Integer>(timeForceClose);
+		comboTimeClose=new JComboBox<Integer>(timeClose);
+		comboTimeBestPrice=new JComboBox<Integer>(timeBestPrice);
 		
 		this.setLayout(new GridLayout(1, 9));
 		
@@ -92,8 +92,8 @@ public class swingPanel extends JPanel{
 		this.add(comboProfitTicks);
 		this.add(comboStopLossTicks);
 		this.add(comboTimeOpen);
-		this.add(comboTimeBestOffer);
-		this.add(comboTimeForceClose);
+		this.add(comboTimeClose);
+		this.add(comboTimeBestPrice);
 		this.add(forceCloseOnStopLoss);
 		
 			
@@ -169,6 +169,15 @@ public class swingPanel extends JPanel{
 		return (String)comboBackLay.getSelectedItem();
 	}
 	
+	public int getBackLayBetData()
+	{
+		if(getBackLay().equals(backLay[0]))
+			return BetData.LAY;
+		else
+			return BetData.BACK;
+		
+	}
+	
 	
 	public BetData createBetData()
 	{
@@ -199,14 +208,14 @@ public class swingPanel extends JPanel{
 		return (Integer)comboTimeOpen.getSelectedItem();
 	}
 	
-	public int getTimeBestOffer()
+	public int getTimeClose()
 	{
-		return (Integer)comboTimeBestOffer.getSelectedItem();
+		return (Integer)comboTimeClose.getSelectedItem();
 	}
 	
-	public int getTimeForceClose()
+	public int getTimeBestPrice()
 	{
-		return (Integer)comboTimeForceClose.getSelectedItem();
+		return (Integer)comboTimeBestPrice.getSelectedItem();
 	}
 	
 	public boolean isforceCloseOnStopLoss()
@@ -214,6 +223,9 @@ public class swingPanel extends JPanel{
 		return forceCloseOnStopLoss.isSelected();
 	}
 	
-	
+	public boolean isKeepIP()
+	{
+		return checkIP.isSelected();
+	}
 	
 }
