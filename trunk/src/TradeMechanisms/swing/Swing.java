@@ -13,8 +13,9 @@ import TradeMechanisms.dutching.DutchingRunnerOptions;
 import TradeMechanisms.dutching.DutchingUtils;
 import TradeMechanisms.open.OpenPosition;
 import bets.BetData;
+import bets.BetUtils;
 
-public class swing extends TradeMechanism implements TradeMechanismListener{
+public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	private static final int I_OPENING = 0;
 	private static final int I_CLOSING = 1;
@@ -46,13 +47,15 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 	private OpenPosition close;
 
 	
-	public swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
 	{
 		super();
 		
 		if(betOpenA==null) return;
 		
 		betOpen=betOpenA;
+		
+		md=betOpen.getRd().getMarketData();
 		
 		waitFramesOpen=waitFramesOpenA;
 		waitFramesNormal=waitFramesNormalA;
@@ -70,17 +73,19 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 	}
 
 	
-	public swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA) {
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA) {
 		this(listenerA, betOpenA, waitFramesOpenA,waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA,true);
 	}
 	
-	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
 		super();
 		
-		if(directionBLA)
+		if(directionBLA==BetData.BACK)
 			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.BACK,ipKeepA);
 		else
 			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.LAY,ipKeepA);
+		
+		md=betOpen.getRd().getMarketData();
 		
 		//this(listenerA,betOpen,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA);
 		waitFramesOpen=waitFramesOpenA;
@@ -95,15 +100,15 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 		initialize();
 	}
 	
-	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
 		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true,false);
 	}
 	
-	public swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA) {
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA) {
 		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true);
 	}
 		
-	public swing( RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,boolean directionBLA,int ticksProfitA,int ticksLossA) {
+	public Swing( RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA) {
 		this(null,rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA);
 	}
 	
@@ -192,6 +197,7 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 
 	private void setState(int state)
 	{
+		System.out.println("seting state");
 		if(STATE==state) return;
 		
 		STATE=state;
@@ -258,7 +264,7 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 		open=new OpenPosition(this, betOpen, waitFramesOpen);
 	}
 	
-	private void close()
+	private void close(OddData od)
 	{
 		
 	}
@@ -277,6 +283,54 @@ public class swing extends TradeMechanism implements TradeMechanismListener{
 	private void processOpen()
 	{
 		System.out.println("process Open");
+		if(open.isEnded())
+		{
+			System.out.println("process Open has end");
+		
+			if(open.getState()==NOT_OPEN )
+			{
+				setState(NOT_OPEN);
+				System.out.println("Did not Open : "+BetUtils.getOpenInfo(open.getMatchedOddDataVector()));
+				setI_STATE(I_END);
+				refresh();
+				return;
+			} else if(open.getState()==CRITICAL_ERROR)
+			{
+				setState(CRITICAL_ERROR);
+				System.out.println("Did not Open : "+BetUtils.getOpenInfo(open.getMatchedOddDataVector()));
+				setI_STATE(I_END);
+				refresh();
+				return;
+			} else if(open.getState()==UNMONITORED)
+			{
+				setState(UNMONITORED);
+				System.out.println("Did not Open : "+BetUtils.getOpenInfo(open.getMatchedOddDataVector()));
+				setI_STATE(I_END);
+				refresh();
+				return;
+			}else if(open.getState()==PARTIAL_OPEN || open.getState()==OPEN)
+			{
+				setState(OPEN);
+				OddData od=BetUtils.getOpenInfo(open.getMatchedOddDataVector());
+				System.out.println("Open : "+od);
+				if(od!=null)
+					close(BetUtils.getOpenInfo(open.getMatchedOddDataVector()));
+				else
+				{
+					setState(NOT_OPEN);
+					System.out.println("Did not Open : "+od);
+					setI_STATE(I_END);
+					refresh();
+					return;
+				}
+					
+			}
+			
+		}
+		else
+			System.out.println("process Open did not end");
+	
+		
 	}
 	
 	private void processClose()
