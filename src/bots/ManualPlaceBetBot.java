@@ -404,7 +404,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
-		// TODO Auto-generated method stub
+
+		msgjf.writeMessageText(msg,color);
 		
 	}
 
