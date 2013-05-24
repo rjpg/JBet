@@ -349,6 +349,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 			if(betInProcess==null)   // nothing to close
 			{
+				System.out.println("Entrei 1111");
 				setState(TradeMechanism.CLOSED);
 				this.setI_STATE(I_END);
 				refresh();
@@ -434,7 +435,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			return;
 		}
 	
-		System.out.println("XXX"+BetUtils.printBet(betInProcess));
+		//System.out.println("Bet in processs (close position)"+BetUtils.printBet(betInProcess));
 	}
 	
 	private void end()

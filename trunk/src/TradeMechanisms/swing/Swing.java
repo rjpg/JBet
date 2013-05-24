@@ -9,6 +9,8 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.TradeMechanismUtils;
+import TradeMechanisms.close.ClosePosition;
 import TradeMechanisms.dutching.DutchingRunnerOptions;
 import TradeMechanisms.dutching.DutchingUtils;
 import TradeMechanisms.open.OpenPosition;
@@ -44,8 +46,16 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private int ticksLossRelative;
 	
 	private OpenPosition open;
-	private OpenPosition close;
-
+	private ClosePosition close;
+	
+	private BetData betClose=null;
+	
+	private OddData openInfo=null;
+	private OddData closeInfo=null;
+	
+	private Vector<BetData> matchedInfoOpen=null;
+	private Vector<BetData> matchedInfoClose=null;
+	
 	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
 	{
@@ -94,6 +104,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		ticksProfit=ticksProfitA;
 		ticksLoss=ticksLossA;
 		
+		forceCloseOnStopLoss=forceCloseOnStopLossA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 		
@@ -132,8 +144,10 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative)));
 		}
 		
-		
-		
+		writeMsgToListeners("Swing Start in state : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
+		writeMsgToListeners("Swing Entry Odd : "+betOpen.getOddRequested(), Color.BLUE);
+		writeMsgToListeners("Swing Profit Odd : "+closeOdd, Color.BLUE);
+		writeMsgToListeners("Swing StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative)), Color.BLUE);
 		open();
 		
 		
@@ -155,8 +169,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public String getStatisticsFields() {
-		// TODO Auto-generated method stub
-		return null;
+		return "EVENT MARKET RUNNER RUNNER_MATCHED_AMOUNT NUMBER_OF_RUNNERS TIME_TO_START ENTRY_ODD PROFIT_ODD STOPLOSS_ODD TICKS_PROFIT TICKS_LOSS POTENTIAL_PROFIT POTENTIAL_LOSS PROFIT_LOSS TICKS_MOVED";
 	}
 
 	@Override
@@ -179,8 +192,16 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public Vector<BetData> getMatchedInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		Vector<BetData> ret=new Vector<BetData>();
+		if(matchedInfoOpen!=null)
+			for(BetData bd:matchedInfoOpen)
+				ret.add(bd);
+		
+		if(matchedInfoClose!=null)
+			for(BetData bd:matchedInfoClose)
+				ret.add(bd);
+		
+		return ret;
 	}
 
 	@Override
@@ -190,7 +211,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public void clean() {
-		// TODO Auto-generated method stub
+		System.out.println("Swind clean runned");
 		
 	}
 	//--------------------------------- TM END --------------------------
@@ -201,6 +222,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		if(STATE==state) return;
 		
 		STATE=state;
+		
+		writeMsgToListeners("Swing State : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
 		
 		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
 		{
@@ -235,6 +258,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 			
 			if(state==PARTIAL_CLOSED)
 				setState(PARTIAL_CLOSED);
+			
 		}
 		
 	}
@@ -247,7 +271,12 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
-		// TODO Auto-generated method stub
+		if(tm==open)
+			writeMsgToListeners("[OPEN]"+msg, color);
+		else if(tm==close)
+			writeMsgToListeners("[CLOSE]"+msg, color);
+		else
+			writeMsgToListeners(msg, color);
 		
 	}
 	//--------------------- End TradeMechanismListener ------------------------
@@ -264,9 +293,25 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		open=new OpenPosition(this, betOpen, waitFramesOpen);
 	}
 	
-	private void close(OddData od)
+	private void close()
 	{
 		
+		OddData odClose=BetUtils.getEquivalent(openInfo, closeOdd);
+		if(openInfo.getType()==BetData.BACK)
+			odClose.setType(BetData.LAY);
+		else
+			odClose.setType(BetData.BACK);
+		
+		odClose.setRd(betOpen.getRd());
+		
+		System.out.println("closing on : "+odClose+" stop Loss :"+ticksLossRelative);
+		
+		betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
+		
+		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,forceCloseOnStopLoss);
+		
+		setI_STATE(I_CLOSING);
+				
 	}
 	
 	private void refresh()
@@ -311,14 +356,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 			}else if(open.getState()==PARTIAL_OPEN || open.getState()==OPEN)
 			{
 				setState(OPEN);
-				OddData od=BetUtils.getOpenInfo(open.getMatchedOddDataVector());
-				System.out.println("Open : "+od);
-				if(od!=null)
-					close(BetUtils.getOpenInfo(open.getMatchedOddDataVector()));
+				matchedInfoOpen=open.getMatchedInfo();
+				openInfo=BetUtils.getOpenInfo(open.getMatchedOddDataVector());
+				System.out.println("Open : "+openInfo);
+				
+				writeMsgToListeners("Swing Open with : "+openInfo, Color.BLUE);
+				if(openInfo!=null)
+					close();
 				else
 				{
 					setState(NOT_OPEN);
-					System.out.println("Did not Open : "+od);
+					System.out.println("Did not Close : "+openInfo);
 					setI_STATE(I_END);
 					refresh();
 					return;
@@ -335,7 +383,38 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	private void processClose()
 	{
-		
+		System.out.println("process Close");
+		if(close.isEnded())
+		{
+			System.out.println("process Close has end");
+			
+			if(close.getState()==CRITICAL_ERROR)
+			{
+				setState(CRITICAL_ERROR);
+				System.out.println("Did not close : "+BetUtils.getOpenInfo(close.getMatchedOddDataVector()));
+				setI_STATE(I_END);
+				refresh();
+				return;
+			} else if(close.getState()==UNMONITORED)
+			{
+				setState(UNMONITORED);
+				System.out.println("Did not close : "+BetUtils.getOpenInfo(close.getMatchedOddDataVector()));
+				setI_STATE(I_END);
+				refresh();
+				return;
+			}else if(close.getState()==CLOSED)
+			{
+				setState(CLOSED);
+				matchedInfoClose=close.getMatchedInfo();
+				closeInfo=BetUtils.getOpenInfo(close.getMatchedOddDataVector());
+				System.out.println("Did close with : "+closeInfo);
+				writeMsgToListeners("Swing Closed with : "+closeInfo, Color.BLUE);
+				setI_STATE(I_END);
+				refresh();
+				return;
+			}
+			
+		}
 	}
 	
 	private void end()
@@ -344,7 +423,9 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		ended=true;
 		
+		writeMsgToListeners("Swing End in State : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
 		informListenersEnd();
+		
 		
 		System.out.println("Swing ended");
 		
@@ -356,6 +437,14 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
 		{
 			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
+	
+	private void writeMsgToListeners(String msg, Color color)
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismMsg(this, msg, color);
 		}
 	}
 }
