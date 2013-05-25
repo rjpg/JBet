@@ -3,6 +3,8 @@ package TradeMechanisms.swing;
 import java.awt.Color;
 import java.util.Vector;
 
+import sun.swing.SwingUtilities2.Section;
+
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
@@ -44,6 +46,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	private double closeOdd; 
 	private int ticksLossRelative;
+	private double closeOddStopLoss; 
 	
 	private OpenPosition open;
 	private ClosePosition close;
@@ -133,15 +136,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		{
 			closeOdd=Utils.indexToOdd((Utils.oddToIndex( betOpen.getOddRequested())-ticksProfit));
 			if(closeOdd==-1) closeOdd=1.01;
-			
-			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)+ticksLossRelative)));
+						
+			closeOddStopLoss=Utils.indexToOdd((Utils.oddToIndex(closeOdd)+ticksLossRelative));
+			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+closeOddStopLoss);
 		}
 		else
 		{
 			closeOdd=Utils.indexToOdd((Utils.oddToIndex(betOpen.getOddRequested())+ticksProfit));
 			if(closeOdd==-1) closeOdd=1000;
 			
-			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative)));
+			closeOddStopLoss=Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative));
+			System.out.println("Close Odd : "+closeOdd+ "  StopLoss Odd : "+closeOddStopLoss);
 		}
 		
 		writeMsgToListeners("Swing Start in state : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
@@ -169,13 +174,83 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public String getStatisticsFields() {
-		return "EVENT MARKET RUNNER RUNNER_MATCHED_AMOUNT NUMBER_OF_RUNNERS TIME_TO_START ENTRY_ODD PROFIT_ODD STOPLOSS_ODD TICKS_PROFIT TICKS_LOSS POTENTIAL_PROFIT POTENTIAL_LOSS PROFIT_LOSS TICKS_MOVED";
+		return "END_STATE EVENT MARKET RUNNER RUNNER_MATCHED_AMOUNT NUMBER_OF_RUNNERS TIME_TO_START ENTRY_ODD PROFIT_ODD STOPLOSS_ODD DIRECTION TICKS_PROFIT TICKS_LOSS AM POTENTIAL_PROFIT POTENTIAL_LOSS PROFIT_LOSS TICKS_MOVED";
 	}
 
 	@Override
 	public String getStatisticsValues() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String ret=TradeMechanismUtils.getStateString(getState());
+				
+		if(betOpen.getRd().getDataFrames()!=null)
+			ret+=" \""+md.getEventName().replace(" ","_")+"\" \""+md.getName().replace(" ","_")+"\" \""+betOpen.getRd().getName().replace(" ","_")+"\" "+betOpen.getRd().getDataFrames().get(0).getMatchedAmount();
+		else
+			ret+=" \""+md.getEventName().replace(" ","_")+"\" \""+md.getName().replace(" ","_")+"\" \""+betOpen.getRd().getName().replace(" ","_")+"\" "+0;
+		
+		ret+=" "+md.getRunners().size();
+		
+		long nowMin=md.getCurrentTime().getTimeInMillis();
+		long startMin=md.getStart().getTimeInMillis();
+		long sub=startMin-nowMin;
+	
+		int sec_to_start=(int)(sub/1000);
+		
+		ret+=" "+sec_to_start+" "+betOpen.getOddRequested()+" "+closeOdd+" "+closeOddStopLoss;
+		
+		if(betOpen.getType()==BetData.BACK)	
+			ret+=" BL";
+		else
+			ret+=" LB";
+		
+		ret+=" "+ticksProfit+" "+ticksLoss+" "+betOpen.getAmount();
+		
+		double potentialP,potentialL;
+				
+		if(betOpen.getType()==BetData.BACK)
+		{
+			double closeAMP=Utils.closeAmountLay(betOpen.getOddRequested(), betOpen.getAmount(),   closeOdd);
+			potentialP=closeAMP-betOpen.getAmount();
+			
+			double closeAML=Utils.closeAmountLay(betOpen.getOddRequested(), betOpen.getAmount(),  closeOddStopLoss);
+			potentialL=closeAML-betOpen.getAmount();
+			
+			
+		}
+		else
+		{
+			double closeAMP=Utils.closeAmountBack(betOpen.getOddRequested(), betOpen.getAmount(),   closeOdd);
+			potentialP=betOpen.getAmount()-closeAMP;
+			
+			double closeAML=Utils.closeAmountBack(betOpen.getOddRequested(), betOpen.getAmount(),   closeOddStopLoss);
+			potentialL=betOpen.getAmount()-closeAML;
+			
+		
+		}
+		
+		ret+=" "+potentialP+" "+potentialL;
+		
+		if(getState()!=TradeMechanism.CLOSED)
+			return ret+" 0 0";
+		
+		int ticksMoved=0;
+		
+		if(betOpen.getType()==BetData.BACK)
+		{
+			int openIndex=Utils.oddToIndex(Utils.nearValidOdd(openInfo.getOdd()));
+			int closeIndex=Utils.oddToIndex(Utils.nearValidOdd(closeInfo.getOdd()));
+			
+			ticksMoved=openIndex-closeIndex;
+		}
+		else
+		{
+			int openIndex=Utils.oddToIndex(Utils.nearValidOdd(openInfo.getOdd()));
+			int closeIndex=Utils.oddToIndex(Utils.nearValidOdd(closeInfo.getOdd()));
+			
+			ticksMoved=closeIndex-openIndex;
+		}
+		
+		ret+=" "+getEndPL()+" "+ticksMoved;
+		return ret;
 	}
 
 	@Override
@@ -204,6 +279,21 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		return ret;
 	}
 
+	@Override
+	public double getEndPL()
+	{
+		
+		if(openInfo==null || closeInfo==null)
+			return 0.00;
+		else
+		{
+			if(openInfo.getType()==BetData.BACK)
+				return closeInfo.getAmount()-openInfo.getAmount();
+			else
+				return openInfo.getAmount()-closeInfo.getAmount();
+		}
+	}
+	
 	@Override
 	public boolean isEnded() {
 		return ended;

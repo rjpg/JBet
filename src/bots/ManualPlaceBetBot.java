@@ -399,6 +399,24 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			System.out.println("Tm ClosePosition Matched Info : "+BetUtils.getOpenInfo(((ClosePosition)tm).getMatchedOddDataVector()));
 		}
 		
+		if(tm instanceof Swing)
+		{
+			
+			String[] fields=tm.getStatisticsFields().split(" ");
+			String[] values=tm.getStatisticsValues().split(" ");
+			           
+			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+=fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			msgjf.writeMessageText(msg,Color.BLUE);
+			
+		}
+		
 		tm.removeTradeMechanismListener(this);
 	}
 

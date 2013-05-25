@@ -162,6 +162,13 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 	}
 	
 	@Override
+	public double getEndPL()
+	{
+		//TODO
+		return 0.00;
+	}
+	
+	@Override
 	public boolean isEnded() {
 		return ended;
 	}

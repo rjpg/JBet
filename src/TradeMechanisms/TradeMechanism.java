@@ -42,6 +42,8 @@ public abstract class TradeMechanism {
 	
 	public abstract boolean isEnded();
 	
+	public abstract double getEndPL();
+	
 	public abstract void clean();
 	
 }

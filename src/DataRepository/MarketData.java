@@ -82,7 +82,7 @@ public class MarketData {
 	public String name=null;
 	public int id;
 	public Calendar start;
-	public String eventName=null;
+	public String eventName="No Name";
 
 
 	public Calendar currentTime=null;
@@ -1463,7 +1463,7 @@ public class MarketData {
 					String[] sarray=s.split(" ");
 
 
-					name=sarray[2];//.replace(" ", "");
+					name=sarray[2].replace("\"", "");
 					id=Integer.parseInt(sarray[0]);
 
 					start = Calendar.getInstance();
