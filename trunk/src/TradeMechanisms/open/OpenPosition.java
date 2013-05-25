@@ -276,6 +276,12 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	}
 	
 	@Override
+	public double getEndPL()
+	{
+		return 0.00;
+	}
+	
+	@Override
 	public boolean isEnded() {
 		return ended;
 	}

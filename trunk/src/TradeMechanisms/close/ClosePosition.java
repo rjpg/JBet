@@ -208,6 +208,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	}
 	
 	@Override
+	public double getEndPL()
+	{
+		return 0.00;
+	}
+	
+	@Override
 	public boolean isEnded() {
 		return ended;
 	}
