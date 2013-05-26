@@ -1458,12 +1458,32 @@ public class MarketData {
 
 
 					//System.out.println("Playing Market");
+					
+					
+					
 					s=s.substring(1);
-
+					
 					String[] sarray=s.split(" ");
 
+					String rejointMarketEvent="";
+					for(int i=2;i<sarray.length;i++)
+						rejointMarketEvent+=" "+sarray[i];
+						
+					//System.out.println("STRINGGGG"+rejointMarketEvent);
 
-					name=sarray[2].replace("\"", "");
+					String[] sarrayMS=rejointMarketEvent.split("\"");
+					
+					//for(int i=0;i<sarrayMS.length;i++)
+					//	System.out.println("["+i+"]="+sarrayMS[i]);
+					
+					if(sarrayMS.length>=2)
+						name=sarrayMS[1];
+					else
+						name="No Name";
+					
+					if(sarrayMS.length>=4)
+						eventName=sarrayMS[3];
+					
 					id=Integer.parseInt(sarray[0]);
 
 					start = Calendar.getInstance();

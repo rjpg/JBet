@@ -3,8 +3,6 @@ package TradeMechanisms.swing;
 import java.awt.Color;
 import java.util.Vector;
 
-import sun.swing.SwingUtilities2.Section;
-
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
@@ -13,8 +11,6 @@ import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
 import TradeMechanisms.close.ClosePosition;
-import TradeMechanisms.dutching.DutchingRunnerOptions;
-import TradeMechanisms.dutching.DutchingUtils;
 import TradeMechanisms.open.OpenPosition;
 import bets.BetData;
 import bets.BetUtils;
@@ -42,6 +38,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private int ticksLoss;
 	private BetData betOpen=null;
 	private boolean forceCloseOnStopLoss=true;
+	private int updateInterval=TradeMechanism.SYNC_MARKET_DATA_UPDATE;
 	// end args
 	
 	private double closeOdd; 
@@ -59,8 +56,16 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private Vector<BetData> matchedInfoOpen=null;
 	private Vector<BetData> matchedInfoClose=null;
 	
+	// statistics
+	private String eventName="No_Name";
+	private String marketName="No_Name";
+	private double matchedOnRunner=0.0;
+	private int secToStart=0;
+	private int numberOfRunners=0;
+	//---
 	
-	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
+	
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
 	{
 		super();
 		
@@ -79,10 +84,27 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
 		
+		updateInterval=updateIntervalA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 		
+		//statistics init data
+		eventName=md.getEventName();
+		marketName=md.getName();
+		matchedOnRunner=betOpen.getRd().getDataFrames().get(0).getMatchedAmount();
+		long nowMin=md.getCurrentTime().getTimeInMillis();
+		long startMin=md.getStart().getTimeInMillis();
+		long sub=startMin-nowMin;
+		secToStart=(int)(sub/1000);
+		numberOfRunners=md.getRunners().size();
+		
 		initialize();
+	}
+	
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
+	{
+		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 	}
 
 	
@@ -90,7 +112,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		this(listenerA, betOpenA, waitFramesOpenA,waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA,true);
 	}
 	
-	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA) {
 		super();
 		
 		if(directionBLA==BetData.BACK)
@@ -109,10 +131,27 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
 		
+		updateInterval=updateIntervalA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
-		
+	
+		//statistics init data
+		eventName=md.getEventName();
+		marketName=md.getName();
+		matchedOnRunner=betOpen.getRd().getDataFrames().get(0).getMatchedAmount();
+		long nowMin=md.getCurrentTime().getTimeInMillis();
+		long startMin=md.getStart().getTimeInMillis();
+		long sub=startMin-nowMin;
+		secToStart=(int)(sub/1000);
+		numberOfRunners=md.getRunners().size();
+			
 		initialize();
+	}
+		
+	
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
+		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 	}
 	
 	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
@@ -182,20 +221,12 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		String ret=TradeMechanismUtils.getStateString(getState());
 				
-		if(betOpen.getRd().getDataFrames()!=null)
-			ret+=" \""+md.getEventName().replace(" ","_")+"\" \""+md.getName().replace(" ","_")+"\" \""+betOpen.getRd().getName().replace(" ","_")+"\" "+betOpen.getRd().getDataFrames().get(0).getMatchedAmount();
-		else
-			ret+=" \""+md.getEventName().replace(" ","_")+"\" \""+md.getName().replace(" ","_")+"\" \""+betOpen.getRd().getName().replace(" ","_")+"\" "+0;
 		
-		ret+=" "+md.getRunners().size();
+		ret+=" \""+eventName.replace(" ","_")+"\" \""+marketName.replace(" ","_")+"\" \""+betOpen.getRd().getName().replace(" ","_")+"\" "+matchedOnRunner;
 		
-		long nowMin=md.getCurrentTime().getTimeInMillis();
-		long startMin=md.getStart().getTimeInMillis();
-		long sub=startMin-nowMin;
-	
-		int sec_to_start=(int)(sub/1000);
+		ret+=" "+numberOfRunners;
 		
-		ret+=" "+sec_to_start+" "+betOpen.getOddRequested()+" "+closeOdd+" "+closeOddStopLoss;
+		ret+=" "+secToStart+" "+betOpen.getOddRequested()+" "+closeOdd+" "+closeOddStopLoss;
 		
 		if(betOpen.getType()==BetData.BACK)	
 			ret+=" BL";
@@ -380,7 +411,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	private void open()
 	{
-		open=new OpenPosition(this, betOpen, waitFramesOpen);
+		open=new OpenPosition(this, betOpen, waitFramesOpen,updateInterval);
 	}
 	
 	private void close()
@@ -398,7 +429,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
 		
-		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,forceCloseOnStopLoss);
+		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,updateInterval,forceCloseOnStopLoss);
 		
 		setI_STATE(I_CLOSING);
 				

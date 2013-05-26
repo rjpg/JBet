@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.SimpleAttributeSet;
@@ -45,7 +46,12 @@ public class MessagePanel extends JPanel {
 
 	}
 
-	public void writeMessageText(String message, Color type) {
+	public void writeMessageText(final String message, final Color type) {
+		
+		 Runnable  runnable = new Runnable() {
+				
+				@Override
+				public void run() {
 		
 		//msgTextArea.setText("[" + getTimeStamp() + "]: "+msgTextArea.getText()+message+"\n");
 		
@@ -70,6 +76,10 @@ public class MessagePanel extends JPanel {
 		} catch (Exception e) {
 		}
 		
+				}
+			};
+
+		SwingUtilities.invokeLater(runnable);	 
 	
 		
 	}
