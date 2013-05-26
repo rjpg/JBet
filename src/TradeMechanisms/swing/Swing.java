@@ -213,7 +213,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public String getStatisticsFields() {
-		return "END_STATE EVENT MARKET RUNNER RUNNER_MATCHED_AMOUNT NUMBER_OF_RUNNERS TIME_TO_START ENTRY_ODD PROFIT_ODD STOPLOSS_ODD DIRECTION TICKS_PROFIT TICKS_LOSS AM POTENTIAL_PROFIT POTENTIAL_LOSS PROFIT_LOSS TICKS_MOVED";
+		return "END_STATE EVENT MARKET RUNNER RUNNER_MATCHED_AMOUNT NUMBER_OF_RUNNERS TIME_TO_START REQUEST_ODD PROFIT_ODD STOPLOSS_ODD DIRECTION TICKS_PROFIT TICKS_LOSS STAKE POTENTIAL_PROFIT POTENTIAL_LOSS PROFIT_LOSS TICKS_MOVED OPEN_ODD CLOSE_ODD OPEN_STAKE CLOSE_STAKE";
 	}
 
 	@Override
@@ -261,7 +261,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		ret+=" "+potentialP+" "+potentialL;
 		
 		if(getState()!=TradeMechanism.CLOSED)
-			return ret+" 0 0";
+			return ret+" 0 0 0.00 0.00 0.0 0.0";
 		
 		int ticksMoved=0;
 		
@@ -281,6 +281,27 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		}
 		
 		ret+=" "+getEndPL()+" "+ticksMoved;
+		
+		if(openInfo!=null)
+			ret+=" "+openInfo.getOdd();
+		else
+			ret+=" 0.00";
+		
+		if(closeInfo!=null)
+			ret+=" "+closeInfo.getOdd();
+		else
+			ret+=" 0.00";
+		
+		if(openInfo!=null)
+			ret+=" "+openInfo.getAmount();
+		else
+			ret+=" 0.0";
+		
+		if(closeInfo!=null)
+			ret+=" "+closeInfo.getAmount();
+		else
+			ret+=" 0.0";
+		
 		return ret;
 	}
 

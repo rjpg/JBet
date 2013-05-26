@@ -13,6 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import bets.BetData;
+
 import statistics.Statistics;
 
 import main.Parameters;
@@ -21,11 +23,13 @@ import correctscore.MessageJFrame;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import GUI.MyChart2D;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.swing.Swing;
 
-public class InfluenceBot extends Bot {
+public class InfluenceBot extends Bot implements TradeMechanismListener{
 
 	public static boolean USE_ONLY_MOUST_INFLUENCE = false;
 
@@ -37,8 +41,6 @@ public class InfluenceBot extends Bot {
 	public NeighboursCorrelationBot ncBot = null;
 
 	public int runnerPos = 0;
-
-	SwingFrontLine swing = null;
 
 	// visuals reds greens
 	private JPanel actionsPanel = null;
@@ -52,6 +54,8 @@ public class InfluenceBot extends Bot {
 
 	public boolean pauseFlag = false;
 
+	public Swing swing=null;
+	
 	public InfluenceBot(MarketData md, int runnerPosA,
 			NeighboursCorrelationBot ncBotA) {
 		super(md, "InfluenceBot - " + runnerPosA + " - ");
@@ -336,8 +340,12 @@ public class InfluenceBot extends Bot {
 			double oddLay = rd.getDataFrames()
 					.get(rd.getDataFrames().size() - 1).getOddLay();
 			writeMsg("Odd Lay (" + rd.getName() + "):" + oddLay, Color.BLACK);
-			swing = new SwingFrontLine(md, rd, 2.0, oddLay, closeTime, emergencyTime,
-					this, 1, ticksUpA, ticksDownA);
+			
+			swing=new Swing(this,rd, 2.0, oddLay,1,closeTime, emergencyTime ,BetData.LAY,ticksUpA,ticksDownA);
+			
+			//swing = new Swing(md, rd, 2.0, oddLay, closeTime, emergencyTime,
+			//		this, 1, ticksUpA, ticksDownA);
+			
 			// swing=new Swing(md,rd, 0.20, oddLay, 100,80, MecanicBot.this,1,2,
 			// 1); 60,30
 			// scalping=new Scalping(md,rd, 0.20, oddLay, 100,80,
@@ -354,8 +362,10 @@ public class InfluenceBot extends Bot {
 					.get(rd.getDataFrames().size() - 1).getOddBack();
 			writeMsg("Odd back (" + rd.getName() + "):" + oddBak, Color.BLACK);
 
-			swing = new SwingFrontLine(md, rd, 2.0, oddBak, closeTime, emergencyTime,
-					this, -1, ticksUpA, ticksDownA);
+			swing=new Swing(this,rd, 2.0, oddBak,1,closeTime, emergencyTime ,BetData.BACK,ticksDownA,ticksUpA);
+			
+			//swing = new SwingFrontLine(md, rd, 2.0, oddBak, closeTime, emergencyTime,
+			//		this, -1, ticksUpA, ticksDownA);
 
 			// swing=new Swing(md,rd, 0.20, oddBak, 100,80,
 			// MecanicBot.this,-1,1,2);
@@ -372,11 +382,7 @@ public class InfluenceBot extends Bot {
 			clearActivation();
 			setMd(md);
 
-			if (Parameters.simulation) {
-				if (swing != null) {
-					swing.clean();
-				}
-			}
+			
 		}
 
 		if (marketEventType == MarketChangeListener.MarketUpdate) {
@@ -386,11 +392,7 @@ public class InfluenceBot extends Bot {
 				update();
 			}
 
-			if (Parameters.simulation) {
-				if (swing != null) {
-					swing.updateState();
-				}
-			}
+			
 		}
 
 	}
@@ -436,18 +438,40 @@ public class InfluenceBot extends Bot {
 			greenAmountLabel.setText("(" + getAmountGreen() + ")");
 	}
 
+
 	@Override
-	public void setAmountRed(double amountRedA) {
-		super.setAmountRed(amountRedA);
-		if (getMsgFrame() != null)
-			redAmountLabel.setText("(" + getAmountRed() + ")");
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		System.out.println("Tm state : "+tm.getState());
+		
 	}
 
 	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		// TODO Auto-generated method stub
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		if(tm instanceof Swing)
+		{
+			
+			String[] fields=tm.getStatisticsFields().split(" ");
+			String[] values=tm.getStatisticsValues().split(" ");
+			           
+			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+=fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			msgjf.writeMessageText(msg,Color.BLUE);
+			
+		}
+		
+		tm.removeTradeMechanismListener(this);
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		msgjf.writeMessageText(msg,color);
 		
 	}
 

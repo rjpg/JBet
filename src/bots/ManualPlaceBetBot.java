@@ -286,7 +286,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					msgjf.writeMessageText("--------- Open Bet ------------ ",Color.BLACK);
 					msgjf.writeMessageText(BetUtils.printBet(swingPanel.createBetData()),Color.BLACK);
 					
-					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP(),400);
+					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP());
 				}
 			});
 			
@@ -409,7 +409,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			
 			for(int i=0;i<fields.length;i++)
 			{
-				msg+=fields[i]+" : "+values[i]+"\n";
+				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
 			}
 			
 			msg+="------------ || ------------";
@@ -427,13 +427,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		
 	}
 
-	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 
 	

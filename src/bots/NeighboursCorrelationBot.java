@@ -16,7 +16,6 @@ import correctscore.MessageJFrame;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import GUI.MyChart2D;
 
@@ -57,7 +56,6 @@ public class NeighboursCorrelationBot extends Bot{
 	public JLabel neighboursMatrixLabels[][];
 	public JPanel labelsPanel=new JPanel();
 	
-	SwingFrontLine swing=null;
 	
 	private Calendar calendarStart=null; 
 	
@@ -723,13 +721,7 @@ public class NeighboursCorrelationBot extends Bot{
 			clearActivation();
 			setMd(md);
 			
-			if(Parameters.simulation)
-			{
-					if(swing!=null)
-					{
-						swing.clean();
-					}
-			}
+			
 		}
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
@@ -743,13 +735,7 @@ public class NeighboursCorrelationBot extends Bot{
 					update();
 				}
 				
-				if(Parameters.simulation)
-				{
-					if(swing!=null)
-					{
-						swing.updateState();
-					}
-				}
+			
 		}
 		
 		
@@ -768,13 +754,6 @@ public class NeighboursCorrelationBot extends Bot{
 		
 	}
 
-	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 

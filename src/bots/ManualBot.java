@@ -12,6 +12,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import bets.BetData;
+
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.swing.Swing;
+
 import statistics.Statistics;
 
 import main.Manager;
@@ -19,12 +25,9 @@ import main.Parameters;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.Scalping;
-import DataRepository.Swing;
-import DataRepository.SwingFrontLine;
 import correctscore.MessageJFrame;
 
-public class ManualBot extends Bot{
+public class ManualBot extends Bot implements TradeMechanismListener{
 
 	//visuals
 	private JPanel actionsPanel=null;
@@ -48,7 +51,6 @@ public class ManualBot extends Bot{
 	
 	
 	//scalping
-	Scalping scalping=null;
 	Swing swing=null;
 	
 	
@@ -129,7 +131,11 @@ public class ManualBot extends Bot{
 						{
 							double oddLay=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
 							msgjf.writeMessageText("Odd Lay ("+rd.getName()+"):"+oddLay, Color.BLACK);
-							swing=new Swing(md,rd, 2.50, oddLay,100, 50,50, ManualBot.this,1,5,10);
+							
+							swing=new Swing(ManualBot.this,rd, 2.50, oddLay, 100,50, 50,BetData.LAY,10,5);
+							
+							//swing=new Swing(md,rd, 2.50, oddLay,100, 50,50, ManualBot.this,1,5,10);
+							
 							//scalping=new Scalping(md,rd, 0.20, oddLay, 50,50, ManualBot.this,1);
 						}
 					}
@@ -161,7 +167,8 @@ public class ManualBot extends Bot{
 						{
 							double oddBak=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddLay();
 							msgjf.writeMessageText("Odd back ("+rd.getName()+"):"+oddBak, Color.BLACK);
-							swing=new Swing(md,rd, 2.50, oddBak,100, 50,50, ManualBot.this,-1,10,5);
+							swing=new Swing(ManualBot.this,rd, 2.50, oddBak, 100,50, 50,BetData.BACK,10,5);
+							//swing=new Swing(md,rd, 2.50, oddBak,100, 50,50, ManualBot.this,-1,10,5);
 							//scalping=new Scalping(md,rd, 0.20, oddBak, 50,50, ManualBot.this,-1);
 						}
 					}
@@ -289,46 +296,16 @@ public class ManualBot extends Bot{
 			{
 				comboRunners.addItem(rd);
 			}
-			if(Parameters.simulation)
-			{
-					if(scalping!=null)
-					{
-						scalping.clean();
-					}
-					
-					if(swing!=null)
-					{
-						swing.clean();
-					}
-			}
+		
 		}
 		
-		if(Parameters.simulation)
-		{
-			if(marketEventType==MarketChangeListener.MarketUpdate)
-			{
-				if(scalping!=null)
-				{
-					scalping.updateState();
-				}
-				if(swing!=null)
-				{
-					swing.updateState();
-				}
-			}
-		}
-		
+	
 	}
 
 	@Override
 	public void setInTrade(boolean inTrade) {
 		super.setInTrade(inTrade);
-		if(inTrade==false)
-		{
-			//System.out.println("scalping is null now");
-			swing=null;
-			scalping=null;
-		}
+	
 	}
 	@Override
 	public void writeMsg(String s, Color c) {
@@ -362,24 +339,71 @@ public class ManualBot extends Bot{
 		redAmountLabel.setText("("+getAmountRed()+")");
 	}
 
-	//@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-
-		
-		writeMsg("Name:"+rd.getName(), Color.BLACK);
-		writeMsg("R/G:"+redOrGreen, Color.BLACK);
-		writeMsg("U/D:"+entryUpDown, Color.BLACK);
-		writeMsg("Entry Odd:"+entryOdd, Color.BLACK);
-		writeMsg("Exit Odd:"+exitOdd, Color.BLACK);
-		writeMsg("Entry stake:"+stake, Color.BLACK);
-		writeMsg("Exit stake:"+exitStake, Color.BLACK);
-		writeMsg("Amount Made:"+amountMade, Color.BLACK);
-		writeMsg("Ticks Moved:"+ticksMoved, Color.BLACK);
-		
+	
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		System.out.println("Tm state : "+tm.getState());
 		
 	}
+
+	@Override
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		if(tm instanceof Swing)
+		{
+			
+			String[] fields=tm.getStatisticsFields().split(" ");
+			String[] values=tm.getStatisticsValues().split(" ");
+			           
+			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			msgjf.writeMessageText(msg,Color.BLUE);
+			
+			if(values[0].equals("CLOSED"))
+			{
+				
+				
+				double pl=Double.parseDouble(values[16]);
+				
+				
+				if(pl<0)
+				{
+				
+					
+					setReds(getReds()+1);
+					setAmountRed(getAmountRed()+pl);
+				}
+				else
+				{
+					setGreens(getGreens()+1);
+					setAmountGreen(getAmountGreen()+pl);
+				}
+					
+				
+				
+				
+				
+			}
+				
+			
+		}
+		
+		tm.removeTradeMechanismListener(this);
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		msgjf.writeMessageText(msg,color);
+		
+	}
+
+	
 
 	
 	
