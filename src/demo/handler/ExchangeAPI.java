@@ -468,10 +468,6 @@ public class ExchangeAPI {
 	// Place some bets on the market
 	public static PlaceBetsResult[] placeBets(Exchange exch, APIContext context, PlaceBets[] bets) throws Exception {
 		
-		
-		
-
-		
 		// Create a request object
 		PlaceBetsReq request = new PlaceBetsReq();
 		request.setHeader(getHeader(context.getToken()));
@@ -487,12 +483,19 @@ public class ExchangeAPI {
         // Send the request to the Betfair Exchange Service.
         PlaceBetsResp resp =null;
         sem.acquire();
+	        try {
+	        	Thread.sleep(50);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+        sem.release();
+        
         try {
         	resp = getStub(exch).placeBets(msg).getResult();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        sem.release();
+        
         context.getUsage().addCall("placeBets");
         
         if(resp==null)

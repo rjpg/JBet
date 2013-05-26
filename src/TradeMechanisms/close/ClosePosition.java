@@ -45,7 +45,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
-	
+	                   
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA)
 	{
 		super();

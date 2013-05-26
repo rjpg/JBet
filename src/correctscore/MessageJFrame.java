@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.SimpleAttributeSet;
@@ -59,8 +60,14 @@ public class MessageJFrame extends JFrame{
 
 	}
 
-	public void writeMessageText(String message, Color type) {
+	public synchronized void writeMessageText(final String message, final Color type) {
 		
+		 Runnable  runnable = new Runnable() {
+				
+				@Override
+				public void run() {
+				
+			
 		//msgTextArea.setText("[" + getTimeStamp() + "]: "+msgTextArea.getText()+message+"\n");
 		
 		// getMsgTextArea().append(message);
@@ -72,6 +79,11 @@ public class MessageJFrame extends JFrame{
 		attr.addAttribute(ColorConstants.Foreground, type);
 		Document doc = msgTextArea.getDocument();
 		// msgTextArea.setText(msgTextArea.getText()+message+"\n");
+		
+				
+		
+		
+		
 		try {
 			doc.insertString(doc.getLength(), "[" + getTimeStamp() + "]: ",
 					attrTS);
@@ -83,7 +95,11 @@ public class MessageJFrame extends JFrame{
 			msgTextArea.setCaretPosition(doc.getLength());
 		} catch (Exception e) {
 		}
-		
+
+				}
+			};
+
+		SwingUtilities.invokeLater(runnable);	 
 	
 		
 	}

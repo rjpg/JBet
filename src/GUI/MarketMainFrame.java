@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -28,6 +29,8 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 	private boolean initializing=false; 
 	
 	public MarketData md;
+	
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss,SSS");
 	
 	public MarketMainFrame( MarketData mdA) {
 		super(mdA.getName());
@@ -86,11 +89,18 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 		
 		
 		long difmillis=c.getTimeInMillis()-now.getTimeInMillis();
+		
+		
 		Calendar dif=Calendar.getInstance();
 		dif.setTimeInMillis(difmillis);
 		
 		
-		this.setTitle(md.getName()+dif.getTime().toString().split(" ")[3]);
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String timeToStart=dateFormat.format(dif.getTimeInMillis());
+		
+		this.setTitle(timeToStart+" "+md.getName()+ " - "+md.getEventName());
+		
+				//dif.getTime().toString().split(" ")[3]);
 		//////////////////////////////////////////////////////////////////////////////////
 	
 	}
@@ -99,7 +109,7 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 	public void MarketChange(MarketData md) {
 		initializing=true;
 		clean();
-		this.setTitle(md.getName());
+		this.setTitle(md.getName()+ " - "+md.getEventName());
 		
 		for(RunnersData rd:md.getRunners())
 		{
@@ -108,7 +118,6 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 				contentPane.add(nrdb);
 				System.out.println("added "+ rd);
 				contentPane.doLayout();
-		
 		}
 		contentPane.doLayout();
 		initializing=false;
