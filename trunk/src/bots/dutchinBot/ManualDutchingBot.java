@@ -25,7 +25,6 @@ import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnerObj;
 import DataRepository.RunnersData;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import GUI.MessagePanel;
 import GUI.MyChart2D;
@@ -198,16 +197,6 @@ public class ManualDutchingBot extends Bot implements TradeMechanismListener{
 			
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			update();			
-	}
-
-	
-
-	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		
-		
 	}
 
 	@Override

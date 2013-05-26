@@ -117,13 +117,6 @@ public class StudyBot extends Bot{
 		
 	}
 
-	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 }

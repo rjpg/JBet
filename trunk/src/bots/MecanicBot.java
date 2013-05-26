@@ -12,6 +12,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.swing.Swing;
+import bets.BetData;
+
 import statistics.Statistics;
 
 import main.Parameters;
@@ -19,13 +24,10 @@ import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
-import DataRepository.Scalping;
-import DataRepository.Swing;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import correctscore.MessageJFrame;
 
-public class MecanicBot extends Bot{
+public class MecanicBot extends Bot  implements TradeMechanismListener{
 
 	static public int Ticks_to_Consider_Neighbour = 30; 
 	
@@ -63,10 +65,6 @@ public class MecanicBot extends Bot{
 	public MessageJFrame msgjf=null;
 	
 	
-	//scalping
-	Scalping scalping=null;
-	SwingFrontLine swing=null;
-	
 	//Statistics
 	double entryRaceAmaunt=0.0;
 	double horseEntryAmount=0.0;
@@ -81,6 +79,9 @@ public class MecanicBot extends Bot{
 	double exitOdd=0.0;
 	double volumeIncLay=0.0;
 	double volumeIncBack=0.0;
+	
+	//swing
+	public Swing swing;
 	
 	
 	public MecanicBot(MarketData md,int runnerPosA) {
@@ -965,7 +966,11 @@ public class MecanicBot extends Bot{
 			scalpTimeStart=rd.getDataFrames().get(rd.getDataFrames().size()-1).getTimestamp();
 			volumeIncLay = volumeLayEvolutionInWindow();
 			volumeIncBack = volumeBackEvolutionInWindow();
-			swing=new SwingFrontLine(md,rd, stake, oddLay, closeTime,emergencyTime, MecanicBot.this,1,ticksUpA, ticksDownA);
+			
+			swing=new Swing(MecanicBot.this,rd, stake, oddLay, 1,closeTime, emergencyTime ,BetData.LAY,ticksUpA,ticksDownA);
+			
+			//swing=new SwingFrontLine(md,rd, stake, oddLay, closeTime,emergencyTime, MecanicBot.this,1,ticksUpA, ticksDownA);
+			
 			//swing=new Swing(md,rd, 0.20, oddLay,  100,80, MecanicBot.this,1,2, 1);  60,30
 			//scalping=new Scalping(md,rd, 0.20, oddLay, 100,80, MecanicBot.this,1);
 		}
@@ -986,7 +991,9 @@ public class MecanicBot extends Bot{
 			volumeIncLay = volumeLayEvolutionInWindow();
 			volumeIncBack = volumeBackEvolutionInWindow();
 			
-			swing=new SwingFrontLine(md,rd, stake, oddBak, closeTime,emergencyTime, MecanicBot.this,-1,ticksUpA,ticksDownA);
+			swing=new Swing(MecanicBot.this,rd, stake, oddBak, 1,closeTime, emergencyTime ,BetData.BACK,ticksDownA,ticksUpA);
+			
+			//swing=new SwingFrontLine(md,rd, stake, oddBak, closeTime,emergencyTime, MecanicBot.this,-1,ticksUpA,ticksDownA);
 			
 			//swing=new Swing(md,rd, 0.20, oddBak, 100,80, MecanicBot.this,-1,1,2);
 			
@@ -1090,18 +1097,7 @@ public class MecanicBot extends Bot{
 			setMd(md);
 			clearActivation();
 			
-			if(Parameters.simulation)
-			{
-					if(scalping!=null)
-					{
-						scalping.clean();
-					}
-					
-					if(swing!=null)
-					{
-						swing.clean();
-					}
-			}
+			
 		}
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
@@ -1119,19 +1115,7 @@ public class MecanicBot extends Bot{
 					update();
 				}
 			
-			
-			if(Parameters.simulation)
-			{
-				
-				if(scalping!=null)
-				{
-					scalping.updateState();
-				}
-				if(swing!=null)
-				{
-					swing.updateState();
-				}
-			}
+		
 		}
 		
 	}
@@ -1139,12 +1123,7 @@ public class MecanicBot extends Bot{
 	@Override
 	public void setInTrade(boolean inTrade) {
 		super.setInTrade(inTrade);
-		if(inTrade==false)
-		{
-			//System.out.println("scalping is null now");
-			scalping=null;
-			swing=null;
-		}
+		
 	}
 	@Override
 	public void writeMsg(String s, Color c) {
@@ -1183,14 +1162,84 @@ public class MecanicBot extends Bot{
 			redAmountLabel.setText("("+getAmountRed()+")");
 	}
 
-	//@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
+	public void tradeResults(String rd, int redOrGreen, int entryUpDown,
 			double entryOdd, double exitOdd, double stake, double exitStake,
 			double amountMade, int ticksMoved) {
 		
-		Statistics.writeStatistics(entryMinute, entryRaceAmaunt, horseEntryAmount, md.getRunners().size(), clearFavorite, rdFavorite.getName(), scalpTimeStart.getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved*redOrGreen, stake, exitStake , amountMade, getMinutesToStart(), rd.getName(), neighbourDiff, rdNeighbour.getName(),volumeIncBack,volumeIncLay,scalpTimeStart.get(Calendar.DAY_OF_WEEK));
+		Statistics.writeStatistics(entryMinute, entryRaceAmaunt, horseEntryAmount, md.getRunners().size(), clearFavorite, rdFavorite.getName(), scalpTimeStart.getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved*redOrGreen, stake, exitStake , amountMade, getMinutesToStart(), rd, neighbourDiff, rdNeighbour.getName(),volumeIncBack,volumeIncLay,scalpTimeStart.get(Calendar.DAY_OF_WEEK));
 		
 	}
+
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		System.out.println("Tm state : "+tm.getState());
+		
+	}
+
+	@Override
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		if(tm instanceof Swing)
+		{
+			
+			String[] fields=tm.getStatisticsFields().split(" ");
+			String[] values=tm.getStatisticsValues().split(" ");
+			           
+			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			msgjf.writeMessageText(msg,Color.BLUE);
+			
+			if(values[0].equals("CLOSED"))
+			{
+				
+				int ticksMoved=Integer.parseInt(values[17]);
+				double pl=Double.parseDouble(values[16]);
+				int direction=1;
+				if(values[10].equals("BL"))
+					direction=-1;
+				int redOrGreen=1;
+				if(pl<0)
+				{
+					redOrGreen=-1;
+					
+					setReds(getReds()+1);
+					setAmountRed(getAmountRed()+pl);
+				}
+				else
+				{
+					setGreens(getGreens()+1);
+					setAmountGreen(getAmountGreen()+pl);
+				}
+					
+				
+				double entryOdd=Double.parseDouble(values[18]);
+				double exitOdd=Double.parseDouble(values[19]);
+				
+				double entryStake=Double.parseDouble(values[20]);
+				double exitStake=Double.parseDouble(values[21]);
+				
+				tradeResults(values[3], redOrGreen, direction,entryOdd, exitOdd, entryStake, exitStake, pl, ticksMoved);
+				
+			}
+				
+			
+		}
+		
+		tm.removeTradeMechanismListener(this);
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		msgjf.writeMessageText(msg,color);
+		
+	}
+
 	
 	
 }

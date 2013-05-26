@@ -13,7 +13,6 @@ import correctscore.MessageJFrame;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import GUI.MyChart2D;
 
@@ -32,7 +31,7 @@ public int number=5;
 	public MyChart2D chartOdd;
 	int time=0;
 	
-	SwingFrontLine swing=null;
+
 	
 	public BaseOfBot(MarketData md) {
 		super(md,"NeighboursCorrelationBot - ");
@@ -159,13 +158,7 @@ public int number=5;
 			clearActivation();
 			setMd(md);
 			
-			if(Parameters.simulation)
-			{
-					if(swing!=null)
-					{
-						swing.clean();
-					}
-			}
+			
 		}
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
@@ -179,13 +172,7 @@ public int number=5;
 					update();
 				}
 				
-				if(Parameters.simulation)
-				{
-					if(swing!=null)
-					{
-						swing.updateState();
-					}
-				}
+				
 				
 				double odd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(getMd().getRunners().get(0), 0))-2);
 				writeMsg("Odd for runner 0 is:"+odd, Color.BLUE);

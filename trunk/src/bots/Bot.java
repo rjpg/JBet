@@ -23,8 +23,6 @@ public abstract class Bot implements MarketChangeListener{
 	
 	public abstract void writeMsg(String s, Color c);
 	
-	public abstract void tradeResults(RunnersData rd,int redOrGreen, int entryUpDown, double entryOdd, double exitOdd, double stake,double exitStake,double amountMade,int ticksMoved);
-	
 	public boolean inTrade=false;
 	
 	// Bot Info

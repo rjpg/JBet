@@ -14,7 +14,6 @@ import correctscore.MessageJFrame;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.SwingFrontLine;
 import DataRepository.Utils;
 import GUI.MyChart2D;
 
@@ -38,7 +37,6 @@ public class WomNeighboursBot extends Bot {
 	
 	public double globalWom=0;
 	
-	SwingFrontLine swing=null;
 	
 	public WomNeighboursBot(MarketData md, int runnerPosA) {
 		super(md,"WomNeighboursBot - "+runnerPosA+" - ");
@@ -237,14 +235,7 @@ public class WomNeighboursBot extends Bot {
 		{
 			clearActivation();
 			setMd(md);
-			
-			if(Parameters.simulation)
-			{
-					if(swing!=null)
-					{
-						swing.clean();
-					}
-			}
+		
 		}
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
@@ -258,13 +249,7 @@ public class WomNeighboursBot extends Bot {
 					update();
 				}
 				
-				if(Parameters.simulation)
-				{
-					if(swing!=null)
-					{
-						swing.updateState();
-					}
-				}
+			
 		}
 		
 		
@@ -283,13 +268,6 @@ public class WomNeighboursBot extends Bot {
 		
 	}
 
-	@Override
-	public void tradeResults(RunnersData rd, int redOrGreen, int entryUpDown,
-			double entryOdd, double exitOdd, double stake, double exitStake,
-			double amountMade, int ticksMoved) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	
 
