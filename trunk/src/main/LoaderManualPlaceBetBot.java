@@ -16,7 +16,7 @@ public class LoaderManualPlaceBetBot {
 		//CategoriesManager.processAMCatIntervals();
 			
 		Parameters.log=false;  // Log or not to Log when not in replay
-		Parameters.replay=true; 
+		Parameters.replay=false; 
 		Parameters.replay_file_list=false; 
 		Parameters.replay_file_list_test=false; 
 		Parameters.REALISTIC_TIME_REPLAY=false;
@@ -32,7 +32,7 @@ public class LoaderManualPlaceBetBot {
 		Parameters.neighboursCorrelationBot=false;
 		Parameters.neuralDataBot=false; 
 		
-		Parameters.simulation=true;
+		Parameters.simulation=false;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 		Parameters.WOM_DIST_CENTER=5;
 		Parameters.CHART_FRAMES=300;

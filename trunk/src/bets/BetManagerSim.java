@@ -71,7 +71,14 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 		for(BetData bd:place)
 		{
 			bd.setState(BetData.PLACING, BetData.PLACE);
-			
+			try {
+				sem.acquire();
+				bets.add(bd);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sem.release();
 		}
 		
 		  Thread placeBetsThread = new Thread(){
@@ -91,7 +98,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	        placeBetsThread.start();
 	       
 	        
-		
+		 //placeBetsThread(place);
 	}
 	
 	public void placeBetsThread(Vector<BetData> place) {
@@ -317,14 +324,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 			
 			bds[i].setEntryVolume(Utils.getVolumeFrame(bds[i].getRd(), 0, bds[i].getOddRequested()));
 			
-			try {
-				sem.acquire();
-				bets.add(bds[i]);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			sem.release();
+			
 			
 			bds[i].setTimestampPlace(bds[i].getRd().getMarketData().getCurrentTime());
 		

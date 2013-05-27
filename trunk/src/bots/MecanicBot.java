@@ -961,13 +961,13 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 		if(!isInTrade())
 		{
 			writeMsg("Start Processing Scalping UP",Color.BLUE);
-			double oddLay=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddLay();
+			double oddLay=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
 			writeMsg("Odd Lay ("+rd.getName()+"):"+oddLay, Color.BLACK);
 			scalpTimeStart=rd.getDataFrames().get(rd.getDataFrames().size()-1).getTimestamp();
 			volumeIncLay = volumeLayEvolutionInWindow();
 			volumeIncBack = volumeBackEvolutionInWindow();
-			
-			swing=new Swing(MecanicBot.this,rd, stake, oddLay, 1,closeTime, emergencyTime ,BetData.LAY,ticksUpA,ticksDownA);
+			setInTrade(true);
+			swing=new Swing(MecanicBot.this,rd, stake, oddLay, 50,closeTime+50, emergencyTime+50 ,BetData.LAY,ticksUpA+1,ticksDownA+2,true);
 			
 			//swing=new SwingFrontLine(md,rd, stake, oddLay, closeTime,emergencyTime, MecanicBot.this,1,ticksUpA, ticksDownA);
 			
@@ -985,13 +985,13 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 		if(!isInTrade())
 		{
 			writeMsg("Start Processing Scalping DOWN",Color.BLUE);
-			double oddBak=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
+			double oddBak=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddLay();
 			writeMsg("Odd back ("+rd.getName()+"):"+oddBak, Color.BLACK);
 			scalpTimeStart=rd.getDataFrames().get(rd.getDataFrames().size()-1).getTimestamp();
 			volumeIncLay = volumeLayEvolutionInWindow();
 			volumeIncBack = volumeBackEvolutionInWindow();
-			
-			swing=new Swing(MecanicBot.this,rd, stake, oddBak, 1,closeTime, emergencyTime ,BetData.BACK,ticksDownA,ticksUpA);
+			setInTrade(true);
+			swing=new Swing(MecanicBot.this,rd, stake, oddBak, 50,closeTime+50, emergencyTime+50 ,BetData.BACK,ticksDownA+1,ticksUpA+2,true);
 			
 			//swing=new SwingFrontLine(md,rd, stake, oddBak, closeTime,emergencyTime, MecanicBot.this,-1,ticksUpA,ticksDownA);
 			
@@ -1166,7 +1166,7 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 			double entryOdd, double exitOdd, double stake, double exitStake,
 			double amountMade, int ticksMoved) {
 		
-		Statistics.writeStatistics(entryMinute, entryRaceAmaunt, horseEntryAmount, md.getRunners().size(), clearFavorite, rdFavorite.getName(), scalpTimeStart.getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved*redOrGreen, stake, exitStake , amountMade, getMinutesToStart(), rd, neighbourDiff, rdNeighbour.getName(),volumeIncBack,volumeIncLay,scalpTimeStart.get(Calendar.DAY_OF_WEEK));
+		Statistics.writeStatistics(entryMinute, entryRaceAmaunt, horseEntryAmount, md.getRunners().size(), clearFavorite, rdFavorite.getName(), scalpTimeStart.getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved, stake, exitStake , amountMade, getMinutesToStart(), rd, neighbourDiff, rdNeighbour.getName(),volumeIncBack,volumeIncLay,scalpTimeStart.get(Calendar.DAY_OF_WEEK));
 		
 	}
 
@@ -1180,7 +1180,7 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 	public void tradeMechanismEnded(TradeMechanism tm, int state) {
 		if(tm instanceof Swing)
 		{
-			
+			setInTrade(false);
 			String[] fields=tm.getStatisticsFields().split(" ");
 			String[] values=tm.getStatisticsValues().split(" ");
 			           
@@ -1192,7 +1192,7 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 			}
 			
 			msg+="------------ || ------------";
-			msgjf.writeMessageText(msg,Color.BLUE);
+			writeMsg(msg,Color.BLUE);
 			
 			if(values[0].equals("CLOSED"))
 			{
@@ -1236,7 +1236,7 @@ public class MecanicBot extends Bot  implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
-		msgjf.writeMessageText(msg,color);
+		writeMsg(msg,color);
 		
 	}
 
