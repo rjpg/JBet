@@ -1131,13 +1131,26 @@ public class Utils {
 		return ret;
 	}
 	
+	
 	public static double getVolumeFrame(RunnersData rd, int pastFrame,double odd)
 	{
-		if(!rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getVolume().containsKey(odd))
-		{
+		int pastFrameCalc=0;
+		if(rd.getDataFrames() == null || rd.getDataFrames().size()==0)
 			return 0;
-		}
-		return rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getVolume().get(odd);
+		else
+			pastFrameCalc=rd.getDataFrames().size()-1-pastFrame;
+		
+		if (rd.getDataFrames().get(pastFrameCalc)==null
+					|| rd.getDataFrames().get(pastFrameCalc).getVolume() ==null
+					|| !rd.getDataFrames().get(pastFrameCalc).getVolume().containsKey(odd)
+					|| rd.getDataFrames().get(pastFrameCalc).getVolume().get(odd)==null )
+			{
+				return 0;
+			}
+	
+		return rd.getDataFrames().get(pastFrameCalc).getVolume().get(odd);	
+	
+		
 	}
 	
 	public static double[] getVolumeLadderFramePivot(RunnersData rd, int pastFrame,int axisSize, double oddPivot )

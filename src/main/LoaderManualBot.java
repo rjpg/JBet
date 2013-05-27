@@ -15,7 +15,7 @@ public class LoaderManualBot {
 	CategoriesManager.processAMCatIntervals();
 		
 	Parameters.log=false;  // Log or not to Log when not in replay
-	Parameters.replay=false; // replay or read from file
+	Parameters.replay=true; // replay or read from file
 	Parameters.replay_file_list=false; // replay or read from file
 	Parameters.replay_file_list_test=false; 
 	Parameters.REALISTIC_TIME_REPLAY=false;
@@ -26,7 +26,7 @@ public class LoaderManualBot {
 	Parameters.amountBot=false;  // see the amounts
 	Parameters.manualBot=true; // manual bot
 	Parameters.studyBot=false; // manual bot
-	Parameters.neuralBot=true; // manual bot
+	Parameters.neuralBot=false; // manual bot
 	Parameters.neighboursCorrelationBot=false; // use neighbours info
 	Parameters.neuralDataBot=false; // manual bot
 	Parameters.simulation=false;

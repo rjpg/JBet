@@ -201,6 +201,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
+			
 			this.setState(TradeMechanism.UNMONITORED);
 			this.setI_STATE(I_END);
 			end();

@@ -999,7 +999,7 @@ public class NeuralBot extends Bot implements TradeMechanismListener{
 			double entryOdd, double exitOdd, double stake, double exitStake,
 			double amountMade, int ticksMoved) {
 		
-		Statistics.writeStatistics(getMinutesToStart(),cat.getAm(), cat.getAm(), md.getRunners().size(), cat.isFavorite(), rdNeighbour.getName(), Calendar.getInstance().getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved*redOrGreen, stake, exitStake , amountMade, getMinutesToStart(), rd, 0, rdNeighbour.getName(),0,0,getMd().getCurrentTime().get(Calendar.DAY_OF_WEEK));
+		Statistics.writeStatistics(getMinutesToStart(),cat.getAm(), cat.getAm(), md.getRunners().size(), cat.isFavorite(), rdNeighbour.getName(), Calendar.getInstance().getTimeInMillis(), redOrGreen, entryUpDown, entryOdd, exitOdd, ticksMoved, stake, exitStake , amountMade, getMinutesToStart(), rd, 0, rdNeighbour.getName(),0,0,getMd().getCurrentTime().get(Calendar.DAY_OF_WEEK));
 		
 	}
 	

@@ -201,7 +201,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	@Override
 	public void forceClose() {
-		// TODO Auto-generated method stub
+		if(close!=null)
+		{
+			close.forceClose();
+			return;
+		}
+		
+		if(open!=null)
+		{
+			open.forceClose();
+			return;
+		}
 		
 	}
 
