@@ -510,8 +510,20 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				try {
 					if(updateInterval!=BetManager.SYNC_MARKET_DATA_UPDATE)
 					{
-						refresh(); /// connect and get the data
-						System.out.println("Not sync with MarketData");
+						if(!processing)
+						{
+							processing=true;
+							try {
+								refresh(); /// connect and get the data
+							} catch (Exception e) {
+								System.err.println("some error in close mecanism refresh() [ClosePositionThread]");
+								e.printStackTrace();
+							}
+							
+							System.out.println("Not sync with MarketData");
+							processing=false;
+						}
+
 					}
 				
 					//	refreshBets();
@@ -594,13 +606,28 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		System.out.println("Close Position clean runned");
 	}
 
+	boolean processing=false;
 	@Override
 	public void MarketChange(MarketData mdA, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 		{
+			
 			if(isPolling() && updateInterval==TradeMechanism.SYNC_MARKET_DATA_UPDATE)
 			{
-				refresh();
+				if(!processing)
+				{
+					processing=true;
+					try {
+						refresh();
+					} catch (Exception e) {
+						System.err.println("some error in close mecanism refresh() [SYNC_MARKET_DATA_UPDATE]");
+						e.printStackTrace();
+
+					}
+					
+					processing=false;
+				}
+				
 				//System.out.println("Sync with MarketData");
 			}
 		}
