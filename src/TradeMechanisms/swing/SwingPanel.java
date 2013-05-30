@@ -14,13 +14,13 @@ import bets.BetData;
 
 public class SwingPanel extends JPanel{
 
-	public static Double[] stakes={10.00,1.00,2.00,5.00,7.00,20.00,50.00,100.00,200.00,500.00,1000.00};
+	public static Double[] stakes={10.00,1.00,2.00,2.50,5.00,7.00,20.00,50.00,100.00,200.00,500.00,1000.00};
 	
 	public static Integer[] ticksProfit={1,2,3,4,5,6,7,8,9,10};
 	
-	public static Integer[] ticksStopLoss={1,2,3,4,5,6,7,8,9,10};
+	public static Integer[] ticksStopLoss={0,1,2,3,4,5,6,7,8,9,10};
 	
-	public static Integer[] timeOpen={0,10,15,20,25,30,35,40,45,50};
+	public static Integer[] timeOpen={0,10,15,20,25,30,35,40,45,50,Integer.MAX_VALUE};
 	
 	public static Integer[] timeClose={0,10,15,20,25,30,35,40,45,50};
 	
