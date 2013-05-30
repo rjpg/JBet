@@ -459,7 +459,10 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		System.out.println("closing on : "+odClose+" stop Loss :"+ticksLossRelative);
 		
 		betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
-		
+		/////////////debug
+		if(close !=null)
+			System.err.println("Running close for the second time in swing !!!!!!");
+		/////////////
 		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,updateInterval,forceCloseOnStopLoss);
 		
 		setI_STATE(I_CLOSING);
