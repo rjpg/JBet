@@ -1199,7 +1199,10 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			if (betResult[i].getSuccess())
 			{
 				if(BetUtils.fillBetFromAPI(bds[i])!=0)
+				{
 					bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
+					System.err.println("Failed to fill bet("+betResult[i].getBetId()+" \n BetData:"+BetUtils.printBet(bds[i]));
+				}
 				else
 					bds[i].setTransition(BetData.CANCEL);
 				someCancel=true;
@@ -1209,7 +1212,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				if(betResult[i].getResultCode()==CancelBetsResultEnum.TAKEN_OR_LAPSED)
 				{
 					//getBetById(ID)
-					System.out.println("Failed to cancel bet("+betResult[i].getBetId()+"taken or lapsed");
+					System.err.println("Failed to cancel bet("+betResult[i].getBetId()+"taken or lapsed");
 					//bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
 					someNotCancel=true;
 				}

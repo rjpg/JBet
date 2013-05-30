@@ -144,6 +144,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		if(betInProcess.getState()==BetData.NOT_PLACED)
 		{
 			md.getBetManager().placeBet(betInProcess);
+			return;
 		}
 		else if(betInProcess.getState()==BetData.CANCELED )
 		{
@@ -172,16 +173,18 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 			betInProcess=null;
 			this.setI_STATE(I_END);
 			refresh();
+			return;
 		}
 		
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
 			setState(TradeMechanism.PARTIAL_OPEN);
-			
+			return;
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
 			// wait ... (do nothing)
+			return;
 		}
 		else if(betInProcess.getState()==BetData.PLACING_ERROR)
 		{
@@ -197,7 +200,9 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 				betInProcess=new BetData(betOpenInfo.getRd(), betOpenInfo.getAmount(), betOpenInfo.getOddRequested(),betOpenInfo.getType(), betOpenInfo.isKeepInPlay());
 				md.getBetManager().placeBet(betInProcess);
 				refresh();
+				return;
 			}
+			//return;
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
