@@ -363,6 +363,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			}
 			
 			md.getBetManager().placeBet(betInProcess);
+			return;
 		}
 		else if(betInProcess.getState()==BetData.CANCELED )
 		{
@@ -391,6 +392,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 			betInProcess=null;
 			refresh();
+			return;
 		}
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED )
 		{
@@ -403,6 +405,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				refresh(); 
 				return;
 			}
+			return;
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
 		{
@@ -414,6 +417,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				refresh();
 				return;
 			}
+			return;
 		}
 		else if(betInProcess.getState()==BetData.PLACING_ERROR)
 		{
@@ -430,6 +434,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				betInProcess=null;
 				refresh();
 			}
+			return;
 		}
 		else if(betInProcess.getState()==BetData.UNMONITORED)
 		{
