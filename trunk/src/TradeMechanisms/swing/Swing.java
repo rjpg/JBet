@@ -526,7 +526,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 					refresh();
 					return;
 				}
-					
+				return;
 			}
 			
 		}
@@ -570,6 +570,9 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 			}
 			
 		}
+		else
+			System.out.println("process Close did not end");
+	
 	}
 	
 	private void end()
