@@ -30,6 +30,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private BetData betInProcess=null;
 	private double targetOdd=1.01;
 	private boolean ended=false;
+	private boolean isInHedge=false;
 	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
@@ -38,6 +39,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private double oddStopLoss=0;
 	private MarketData md;
 	private boolean forceCloseOnStopLoss=true;
+	private boolean useStopProfifInBestPrice=false;
 	
 	// THREAD
 	private ClosePositionThread as;
@@ -45,8 +47,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
-	                   
-	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA)
+	
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA)
 	{
 		super();
 		
@@ -57,6 +60,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		waitFramesUntilForceClose=waitFramesUntilForceCloseA+2;
 		updateInterval=updateIntervalA;
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
+		useStopProfifInBestPrice=useStopProfifInBestPriceA;
 		
 		//System.out.println("Force : "+forceCloseOnStopLoss);
 		
@@ -82,6 +86,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		md.addTradingMechanismTrading(this);
 		
 		initialize();	
+	}
+	                   
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,false);	
 	}
 	
 	
@@ -266,12 +275,28 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	} 
 	
 
-	private BetData createBetForOdd(double odd)
+	private BetData createBetForOdd()    //arg double odd replaced by targetOdd
 	{
 	
 		Vector<OddData> odv=getMatchedOddDataVector();
 				
-		OddData odMissing=BetUtils.getGreening(odv,betCloseInfo.getOddDataOriginal(),odd);
+		OddData odMissing=BetUtils.getGreening(odv,betCloseInfo.getOddDataOriginal(),targetOdd);
+		
+		if(odMissing.getType()!=betCloseInfo.getType())
+		{
+			if(isInHedge==false)
+			{
+				isInHedge=true;
+				
+				updateTargetOdd();
+			
+				odMissing=BetUtils.getGreening(odv,betCloseInfo.getOddDataOriginal(),targetOdd);
+			}
+		}
+		else
+		{
+			isInHedge=false;
+		}
 		
 		double am=Utils.convertAmountToBF(odMissing.getAmount());
 		if(am==0)
@@ -280,6 +305,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			return new BetData(betCloseInfo.getRd(), odMissing, betCloseInfo.isKeepInPlay());
 		
 	}
+	
+
 	
 	/**
 	 * 
@@ -309,26 +336,54 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void updateTargetOdd()
 	{
-		if(betCloseInfo.getType()==BetData.BACK)
+		
+		if(isInHedge)
 		{
-			if(getActualOdd()<oddStopLoss)
-				forceCloseStopLoss();
+			targetOdd=getBestPrice();
 		}
 		else
 		{
-			if(getActualOdd()>oddStopLoss)
-				forceCloseStopLoss();
-		}
+			if(betCloseInfo.getType()==BetData.BACK)
+			{
+				if(getActualOdd()<oddStopLoss)
+					forceCloseStopLoss();
+			}
+			else
+			{
+				if(getActualOdd()>oddStopLoss)
+					forceCloseStopLoss();
+			}
+				
+			int state = processFrames();
 			
-		int state = processFrames();
-		
-		switch (state) {
-	        case  0: targetOdd=betCloseInfo.getOddRequested(); break;
-	        case  1: targetOdd=getBestPrice(); break;
-	        case -1: targetOdd=getActualOdd(); break;
-	        default: targetOdd=getActualOdd(); break;
+			switch (state) {
+		        case  0: targetOdd=betCloseInfo.getOddRequested(); break;
+		        case  1: {targetOdd=getBestPrice();
+		        		filterTargetOddUsingStopProfifInBestPrice();}
+		        		break;
+		        case -1: targetOdd=getActualOdd(); break;
+		        default: targetOdd=getActualOdd(); break;
+			}
+			
 		}
 
+	}
+	
+	void filterTargetOddUsingStopProfifInBestPrice()
+	{
+		if(useStopProfifInBestPrice)
+		{
+			if(betCloseInfo.getType()==BetData.BACK)
+			{
+				if(targetOdd>betCloseInfo.getOddRequested())
+					targetOdd=betCloseInfo.getOddRequested();
+			}
+			else
+			{
+				if(targetOdd<betCloseInfo.getOddRequested())
+					targetOdd=betCloseInfo.getOddRequested();
+			}
+		}
 	}
 	
 	private void refresh()
@@ -351,7 +406,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		if(betInProcess==null || betInProcess.getState()==BetData.NOT_PLACED)
 		{
 			System.out.println("Entrei 1");
-			betInProcess=createBetForOdd(targetOdd);
+			betInProcess=createBetForOdd();
 			
 			if(betInProcess==null)   // nothing to close
 			{
@@ -401,8 +456,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
-				md.getBetManager().cancelBet(betInProcess);
-				refresh(); 
+				if(md.getBetManager().cancelBet(betInProcess)==0);
+					refresh(); 
+				// else 
+				//	let it call update (when sync with marketData) when cancel return error
+				//  to update bet state using betManegar Update() 
 				return;
 			}
 			return;
@@ -413,8 +471,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
-				md.getBetManager().cancelBet(betInProcess);
-				refresh();
+				if(md.getBetManager().cancelBet(betInProcess)==0);
+					refresh();
 				return;
 			}
 			return;
@@ -636,6 +694,18 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		{
 			this.unmonitored();
 		}
+	}
+
+	@Override
+	public void setPause(boolean pauseA) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isPause() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

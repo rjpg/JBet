@@ -39,6 +39,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private BetData betOpen=null;
 	private boolean forceCloseOnStopLoss=true;
 	private int updateInterval=TradeMechanism.SYNC_MARKET_DATA_UPDATE;
+	private boolean useStopProfifInBestPrice=false;
 	// end args
 	
 	private double closeOdd; 
@@ -65,7 +66,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	//---
 	
 	
-	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA,boolean useStopProfifInBestPriceA)
 	{
 		super();
 		
@@ -86,6 +87,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		updateInterval=updateIntervalA;
 		
+		useStopProfifInBestPrice=useStopProfifInBestPriceA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 		
@@ -102,6 +105,11 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		initialize();
 	}
 	
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
+	{
+		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false);
+	}
+	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
 	{
 		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
@@ -112,7 +120,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		this(listenerA, betOpenA, waitFramesOpenA,waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA,true);
 	}
 	
-	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA) {
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA, boolean useStopProfifInBestPriceA) {
 		super();
 		
 		if(directionBLA==BetData.BACK)
@@ -133,6 +141,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		updateInterval=updateIntervalA;
 		
+		useStopProfifInBestPrice=useStopProfifInBestPriceA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 	
@@ -148,10 +158,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 			
 		initialize();
 	}
-		
 	
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA) {
+		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,updateIntervalA,false);
+	}
+		
 	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
 		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+	}
+	
+	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,boolean useStopProfifInBestPriceA) {
+		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,TradeMechanism.SYNC_MARKET_DATA_UPDATE,useStopProfifInBestPriceA);
 	}
 	
 	public Swing(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
@@ -463,7 +480,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		if(close !=null)
 			System.err.println("Running close for the second time in swing !!!!!!");
 		/////////////
-		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,updateInterval,forceCloseOnStopLoss);
+		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,updateInterval,forceCloseOnStopLoss,useStopProfifInBestPrice);
 		
 		setI_STATE(I_CLOSING);
 				
@@ -604,5 +621,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		{
 			tml.tradeMechanismMsg(this, msg, color);
 		}
+	}
+
+	@Override
+	public void setPause(boolean pauseA) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isPause() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

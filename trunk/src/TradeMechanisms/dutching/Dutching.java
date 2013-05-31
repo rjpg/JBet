@@ -434,5 +434,17 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 			tml.tradeMechanismEnded(this, STATE);
 		}
 	}
+
+	@Override
+	public void setPause(boolean pauseA) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isPause() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 }

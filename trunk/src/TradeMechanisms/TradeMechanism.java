@@ -42,6 +42,10 @@ public abstract class TradeMechanism {
 	
 	public abstract boolean isEnded();
 	
+	public abstract void setPause(boolean pauseA);
+	
+	public abstract boolean isPause();
+	
 	public abstract double getEndPL();
 	
 	public abstract void clean();

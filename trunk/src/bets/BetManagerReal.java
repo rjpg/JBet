@@ -1206,7 +1206,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				if(betResult[i].getResultCode()==CancelBetsResultEnum.TAKEN_OR_LAPSED)
 				{
 					//getBetById(ID)
-					System.err.println("Failed to cancel bet("+betResult[i].getBetId()+"taken or lapsed");
+					System.err.println("Failed to cancel bet("+betResult[i].getBetId()+" taken or lapsed");
 					//bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
 					someNotCancel=true;
 				}
