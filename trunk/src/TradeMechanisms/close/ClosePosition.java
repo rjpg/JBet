@@ -375,12 +375,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		{
 			if(betCloseInfo.getType()==BetData.BACK)
 			{
-				if(targetOdd>betCloseInfo.getOddRequested())
+				if(targetOdd > betCloseInfo.getOddRequested())
 					targetOdd=betCloseInfo.getOddRequested();
 			}
 			else
 			{
-				if(targetOdd<betCloseInfo.getOddRequested())
+				if(targetOdd < betCloseInfo.getOddRequested())
 					targetOdd=betCloseInfo.getOddRequested();
 			}
 		}
