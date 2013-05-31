@@ -286,7 +286,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					msgjf.writeMessageText("--------- Open Bet ------------ ",Color.BLACK);
 					msgjf.writeMessageText(BetUtils.printBet(swingPanel.createBetData()),Color.BLACK);
 					
-					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP());
+					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP(),true);
 				}
 			});
 			

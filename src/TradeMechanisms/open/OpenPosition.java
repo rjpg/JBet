@@ -409,4 +409,16 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		return polling;
 	}
 
+	@Override
+	public void setPause(boolean pauseA) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isPause() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
