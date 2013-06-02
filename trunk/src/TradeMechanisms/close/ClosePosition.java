@@ -31,6 +31,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private double targetOdd=1.01;
 	private boolean ended=false;
 	private boolean isInHedge=false;
+	private boolean processing=false;
+	private boolean forceCloseCalledStopLoss=false;
 	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
@@ -40,6 +42,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private MarketData md;
 	private boolean forceCloseOnStopLoss=true;
 	private boolean useStopProfifInBestPrice=false;
+	
+	// False is not used - to think about it 
+	private boolean goOnfrontInBestPrice=true;
 	
 	// THREAD
 	private ClosePositionThread as;
@@ -152,6 +157,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 
 	public void forceCloseStopLoss() {
+		forceCloseCalledStopLoss=true;
 		if(forceCloseOnStopLoss)
 			forceClose();
 		else
@@ -358,8 +364,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 			switch (state) {
 		        case  0: targetOdd=betCloseInfo.getOddRequested(); break;
-		        case  1: {targetOdd=getBestPrice();
-		        		filterTargetOddUsingStopProfifInBestPrice();}
+		        case  1: {
+		        		targetOdd=getBestPrice();
+		        		filterTargetOddUsingStopProfifInBestPrice();
+		        		filterTargetOddUsingGoOnfrontInBestPrice();
+		        		}
 		        		break;
 		        case -1: targetOdd=getActualOdd(); break;
 		        default: targetOdd=getActualOdd(); break;
@@ -377,11 +386,31 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			{
 				if(targetOdd > betCloseInfo.getOddRequested())
 					targetOdd=betCloseInfo.getOddRequested();
+					
 			}
 			else
 			{
 				if(targetOdd < betCloseInfo.getOddRequested())
 					targetOdd=betCloseInfo.getOddRequested();
+			}
+		}
+	}
+	
+	void filterTargetOddUsingGoOnfrontInBestPrice()
+	{
+		if(goOnfrontInBestPrice && forceCloseCalledStopLoss)
+		{
+			if(betCloseInfo.getType()==BetData.BACK)
+			{
+				double targetOddAux=Utils.indexToOdd((Utils.oddToIndex(getActualOdd())+1));
+				if(targetOddAux!=-1)
+					targetOdd=targetOddAux;
+			}
+			else
+			{
+				double targetOddAux=Utils.indexToOdd((Utils.oddToIndex(targetOdd)-1));
+				if(targetOddAux!=-1)
+					targetOdd=targetOddAux;
 			}
 		}
 	}
@@ -471,8 +500,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 			if(targetOdd!=betInProcess.getOddRequested())
 			{
+				
 				if(md.getBetManager().cancelBet(betInProcess)==0);
+				{
+					System.out.println("Cancel return 0");
 					refresh();
+				}
 				return;
 			}
 			return;
@@ -664,7 +697,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		System.out.println("Close Position clean runned");
 	}
 
-	boolean processing=false;
+	
 	@Override
 	public void MarketChange(MarketData mdA, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)

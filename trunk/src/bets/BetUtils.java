@@ -304,7 +304,7 @@ public class BetUtils {
 		else
 			ret+="Cancel State Time : "+dateFormat.format(new Date(bd.getTimestampCancel().getTimeInMillis()))+"\n";
 		
-		
+		ret+="PassedOnGetMUBetsUpdate : "+bd.isPassedOnGetMUBetsUpdate()+"\n";
 		ret+=" --- --- \n";
 		
 		return ret;

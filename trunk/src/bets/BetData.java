@@ -21,8 +21,8 @@ public class BetData {
 	
 	protected int lastState=BetData.NOT_PLACED;
 	protected int transition=BetData.SYSTEM;
+	protected boolean passedOnGetMUBetsUpdate=false;
 	//----------------------------
-
 	
 	// Transitions
 	public static final int SYSTEM = 0;
@@ -139,7 +139,7 @@ public class BetData {
 		if(BetUtils.isBetFinalState(this.state))
 			setTimestampFinalState(getRd().getMarketData().getCurrentTime());
 		
-		if(this.state == BetData.CANCELED || this.state == BetData.CANCEL_WAIT_UPDATE || this.state == BetData.PARTIAL_CANCELED)
+		if(this.state == BetData.CANCELED || this.state == BetData.PARTIAL_CANCELED)
 			setTimestampCancel(getRd().getMarketData().getCurrentTime());
 	}
 
@@ -268,5 +268,14 @@ public class BetData {
 	{
 		return new OddData(getOddRequested(), getAmount(),getType(),getRd());
 	}
+	
+	protected boolean isPassedOnGetMUBetsUpdate() {
+		return passedOnGetMUBetsUpdate;
+	}
+
+	protected void setPassedOnGetMUBetsUpdate(boolean passedOnGetMUBetsUpdate) {
+		this.passedOnGetMUBetsUpdate = passedOnGetMUBetsUpdate;
+	}
+
 	
 }
