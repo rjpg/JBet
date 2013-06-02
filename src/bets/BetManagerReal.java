@@ -119,9 +119,27 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				
 				if(matched.size()==0 && unmatched.size()==0) //external cancel (without any match)
 				{
-					bd.setState(BetData.CANCELED,BetData.SYSTEM);
+					if(bd.isPassedOnGetMUBetsUpdate())
+						bd.setState(BetData.CANCELED,BetData.SYSTEM);
+					else
+					{
+						if(BetUtils.fillBetFromAPI(bd)!=0)
+						{
+							bd.setState(BetData.CANCEL_WAIT_UPDATE, BetData.SYSTEM);
+							System.err.println("Failed to fill bet("+bd.getBetID()+") \n BetData:"+BetUtils.printBet(bd));
+						}
+					}
 				}
-				else if(matched.size()==0) // unmached
+				else
+				{
+					if(!bd.isPassedOnGetMUBetsUpdate())
+						bd.setPassedOnGetMUBetsUpdate(true);
+				}
+				
+				if(matched.size()==0 && unmatched.size()==0) 
+				{
+					// it has to be here to work with the else if ...TODO review
+				}else if(matched.size()==0) // unmached
 				{
 					// does not do nothing 
 					bd.setState(BetData.UNMATCHED,BetData.SYSTEM);
@@ -363,7 +381,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 
 	}
 	
-	public int placeBetsThread(Vector<BetData> place)
+	private int placeBetsThread(Vector<BetData> place)
 	{
 	
 		
@@ -1154,9 +1172,22 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	{
 		System.out.println("Cancel bet was called"); 
 		if(cancelBets.isEmpty()) return 0;
-		CancelBets canc[] = new CancelBets[cancelBets.size()];
 		
-		BetData[] bds=cancelBets.toArray(new BetData[]{});
+		CancelBets canc[];
+		BetData[] bds;
+		try {
+			sem.acquire();
+			
+			canc = new CancelBets[cancelBets.size()];
+			bds=cancelBets.toArray(new BetData[]{});
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+		sem.release();
+		
 		
 		for(int i=0;i<bds.length;i++)
 		{
@@ -1192,13 +1223,34 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		{
 			if (betResult[i].getSuccess())
 			{
-				if(BetUtils.fillBetFromAPI(bds[i])!=0)
+				if(betResult[i].getSizeMatched()>0.00)
 				{
-					bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
-					System.err.println("Failed to fill bet("+betResult[i].getBetId()+" \n BetData:"+BetUtils.printBet(bds[i]));
+					if(betResult[i].getSizeMatched()>bds[i].getMatchedAmount())
+					{
+						double odds[]={bds[i].getOddMached(),bds[i].getOddRequested()};
+						double amounts[]={bds[i].getMatchedAmount(),betResult[i].getSizeMatched()-bds[i].getMatchedAmount()};
+											
+						bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+						bds[i].setOddMached(Utils.calculateOddAverage(odds, amounts));
+						
+					}
+										
+					bds[i].setState(BetData.PARTIAL_CANCELED, BetData.CANCEL);
 				}
 				else
-					bds[i].setTransition(BetData.CANCEL);
+				{
+					//bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+					bds[i].setState(BetData.CANCELED, BetData.CANCEL);
+				}
+				
+				/*if(BetUtils.fillBetFromAPI(bds[i])!=0)
+				{
+					bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
+					System.err.println("Failed to fill bet("+betResult[i].getBetId()+") \n BetData:"+BetUtils.printBet(bds[i]));
+				}
+				else
+					bds[i].setTransition(BetData.CANCEL);*/
+				
 				someCancel=true;
 			}
 			else
@@ -1207,6 +1259,11 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				{
 					//getBetById(ID)
 					System.err.println("Failed to cancel bet("+betResult[i].getBetId()+" taken or lapsed");
+					if(BetUtils.fillBetFromAPI(bds[i])!=0)
+					{
+						bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
+						System.err.println("Failed to fill bet("+betResult[i].getBetId()+") \n BetData:"+BetUtils.printBet(bds[i]));
+					}
 					//bds[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.CANCEL);
 					someNotCancel=true;
 				}
@@ -1220,10 +1277,11 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		
 		if(someNotCancel==true && someCancel==true)
 			return -2;
-		else if(someCancel==false)
+		
+		if(someCancel==false)
 			return -1;
-		else
-			return 0;
+		
+		return 0;
 	}
 	
 		

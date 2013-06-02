@@ -534,13 +534,23 @@ public class ExchangeAPI {
 
         // Send the request to the Betfair Exchange Service.
         UpdateBetsResp resp = null;
+        
         sem.acquire();
+        try {
+        	Thread.sleep(50);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+        sem.release();
+    
+    
+        //sem.acquire();
         try {
             resp = getStub(exch).updateBets(msg).getResult();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        sem.release();
+        //sem.release();
         context.getUsage().addCall("updateBets");
         
         if(resp==null)

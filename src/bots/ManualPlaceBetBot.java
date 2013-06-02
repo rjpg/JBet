@@ -151,12 +151,12 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					
 					msgjf.writeMessageText("Place pressed",Color.BLUE);
 					bet=betPanel.createBetData();
-					bet2=betPanel2.createBetData();
+					//bet2=betPanel2.createBetData();
 					
 					Vector<BetData> bds=new Vector<BetData>();
 					
 					bds.add(bet);
-					bds.add(bet2);
+					//bds.add(bet2);
 					
 					getMd().getBetManager().placeBets(bds);
 					msgjf.writeMessageText("Place End",Color.BLUE);

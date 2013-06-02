@@ -1301,8 +1301,9 @@ public class Utils {
         		//matrix[l][c]=l+c;
         	}
         
+        System.out.println(convertAmountToBF(2.50));
         
-        System.out.println("AM:"+Utils.closeAmountLay(6.4, 10,   6.2));
+        System.out.println("AM:"+Utils.closeAmountBack(6.0, 2.5,   5.9));
         
         //10.32 @ 6.2 (LAY)  10.32258064516129
         //9.877342419080069 @ 5.87
