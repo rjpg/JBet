@@ -198,8 +198,15 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 			else
 			{
 				betInProcess=new BetData(betOpenInfo.getRd(), betOpenInfo.getAmount(), betOpenInfo.getOddRequested(),betOpenInfo.getType(), betOpenInfo.isKeepInPlay());
-				md.getBetManager().placeBet(betInProcess);
+				
+				// TODO use insistOpen
+				//md.getBetManager().placeBet(betInProcess);
+				//refresh();
+				
+				betInProcess=null;
+				this.setI_STATE(I_END);
 				refresh();
+				
 				return;
 			}
 			//return;

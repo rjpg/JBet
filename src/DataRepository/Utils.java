@@ -1301,7 +1301,7 @@ public class Utils {
         		//matrix[l][c]=l+c;
         	}
         
-        System.out.println(convertAmountToBF(2.50));
+        System.out.println(convertAmountToBF(0.049));
         
         System.out.println("AM:"+Utils.closeAmountBack(6.0, 2.5,   5.9));
         
