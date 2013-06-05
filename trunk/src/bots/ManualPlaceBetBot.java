@@ -304,8 +304,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					so.setGoOnfrontInBestPrice(true);
 					so.setUseStopProfifInBestPrice(true);
 					so.setPercentageOpen(1.00);
-					so.setDelayBetweenOpenClose(10);
-					so.setDelayIgnoreStopLossA(10);
+					so.setDelayBetweenOpenClose(-1);
+					so.setDelayIgnoreStopLoss(-1);
 					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					
 					swing=new Swing(so);

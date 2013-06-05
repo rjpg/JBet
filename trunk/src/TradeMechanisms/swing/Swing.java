@@ -88,7 +88,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 				so.isUseStopProfifInBestPrice(),
 				so.isGoOnfrontInBestPrice(),
 				so.getDelayBetweenOpenClose(),
-				so.getDelayIgnoreStopLossA(),
+				so.getDelayIgnoreStopLoss(),
 				so.getPercentageOpen(),
 				so.isInsistOpen());
 	}

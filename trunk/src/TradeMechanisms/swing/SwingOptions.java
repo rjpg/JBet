@@ -17,7 +17,7 @@ public class SwingOptions {
 	boolean useStopProfifInBestPrice=false;
 	boolean goOnfrontInBestPrice=false;
 	int delayBetweenOpenClose=-1;
-	int delayIgnoreStopLossA=-1;
+	int delayIgnoreStopLoss=-1;
 	double percentageOpen=1.00;
 	boolean insistOpen=false;
 	
@@ -126,12 +126,12 @@ public class SwingOptions {
 		this.delayBetweenOpenClose = delayBetweenOpenClose;
 	}
 
-	public int getDelayIgnoreStopLossA() {
-		return delayIgnoreStopLossA;
+	public int getDelayIgnoreStopLoss() {
+		return delayIgnoreStopLoss;
 	}
 
-	public void setDelayIgnoreStopLossA(int delayIgnoreStopLossA) {
-		this.delayIgnoreStopLossA = delayIgnoreStopLossA;
+	public void setDelayIgnoreStopLoss(int delayIgnoreStopLossA) {
+		this.delayIgnoreStopLoss = delayIgnoreStopLossA;
 	}
 
 	public double getPercentageOpen() {
