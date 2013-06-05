@@ -29,6 +29,8 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	private BetData betOpenInfo=null;
 	private MarketData md;
+	private boolean insistOpen=false;
+	private double percentageOpen=1.00;
 
 	// THREAD
 	private OpenPositionThread as;
@@ -36,9 +38,17 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	protected int updateInterval = 500;
 	private boolean polling = false;
 
-
-
-	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA, int updateIntervalA) {
+	public OpenPosition(OpenPositionOptions opo)
+	{
+		this(opo.getDefaultListener(),
+				opo.getBetOpenInfo(),
+				opo.getWaitFrames(), 
+				opo.getUpdateInterval(),
+				opo.isInsistOpen(),
+				opo.percentageOpen);
+	}
+	
+	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA, int updateIntervalA,boolean insistOpenA,double percentageOpenA) {
 		super();
 
 		if(botA!=null)
@@ -47,6 +57,8 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		betOpenInfo=betOpenInfoA;
 		waitFramesNormal=waitFramesNormalA;
 		updateInterval=updateIntervalA;
+		insistOpen=insistOpenA;
+		percentageOpen=percentageOpenA;
 
 		md=betOpenInfoA.getRd().getMarketData();
 
@@ -54,6 +66,10 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 
 		initialize();
 
+	}
+
+	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA, int updateIntervalA) {
+		this(botA, betOpenInfoA, waitFramesNormalA, TradeMechanism.SYNC_MARKET_DATA_UPDATE,false,1.00);
 	}
 
 	public OpenPosition(TradeMechanismListener botA,BetData betOpenInfoA, int waitFramesNormalA) {
@@ -179,6 +195,16 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 		else if(betInProcess.getState()==BetData.PARTIAL_MATCHED)
 		{
 			setState(TradeMechanism.PARTIAL_OPEN);
+			if(percentageOpen<0.99)
+			{
+				if(betInProcess.getMatchedAmount()>(betInProcess.getAmount()*percentageOpen))
+				{
+						md.getBetManager().cancelBet(betInProcess);
+						refresh();
+						return;
+				}
+			}
+				
 			return;
 		}
 		else if(betInProcess.getState()==BetData.UNMATCHED)
@@ -197,17 +223,22 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 			} 
 			else
 			{
-				betInProcess=new BetData(betOpenInfo.getRd(), betOpenInfo.getAmount(), betOpenInfo.getOddRequested(),betOpenInfo.getType(), betOpenInfo.isKeepInPlay());
-				
-				// TODO use insistOpen
-				//md.getBetManager().placeBet(betInProcess);
-				//refresh();
-				
-				betInProcess=null;
-				this.setI_STATE(I_END);
-				refresh();
-				
-				return;
+
+				if(insistOpen==true)
+				{
+					betInProcess=new BetData(betOpenInfo.getRd(), betOpenInfo.getAmount(), betOpenInfo.getOddRequested(),betOpenInfo.getType(), betOpenInfo.isKeepInPlay());
+					md.getBetManager().placeBet(betInProcess);
+					refresh();
+					return;
+				}
+				else
+				{
+					betInProcess=null;
+					this.setI_STATE(I_END);
+					refresh();
+					return;
+				}
+
 			}
 			//return;
 		}
