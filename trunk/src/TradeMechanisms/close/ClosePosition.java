@@ -46,19 +46,36 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	// False is not used - to think about it 
 	private boolean goOnfrontInBestPrice=true;
 	
+	private int startDelay=-1;
+	
+	private int ignoreStopLossDelay=-1;
+	
 	// THREAD
 	private ClosePositionThread as;
 	private Thread t;
 	protected int updateInterval = 500;
 	private boolean polling = false;
 	
+	public ClosePosition(ClosePositionOptions cpo)
+	{
+		this(cpo.getDefaultListener(),
+				cpo.getBetCloseInfo(),
+				cpo.getStopLossTicks(),
+				cpo.getWaitFramesNormal(),
+				cpo.getWaitFramesUntilForceClose(),
+				cpo.getUpdateInterval(),
+				cpo.isForceCloseOnStopLoss(),
+				cpo.isUseStopProfifInBestPrice(),
+				cpo.isGoOnfrontInBestPrice(),
+				cpo.getStartDelay(),
+				cpo.getIgnoreStopLossDelay());
+		
+	}
 	
-	
-	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA)
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA, int startDelayA,int ignoreStopLossDelayA)
 	{
 		super();
-		
-		
+
 		betCloseInfo=betCloseInfoA;
 		stopLossTicks=stopLossTicksA;
 		waitFramesNormal=waitFramesNormalA-1;
@@ -66,6 +83,9 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		updateInterval=updateIntervalA;
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
 		useStopProfifInBestPrice=useStopProfifInBestPriceA;
+		goOnfrontInBestPrice=goOnfrontInBestPriceA;
+		startDelay=startDelayA;
+		ignoreStopLossDelay=ignoreStopLossDelayA;
 		
 		//System.out.println("Force : "+forceCloseOnStopLoss);
 		
@@ -84,21 +104,36 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			
 		System.out.println("Stop loss Odd:"+oddStopLoss);
 		
-		addTradeMechanismListener(botA);
+		if(botA!=null)
+			addTradeMechanismListener(botA);
 		
 		md=betCloseInfoA.getRd().getMarketData();
 		
 		md.addTradingMechanismTrading(this);
 		
-		initialize();	
+		initialize();
+
+	}
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA, int startDelayA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,useStopProfifInBestPriceA,goOnfrontInBestPriceA,-1,-1);
+	}
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,useStopProfifInBestPriceA,goOnfrontInBestPriceA,-1);
+	}
+	
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA)
+	{
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,useStopProfifInBestPriceA,false);
 	}
 	                   
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA)
 	{
 		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,false);	
 	}
-	
-	
 	
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA)
 	{
@@ -157,6 +192,13 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 
 	public void forceCloseStopLoss() {
+		
+		if(ignoreStopLossDelay>0)
+		{
+			ignoreStopLossDelay--;
+			return;
+		}
+		
 		forceCloseCalledStopLoss=true;
 		if(forceCloseOnStopLoss)
 			forceClose();
@@ -417,6 +459,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void refresh()
 	{
+		
+		if(startDelay>0)
+		{
+			startDelay--;
+			return;
+		}
 		
 		updateTargetOdd();
 		

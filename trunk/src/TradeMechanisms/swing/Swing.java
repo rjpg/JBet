@@ -11,7 +11,9 @@ import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
 import TradeMechanisms.close.ClosePosition;
+import TradeMechanisms.close.ClosePositionOptions;
 import TradeMechanisms.open.OpenPosition;
+import TradeMechanisms.open.OpenPositionOptions;
 import bets.BetData;
 import bets.BetUtils;
 
@@ -40,6 +42,13 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private boolean forceCloseOnStopLoss=true;
 	private int updateInterval=TradeMechanism.SYNC_MARKET_DATA_UPDATE;
 	private boolean useStopProfifInBestPrice=false;
+	
+	private boolean goOnfrontInBestPrice=false;
+	private int delayBetweenOpenClose=-1;
+	private int delayIgnoreStopLoss=-1;
+	
+	private double percentageOpen=1.00;
+	private boolean insistOpen=false;
 	// end args
 	
 	private double closeOdd; 
@@ -66,7 +75,25 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	//---
 	
 	
-	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA,boolean useStopProfifInBestPriceA)
+	public Swing(SwingOptions so) {
+		this(so.getDefaultListener(),
+				so.getBetOpenInfo(),
+				so.getWaitFramesOpen(),
+				so.getWaitFramesNormal(),
+				so.getWaitFramesBestPrice(),
+				so.getTicksProfit(),
+				so.getTicksLoss(),
+				so.isForceCloseOnStopLoss(),
+				so.getUpdateInterval(),
+				so.isUseStopProfifInBestPrice(),
+				so.isGoOnfrontInBestPrice(),
+				so.getDelayBetweenOpenClose(),
+				so.getDelayIgnoreStopLossA(),
+				so.getPercentageOpen(),
+				so.isInsistOpen());
+	}
+	
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA,boolean useStopProfifInBestPriceA, boolean goOnfrontInBestPriceA, int delayBetweenOpenCloseA,int delayIgnoreStopLossA, double percentageOpenA, boolean insistOpenA)
 	{
 		super();
 		
@@ -89,6 +116,12 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		
 		useStopProfifInBestPrice=useStopProfifInBestPriceA;
 		
+		goOnfrontInBestPrice=goOnfrontInBestPriceA;
+		delayBetweenOpenClose=delayBetweenOpenCloseA;
+		delayIgnoreStopLoss=delayIgnoreStopLossA;
+		percentageOpen=percentageOpenA; 
+		insistOpen=insistOpenA;
+		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
 		
@@ -107,7 +140,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
 	{
-		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false);
+		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false,false,-1,-1, 1.00, false);
 	}
 	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
@@ -459,7 +492,13 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	private void open()
 	{
-		open=new OpenPosition(this, betOpen, waitFramesOpen,updateInterval);
+		OpenPositionOptions opo=new OpenPositionOptions(betOpen,this);
+		opo.setWaitFrames(waitFramesOpen);
+		opo.setUpdateInterval(updateInterval);
+		opo.setPercentageOpen(percentageOpen);
+		opo.setInsistOpen(insistOpen);
+		
+		open=new OpenPosition(opo);
 	}
 	
 	private void close()
@@ -480,7 +519,19 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		if(close !=null)
 			System.err.println("Running close for the second time in swing !!!!!!");
 		/////////////
-		close=new ClosePosition(this,betClose,ticksLossRelative,waitFramesNormal,waitFramesBestPrice,updateInterval,forceCloseOnStopLoss,useStopProfifInBestPrice);
+		
+		ClosePositionOptions cpo=new ClosePositionOptions(betClose, this);
+		cpo.setStopLossTicks(ticksLossRelative);
+		cpo.setWaitFramesNormal(waitFramesNormal);
+		cpo.setWaitFramesUntilForceClose(waitFramesBestPrice);
+		cpo.setUpdateInterval(updateInterval);
+		cpo.setForceCloseOnStopLoss(forceCloseOnStopLoss);
+		cpo.setUseStopProfifInBestPrice(useStopProfifInBestPrice);
+		cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
+		cpo.setStartDelay(delayBetweenOpenClose);
+		cpo.setIgnoreStopLossDelay(delayIgnoreStopLoss);
+		
+		close=new ClosePosition(cpo);
 		
 		setI_STATE(I_CLOSING);
 				
