@@ -22,6 +22,7 @@ import TradeMechanisms.close.ClosePosition;
 import TradeMechanisms.close.ClosePositionPanel;
 import TradeMechanisms.open.OpenPosition;
 import TradeMechanisms.swing.Swing;
+import TradeMechanisms.swing.SwingOptions;
 import TradeMechanisms.swing.SwingPanel;
 import bets.BetData;
 import bets.BetPanel;
@@ -286,7 +287,29 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					msgjf.writeMessageText("--------- Open Bet ------------ ",Color.BLACK);
 					msgjf.writeMessageText(BetUtils.printBet(swingPanel.createBetData()),Color.BLACK);
 					
-					swing=new Swing(ManualPlaceBetBot.this,swingPanel.getRunner(), swingPanel.getStake(), swingPanel.getOdd(), swingPanel.getTimeOpen(),swingPanel.getTimeClose(), swingPanel.getTimeBestPrice(),swingPanel.getBackLayBetData(),swingPanel.getTicksProfit(),swingPanel.getTicksStopLoss(), swingPanel.isforceCloseOnStopLoss(), swingPanel.isKeepIP(),true);
+					BetData betOpen=new BetData(swingPanel.getRunner(),
+							swingPanel.getStake(),
+							swingPanel.getOdd(),
+							swingPanel.getBackLayBetData(),
+							swingPanel.isKeepIP());
+					
+					SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
+					so.setWaitFramesOpen(swingPanel.getTimeOpen());
+					so.setWaitFramesNormal(swingPanel.getTimeClose());
+					so.setWaitFramesBestPrice(swingPanel.getTimeBestPrice());
+					so.setTicksProfit(swingPanel.getTicksProfit());
+					so.setTicksLoss(swingPanel.getTicksStopLoss());
+					so.setForceCloseOnStopLoss(swingPanel.isforceCloseOnStopLoss());
+					so.setInsistOpen(false);
+					so.setGoOnfrontInBestPrice(true);
+					so.setUseStopProfifInBestPrice(true);
+					so.setPercentageOpen(1.00);
+					so.setDelayBetweenOpenClose(10);
+					so.setDelayIgnoreStopLossA(10);
+					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+					
+					swing=new Swing(so);
+					
 				}
 			});
 			
