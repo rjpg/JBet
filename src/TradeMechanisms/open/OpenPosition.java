@@ -1,5 +1,6 @@
 package TradeMechanisms.open;
 
+import java.awt.Color;
 import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
@@ -24,6 +25,7 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 	private BetData betInProcess;
 	private Vector<BetData> historyBetsMatched=new Vector<BetData>();
 	private boolean ended=false;
+	private boolean pause=false;
 	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
@@ -125,6 +127,8 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 
 	private void refresh()
 	{
+		if (pause) return;
+		
 		//System.out.println("refresh.. listeners number :"+listeners.size());
 		waitFramesNormal--;
 		
@@ -449,14 +453,24 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 
 	@Override
 	public void setPause(boolean pauseA) {
-		// TODO Auto-generated method stub
+		pause=pauseA;
+		
+		writeMsgToListeners("OpenPosition setPause() was called with :"+pause, Color.BLUE);
 		
 	}
 
 	@Override
 	public boolean isPause() {
-		// TODO Auto-generated method stub
-		return false;
+		return pause;
+	}
+	
+	private void writeMsgToListeners(String msg, Color color)
+	{
+		if(listeners!=null)
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismMsg(this, msg, color);
+		}
 	}
 
 }

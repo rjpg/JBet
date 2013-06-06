@@ -1,5 +1,6 @@
 package TradeMechanisms.close;
 
+import java.awt.Color;
 import java.util.Vector;
 
 import DataRepository.MarketChangeListener;
@@ -33,6 +34,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private boolean isInHedge=false;
 	private boolean processing=false;
 	private boolean forceCloseCalledStopLoss=false;
+	private boolean pause=false; 
 	
 	// this
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
@@ -47,7 +49,6 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private boolean goOnfrontInBestPrice=true;
 	
 	private int startDelay=-1;
-	
 	private int ignoreStopLossDelay=-1;
 	
 	// THREAD
@@ -459,6 +460,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	private void refresh()
 	{
+		if (pause) return;
 		
 		if(startDelay>0)
 		{
@@ -779,18 +781,24 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 
 	@Override
 	public void setPause(boolean pauseA) {
-		// TODO Auto-generated method stub
-		
+		pause=pauseA;
+		writeMsgToListeners("ClosePosition setPause() was called with :"+pause, Color.BLUE);
 	}
 
 	@Override
 	public boolean isPause() {
-		// TODO Auto-generated method stub
-		return false;
+		return pause;
 	}
 
 
-
+	private void writeMsgToListeners(String msg, Color color)
+	{
+		if(listeners!=null)
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismMsg(this, msg, color);
+		}
+	}
 	
 
 }
