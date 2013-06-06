@@ -40,6 +40,9 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	private JButton openPositionButton=null;
 	private JButton swingButton=null;
 	
+	private JButton pauseswingButton=null;
+	private boolean pause=false;
+	
 	
 	private JButton jumpButton=null;
 	
@@ -59,7 +62,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	public BetData bet=null;
 	public BetData bet2=null;
 	
-	public Swing swing;
+	public Vector<Swing> swings=new Vector<Swing>();
 	
 	public ManualPlaceBetBot(MarketData md, Manager managerA) {
 		super(md,"Manual Place Bet Bot");
@@ -86,12 +89,13 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			actionsPanel.setLayout(new BorderLayout());
 			
 			JPanel auxPanel=new JPanel();
-			auxPanel.setLayout(new GridLayout(5,1));
+			auxPanel.setLayout(new GridLayout(6,1));
 			auxPanel.add(getPlaceButton());
 			auxPanel.add(getCancelButton());
 			auxPanel.add(getClosePositionButton());
 			auxPanel.add(getOpenPositionButton());
 			auxPanel.add(getSwingButton());
+			auxPanel.add(getPauseButton());
 			actionsPanel.add(auxPanel,BorderLayout.CENTER);
 			
 		}
@@ -303,18 +307,61 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					so.setInsistOpen(false);
 					so.setGoOnfrontInBestPrice(true);
 					so.setUseStopProfifInBestPrice(true);
-					so.setPercentageOpen(1.00);
+					so.setPercentageOpen(0.80);   // if 80% is open go to close  
 					so.setDelayBetweenOpenClose(-1);
 					so.setDelayIgnoreStopLoss(-1);
 					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					
-					swing=new Swing(so);
+					Swing swing=new Swing(so);
+					
+					swings.add(swing);
 					
 				}
 			});
 			
 		}
 		return swingButton;
+	}
+	
+	public JButton getPauseButton()
+	{
+		if(pauseswingButton== null)
+		{
+			if(pause==true)
+				pauseswingButton=new JButton("Continue");
+			else
+				pauseswingButton=new JButton("Pause");
+			
+			pauseswingButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					pause=!pause;
+					
+					if(pause==true)
+						pauseswingButton.setText("Continue");
+					else
+						pauseswingButton.setText("Pause");
+					
+					for(Swing s:swings)
+					{
+						if(pause==true)
+						{
+							if(s.getState()==TradeMechanism.OPEN || 
+									s.getState()==TradeMechanism.PARTIAL_OPEN ||
+									s.getState()==TradeMechanism.PARTIAL_CLOSED)
+								s.setPause(pause);
+						}
+						else
+						{
+							s.setPause(pause);
+						}
+					}
+					
+				}
+			});
+		}
+		return pauseswingButton;
 	}
 	
 	public JButton getJumpButton()

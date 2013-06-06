@@ -66,6 +66,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	private Vector<BetData> matchedInfoOpen=null;
 	private Vector<BetData> matchedInfoClose=null;
 	
+	private boolean pause=false;
+	
 	// statistics
 	private String eventName="No_Name";
 	private String marketName="No_Name";
@@ -676,13 +678,17 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 
 	@Override
 	public void setPause(boolean pauseA) {
-		// TODO Auto-generated method stub
+		
+		pause=pauseA;
+		
+		if(open!=null) open.setPause(pauseA);
+		if(close!=null) close.setPause(pauseA);
+		
 		
 	}
 
 	@Override
 	public boolean isPause() {
-		// TODO Auto-generated method stub
-		return false;
+		return pause;
 	}
 }
