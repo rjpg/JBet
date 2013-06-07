@@ -451,7 +451,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 			}
 			else
 			{
-				double targetOddAux=Utils.indexToOdd((Utils.oddToIndex(targetOdd)-1));
+				double targetOddAux=Utils.indexToOdd((Utils.oddToIndex(getActualOdd())-1));
 				if(targetOddAux!=-1)
 					targetOdd=targetOddAux;
 			}

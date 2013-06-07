@@ -243,7 +243,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		writeMsgToListeners("Swing Start in state : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
 		writeMsgToListeners("Swing Entry Odd : "+betOpen.getOddRequested(), Color.BLUE);
 		writeMsgToListeners("Swing Profit Odd : "+closeOdd, Color.BLUE);
-		writeMsgToListeners("Swing StopLoss Odd : "+Utils.indexToOdd((Utils.oddToIndex(closeOdd)-ticksLossRelative)), Color.BLUE);
+		writeMsgToListeners("Swing StopLoss Odd : "+closeOddStopLoss, Color.BLUE);
 		open();
 		
 		
