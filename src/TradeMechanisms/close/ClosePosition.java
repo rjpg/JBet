@@ -43,7 +43,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private double oddStopLoss=0;
 	private MarketData md;
 	private boolean forceCloseOnStopLoss=true;
-	private boolean useStopProfifInBestPrice=false;
+	private boolean useStopProfitInBestPrice=false;
 	
 	// False is not used - to think about it 
 	private boolean goOnfrontInBestPrice=true;
@@ -66,7 +66,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				cpo.getWaitFramesUntilForceClose(),
 				cpo.getUpdateInterval(),
 				cpo.isForceCloseOnStopLoss(),
-				cpo.isUseStopProfifInBestPrice(),
+				cpo.isUseStopProfitInBestPrice(),
 				cpo.isGoOnfrontInBestPrice(),
 				cpo.getStartDelay(),
 				cpo.getIgnoreStopLossDelay());
@@ -83,7 +83,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		waitFramesUntilForceClose=waitFramesUntilForceCloseA+2;
 		updateInterval=updateIntervalA;
 		forceCloseOnStopLoss=forceCloseOnStopLossA;
-		useStopProfifInBestPrice=useStopProfifInBestPriceA;
+		useStopProfitInBestPrice=useStopProfifInBestPriceA;
 		goOnfrontInBestPrice=goOnfrontInBestPriceA;
 		startDelay=startDelayA;
 		ignoreStopLossDelay=ignoreStopLossDelayA;
@@ -423,7 +423,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	
 	void filterTargetOddUsingStopProfifInBestPrice()
 	{
-		if(useStopProfifInBestPrice)
+		if(useStopProfitInBestPrice)
 		{
 			if(betCloseInfo.getType()==BetData.BACK)
 			{

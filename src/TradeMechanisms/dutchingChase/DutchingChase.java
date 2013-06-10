@@ -13,17 +13,21 @@ public class DutchingChase extends TradeMechanism{
 	
 	private Vector<DutchingChaseOptions> dco;
 	
-	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcoA ) {
+	private double globalStake;
+	
+	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcoA, double globalStakeA ) {
 		if(bot!=null)
 			addTradeMechanismListener(bot);
 		
 		dco=dcoA;
 		
+		globalStake=globalStakeA;
+		
 		initialize();
 	}
 	
-	public DutchingChase(Vector<DutchingChaseOptions> dcoA ) {
-		this(null,dcoA);
+	public DutchingChase(Vector<DutchingChaseOptions> dcoA, double globalStakeA ) {
+		this(null,dcoA,globalStakeA);
 	}
 	
 	private void initialize()

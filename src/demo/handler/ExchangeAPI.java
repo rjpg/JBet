@@ -419,9 +419,9 @@ public class ExchangeAPI {
 			request.setMarketId(marketId);
 		}
         request.setBetStatus(BetStatusEnum.MU);
-        request.setSortOrder(SortOrderEnum.ASC);
-        request.setOrderBy(BetsOrderByEnum.BET_ID);
-        request.setRecordCount(1000);
+        request.setSortOrder(SortOrderEnum.DESC);
+        request.setOrderBy(BetsOrderByEnum.PLACED_DATE);
+        request.setRecordCount(500);
         request.setStartRecord(0);
 
         // Create the message and attach the request to it.
