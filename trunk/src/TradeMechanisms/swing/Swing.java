@@ -528,7 +528,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		cpo.setWaitFramesUntilForceClose(waitFramesBestPrice);
 		cpo.setUpdateInterval(updateInterval);
 		cpo.setForceCloseOnStopLoss(forceCloseOnStopLoss);
-		cpo.setUseStopProfifInBestPrice(useStopProfifInBestPrice);
+		cpo.setUseStopProfitInBestPrice(useStopProfifInBestPrice);
 		cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
 		cpo.setStartDelay(delayBetweenOpenClose);
 		cpo.setIgnoreStopLossDelay(delayIgnoreStopLoss);

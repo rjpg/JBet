@@ -13,7 +13,7 @@ public class ClosePositionOptions {
 	int waitFramesUntilForceClose=10;
 	int updateInterval=TradeMechanism.SYNC_MARKET_DATA_UPDATE;
 	boolean forceCloseOnStopLoss=true;
-	boolean useStopProfifInBestPrice=false;
+	boolean useStopProfitInBestPrice=false;
 	boolean goOnfrontInBestPrice=false;
 	int startDelay=-1;
 	int ignoreStopLossDelay=-1;
@@ -87,12 +87,12 @@ public class ClosePositionOptions {
 		this.forceCloseOnStopLoss = forceCloseOnStopLoss;
 	}
 
-	public boolean isUseStopProfifInBestPrice() {
-		return useStopProfifInBestPrice;
+	public boolean isUseStopProfitInBestPrice() {
+		return useStopProfitInBestPrice;
 	}
 
-	public void setUseStopProfifInBestPrice(boolean useStopProfifInBestPrice) {
-		this.useStopProfifInBestPrice = useStopProfifInBestPrice;
+	public void setUseStopProfitInBestPrice(boolean useStopProfifInBestPrice) {
+		this.useStopProfitInBestPrice = useStopProfifInBestPrice;
 	}
 
 	public boolean isGoOnfrontInBestPrice() {
