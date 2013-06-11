@@ -101,6 +101,15 @@ public class BetData {
 		this.keepInPlay=keepIP;
 	}
 	
+	public BetData (OddData od,boolean keepIP)
+	{
+		this.rd=od.getRd();
+		this.amount=od.getAmount();
+		this.oddRequested=od.getOdd();
+		this.type=od.getType();
+		this.keepInPlay=keepIP;
+	}
+	
 	public int getType() {
 		return type;
 	}
