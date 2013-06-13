@@ -4,26 +4,38 @@ import java.awt.Color;
 import java.util.Vector;
 
 import bets.BetData;
+import DataRepository.MarketData;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.dutching.DutchingRunnerOptions;
 
-public class DutchingChase extends TradeMechanism{
+public class DutchingChase extends TradeMechanism implements TradeMechanismListener{
 
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	
-	private Vector<DutchingChaseOptions> dco;
-	
+	//args
+	private Vector<DutchingChaseOptions> dcov;
 	private double globalStake;
 	
-	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcoA, double globalStakeA ) {
+	//dynamic vars
+	private boolean ended=false;
+	private boolean pause=false;
+	
+	private MarketData md;
+	
+	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcovA, double globalStakeA ) {
 		if(bot!=null)
 			addTradeMechanismListener(bot);
 		
-		dco=dcoA;
+		dcov=dcovA;
 		
 		globalStake=globalStakeA;
 		
 		initialize();
+	}
+	
+	public DutchingChase(Vector<DutchingChaseOptions> dcoA) {
+		this(null,dcoA,0.00);
 	}
 	
 	public DutchingChase(Vector<DutchingChaseOptions> dcoA, double globalStakeA ) {
@@ -32,18 +44,28 @@ public class DutchingChase extends TradeMechanism{
 	
 	private void initialize()
 	{
+		md=dcov.get(0).getBetCloseInfo().getRd().getMarketData();
+		md.addTradingMechanismTrading(this);
 		
 	}
 	
+	
+	//----------------start tradeMechanism ----------------
 	@Override
 	public void forceClose() {
-		// TODO Auto-generated method stub
+		for(DutchingChaseOptions dco:dcov)
+		{
+			dco.getClose().forceClose();
+		}
 		
 	}
 
 	@Override
 	public void forceCancel() {
-		// TODO Auto-generated method stub
+		for(DutchingChaseOptions dco:dcov)
+		{
+			dco.getClose().forceCancel();
+		}
 		
 	}
 
@@ -72,26 +94,39 @@ public class DutchingChase extends TradeMechanism{
 
 	@Override
 	public Vector<BetData> getMatchedInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		Vector<BetData> ret=new Vector<BetData>();
+		
+		for(DutchingChaseOptions dco:dcov)
+		{
+			for (BetData bd:dco.getClose().getMatchedInfo())
+				ret.add(bd);
+		}
+		
+		return ret; 
 	}
 
 	@Override
 	public boolean isEnded() {
-		// TODO Auto-generated method stub
-		return false;
+		return ended;
 	}
 
 	@Override
 	public void setPause(boolean pauseA) {
-		// TODO Auto-generated method stub
+		if(pauseA==pause) return;
+		
+		pause=pauseA;
+		
+		for(DutchingChaseOptions dco:dcov)
+		{
+			dco.getClose().setPause(pause);
+		}
+		
 		
 	}
 
 	@Override
 	public boolean isPause() {
-		// TODO Auto-generated method stub
-		return false;
+		return pause;
 	}
 
 	@Override
@@ -106,12 +141,95 @@ public class DutchingChase extends TradeMechanism{
 		
 	}
 
+	//----------------end tradeMechanism ----------------
+	
+	
+	private void setState(int state)
+	{
+		if(STATE==CRITICAL_ERROR) return;
+		
+		if(STATE==state) return;
+		
+		STATE=state;
+		
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismChangeState(this, STATE);
+		}
+	}
 	private void writeMsgToListeners(String msg, Color color)
 	{
 		if(listeners!=null)
-		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
 		{
-			tml.tradeMechanismMsg(this, msg, color);
+			String msgaux="[DutchingChase]"+msg;
+			for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+			{
+				tml.tradeMechanismMsg(this, msgaux, color);
+			}
 		}
 	}
+
+	
+	// ------------- start tradeMechanims listener --------------------- 
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		
+		boolean allEnded=true;
+		boolean allClosed=true;
+		
+		for(DutchingChaseOptions dro:dcov)
+			if(dro.getClose()!=null)
+			{
+				if(!dro.getClose().isEnded())
+					allEnded=false;
+				
+				if(dro.getClose().getState()!=TradeMechanism.CLOSED)
+					allClosed=false;
+				
+			}
+		
+		if(allEnded)
+		{
+			System.out.println("Dutching All Close Position ended");
+			if(allClosed)
+				setState(TradeMechanism.CLOSED);
+			
+			end();
+		}
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		writeMsgToListeners(msg, color);
+		
+	}
+	
+	// ------------- end tradeMechanims listener ---------------------
+	
+	private void end()
+	{
+		md.removeTradingMechanismTrading(this);
+		
+		ended=true;
+		
+		informListenersEnd();
+		
+		clean();
+	}
+	
+	private void informListenersEnd()
+	{
+		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+		{
+			tml.tradeMechanismEnded(this, STATE);
+		}
+	}
+
 }
