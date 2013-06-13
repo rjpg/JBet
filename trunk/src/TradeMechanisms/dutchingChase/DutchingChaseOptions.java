@@ -4,6 +4,7 @@ package TradeMechanisms.dutchingChase;
 import bets.BetData;
 import DataRepository.OddData;
 import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.close.ClosePosition;
 
 
@@ -22,7 +23,22 @@ public class DutchingChaseOptions {
 	boolean goOnfrontInBestPrice=false;
 	int startDelay=-1;
 	int ignoreStopLossDelay=-1;
-	boolean keepIP=false;	
+	
+	
+	/*
+	TradeMechanismListener defaultListener=null;
+	
+	BetData betCloseInfo;
+	int stopLossTicks=1;
+	int waitFramesNormal=20;
+	int waitFramesUntilForceClose=10;
+	int updateInterval=TradeMechanism.SYNC_MARKET_DATA_UPDATE;
+	boolean forceCloseOnStopLoss=true;
+	boolean useStopProfitInBestPrice=false;
+	boolean goOnfrontInBestPrice=false;
+	int startDelay=-1;
+	int ignoreStopLossDelay=-1;
+	*/
 	
 	//dynamic vars
 	protected ClosePosition close=null;
@@ -109,14 +125,6 @@ public class DutchingChaseOptions {
 
 	public void setIgnoreStopLossDelay(int ignoreStopLossDelay) {
 		this.ignoreStopLossDelay = ignoreStopLossDelay;
-	}
-	
-	public boolean isKeepIP() {
-		return keepIP;
-	}
-
-	public void setKeepIP(boolean keepIP) {
-		this.keepIP = keepIP;
 	}
 	
 	protected ClosePosition getClose() {
