@@ -794,9 +794,17 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private void writeMsgToListeners(String msg, Color color)
 	{
 		if(listeners!=null)
-		for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
 		{
-			tml.tradeMechanismMsg(this, msg, color);
+			String msgaux="[ClosePosition]";
+			
+			if(getRunner()!=null)
+				msgaux+="["+getRunner().getName()+"]";
+			
+			msgaux+=msg;
+			for(TradeMechanismListener tml: listeners.toArray(new TradeMechanismListener[]{}))
+			{
+				tml.tradeMechanismMsg(this, msgaux, color);
+			}
 		}
 	}
 	

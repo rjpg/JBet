@@ -1,6 +1,7 @@
 package TradeMechanisms.dutchingChase;
 
 
+import bets.BetData;
 import DataRepository.OddData;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.close.ClosePosition;
@@ -9,8 +10,9 @@ import TradeMechanisms.close.ClosePosition;
 
 public class DutchingChaseOptions {
 	
-	OddData odCloseInfo;
-
+	
+	//Args
+	BetData betCloseInfo;
 	int stopLossTicks=1;
 	int waitFramesNormal=20;
 	int waitFramesBestPrice=10;
@@ -21,18 +23,20 @@ public class DutchingChaseOptions {
 	int startDelay=-1;
 	int ignoreStopLossDelay=-1;
 	boolean keepIP=false;	
+	
+	//dynamic vars
 	protected ClosePosition close=null;
 	
-	public DutchingChaseOptions(OddData odCloseInfoA) {
-		odCloseInfo=odCloseInfoA;
+	public DutchingChaseOptions(BetData betCloseInfoA) {
+		betCloseInfo=betCloseInfoA;
 	}
 
-	public OddData getOdCloseInfo() {
-		return odCloseInfo;
+	public BetData getBetCloseInfo() {
+		return betCloseInfo;
 	}
 
-	public void setOdCloseInfo(OddData odCloseInfo) {
-		this.odCloseInfo = odCloseInfo;
+	public void setOdCloseInfo(BetData betCloseInfo) {
+		this.betCloseInfo = betCloseInfo;
 	}
 
 	public int getStopLossTicks() {
