@@ -5,9 +5,13 @@ import java.util.Vector;
 
 import bets.BetData;
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.close.ClosePosition;
+import TradeMechanisms.close.ClosePositionOptions;
 import TradeMechanisms.dutching.DutchingRunnerOptions;
+import TradeMechanisms.dutching.DutchingUtils;
 
 public class DutchingChase extends TradeMechanism implements TradeMechanismListener{
 
@@ -46,6 +50,53 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	{
 		md=dcov.get(0).getBetCloseInfo().getRd().getMarketData();
 		md.addTradingMechanismTrading(this);
+		
+		setState(TradeMechanism.OPEN);
+		
+		Vector<OddData> vod=new Vector<OddData>();
+		
+		// group all the OddData from open bets 
+		for(DutchingChaseOptions dco:dcov)
+		{
+			vod.add(dco.getBetCloseInfo().getOddDataOriginal());
+		}
+		
+		// recalculate all the amounts based on the global stake 
+		DutchingUtils.calculateAmounts(vod, globalStake);
+		
+		// reset all the amounts for NOT_PLACED bets 
+		// WARNING: if some bets are already placed the amount for that runner
+		//  will not be recalculated. 
+		for(DutchingChaseOptions dco:dcov)
+		{
+			for(OddData od:vod)
+			{
+				if(od.getRd()==dco.getBetCloseInfo().getRd())
+				{
+					if(dco.getBetCloseInfo().getState()==BetData.NOT_PLACED)
+						dco.getBetCloseInfo().setAmount(od.getAmount());
+				}
+			}
+		}
+		
+		// start the closing processes 
+		for(DutchingChaseOptions dco:dcov)
+		{
+			ClosePositionOptions cpo=new ClosePositionOptions(dco.getBetCloseInfo(), this);
+			
+			cpo.setStopLossTicks(dco.getStopLossTicks());
+			cpo.setWaitFramesNormal(dco.getWaitFramesNormal());
+			cpo.setWaitFramesUntilForceClose(dco.getWaitFramesBestPrice());
+			cpo.setUpdateInterval(dco.getUpdateInterval());
+			cpo.setForceCloseOnStopLoss(dco.isForceCloseOnStopLoss());
+			cpo.setUseStopProfitInBestPrice(dco.isUseStopProfitInBestPrice());
+			cpo.setGoOnfrontInBestPrice(dco.isGoOnfrontInBestPrice());
+			cpo.setStartDelay(dco.getStartDelay());
+			cpo.setIgnoreStopLossDelay(dco.getIgnoreStopLossDelay());
+			
+			dco.setClose(new ClosePosition(cpo));
+			
+		}
 		
 	}
 	
@@ -173,7 +224,21 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	// ------------- start tradeMechanims listener --------------------- 
 	@Override
 	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
-		// TODO Auto-generated method stub
+		
+		for(DutchingChaseOptions dro:dcov)
+		{
+			if(dro.getClose()!=null)
+			{
+				if(dro.getClose().getState()==TradeMechanism.PARTIAL_CLOSED)
+					setState(TradeMechanism.PARTIAL_CLOSED);
+				
+				if(dro.getClose().getState()==TradeMechanism.CRITICAL_ERROR)
+					setState(TradeMechanism.CRITICAL_ERROR);
+				
+				if(dro.getClose().getState()==TradeMechanism.UNMONITORED)
+					setState(TradeMechanism.UNMONITORED);
+			}
+		}
 		
 	}
 
