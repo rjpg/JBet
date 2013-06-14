@@ -105,9 +105,10 @@ public class Dutching extends TradeMechanism implements TradeMechanismListener{
 				
 			}
 			
-			DutchingUtils.calculateAmounts(vod, globalStake);
-			
 		}
+		
+		DutchingUtils.calculateAmounts(vod, globalStake);
+		
 		if(hasOpen)
 		{
 			setState(TradeMechanism.NOT_OPEN);
