@@ -1,6 +1,8 @@
 package bets;
 
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JCheckBox;
@@ -55,13 +57,22 @@ public class BetPanel extends JPanel{
 		
 		checkIP=new JCheckBox("IP",false);
 		
-		this.setLayout(new GridLayout(1, 4));
+		JPanel aux=new JPanel();
+		FlowLayout fl=new FlowLayout();
+		fl.setHgap(0);
+		fl.setVgap(0);
+		aux.setLayout(fl);
 		
-		this.add(comboOdd);
-		this.add(comboStake);
-		this.add(comboBackLay);
-		this.add(comboRunner);
-		this.add(checkIP);
+//		fl.setAlignment(FlowLayout.TRAILING);
+		this.setLayout(new BorderLayout());
+		
+		aux.add(checkIP);
+		aux.add(comboOdd);
+		aux.add(comboStake);
+		aux.add(comboBackLay);
+		
+		this.add(comboRunner,BorderLayout.NORTH);
+		this.add(aux,BorderLayout.SOUTH);
 		
 	}
 	
