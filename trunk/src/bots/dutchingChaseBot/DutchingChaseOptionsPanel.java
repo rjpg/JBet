@@ -1,4 +1,4 @@
-package TradeMechanisms.dutchingChase;
+package bots.dutchingChaseBot;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
