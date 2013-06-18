@@ -934,7 +934,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
-					BetUtils.fillBetFromAPI(bd);
+					while(BetUtils.fillBetFromAPI(bd)!=0);
 					bd.setTransition(BetData.PLACE);
 					
 				}
@@ -947,7 +947,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
-					BetUtils.fillBetFromAPI(bd);
+					while(BetUtils.fillBetFromAPI(bd)!=0);
 					bd.setTransition(BetData.PLACE);
 				}
 			}
@@ -1070,7 +1070,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			{
 				//cancelBetsID(new long[]{bds1[i].getBetID()});
 				bds1[i].setBetID(betUpdateResult1[i].getNewBetId());
-				BetUtils.fillBetFromAPI(bds1[i]);
+				while(BetUtils.fillBetFromAPI(bds1[i])!=0);
 				bds1[i].setTransition(BetData.PLACE);
 				someUpdated=true;
 				
