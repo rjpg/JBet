@@ -421,7 +421,7 @@ public class ExchangeAPI {
         request.setBetStatus(BetStatusEnum.MU);
         request.setSortOrder(SortOrderEnum.DESC);
         request.setOrderBy(BetsOrderByEnum.PLACED_DATE);
-        request.setRecordCount(1);
+        request.setRecordCount(500);
         request.setStartRecord(0);
 
         // Create the message and attach the request to it.
