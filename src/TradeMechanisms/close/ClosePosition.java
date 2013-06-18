@@ -485,6 +485,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		if(betInProcess==null || betInProcess.getState()==BetData.NOT_PLACED)
 		{
 			System.out.println("Entrei 1");
+			writeMsgToListeners("Entrei 1", Color.BLUE);
 			betInProcess=createBetForOdd();
 			
 			if(betInProcess==null)   // nothing to close
