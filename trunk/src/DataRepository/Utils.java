@@ -1303,7 +1303,21 @@ public class Utils {
         
         System.out.println(convertAmountToBF(0.049));
         
-        System.out.println("AM:"+Utils.closeAmountBack(6.0, 2.5,   5.9));
+        System.out.println("AM:"+Utils.closeAmountLay(5.0, 100,   2.80));
+        
+       // System.out.println("AM:"+Utils.closeAmountLay(3.0,  100,  Utils.1.9  ));
+        
+       
+        
+        for (int i=0;i<STEPS-1;i++)
+        {
+        	
+        	System.out.println(Utils.indexToOdd(i)+ " Gain: "+(100-Utils.closeAmountBack(Utils.indexToOdd(i),  100,  Utils.indexToOdd(i+1))));
+        }
+       
+        
+        System.out.println("AM:"+Utils.closeAmountLay(1.20,  100,  1.10  ));
+        
         
         //10.32 @ 6.2 (LAY)  10.32258064516129
         //9.877342419080069 @ 5.87

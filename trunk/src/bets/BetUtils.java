@@ -403,11 +403,11 @@ public class BetUtils {
 		
 		double amToReduce =Utils.closeAmountBack(oddAvgL, totalAmL, oddAvgB);
 		//System.out.println("Am to reduce B :"+amToReduce); 
-		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK);
+		OddData odB = new OddData(oddAvgB, totalAmB-amToReduce,BetData.BACK,vod.get(0).getRd());
 		
 		amToReduce =Utils.closeAmountLay(oddAvgB, totalAmB, oddAvgL);
 		//System.out.println("Am to reduce L :"+amToReduce);
-		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.LAY);
+		OddData odL = new OddData(oddAvgL, totalAmL-amToReduce,BetData.LAY,vod.get(0).getRd());
 		
 		if(odB.getAmount()>odL.getAmount())
 			return odB;
