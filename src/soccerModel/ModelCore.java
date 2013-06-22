@@ -100,11 +100,11 @@ public class ModelCore {
 		
 		System.out.println("Supremacy :"+supremacy);
 		
-		goalsVector.add(new GoalEvent(70, true, 1, 0));
+		//goalsVector.add(new GoalEvent(70, true, 1, 0));
 		
-		goalsVector.add(new GoalEvent(95, true, 2, 0));
+		//goalsVector.add(new GoalEvent(95, true, 2, 0));
 		
-		goalsVector.add(new GoalEvent(100, false, 2, 1));
+		//goalsVector.add(new GoalEvent(100, false, 2, 1));
 		
 		
 		//double lA=(sup/2)+(totalGoals/2);
@@ -896,7 +896,7 @@ public class ModelCore {
 		System.out.println("A:"+sumA);
 		System.out.println("Draw:"+sumDraw);
 		System.out.println("B:"+sumB);
-		System.out.println("ACtual:"+(actual));
+		System.out.println("ACtual:"+(1/actual));
 		
 	}
 	

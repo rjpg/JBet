@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.util.Vector;
 
 import bets.BetData;
+import bets.BetUtils;
+import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
+import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.close.ClosePosition;
@@ -13,7 +16,7 @@ import TradeMechanisms.close.ClosePositionOptions;
 import TradeMechanisms.dutching.DutchingRunnerOptions;
 import TradeMechanisms.dutching.DutchingUtils;
 
-public class DutchingChase extends TradeMechanism implements TradeMechanismListener{
+public class DutchingChase extends TradeMechanism implements TradeMechanismListener, MarketChangeListener{
 
 	private Vector<TradeMechanismListener> listeners=new Vector<TradeMechanismListener>();
 	
@@ -26,6 +29,8 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	private boolean pause=false;
 	
 	private MarketData md;
+	
+	
 	
 	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcovA, double globalStakeA ) {
 		if(bot!=null)
@@ -50,6 +55,8 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	{
 		md=dcov.get(0).getBetCloseInfo().getRd().getMarketData();
 		md.addTradingMechanismTrading(this);
+		
+		md.addMarketChangeListener(this);
 		
 		setState(TradeMechanism.OPEN);
 		
@@ -188,7 +195,13 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 
 	@Override
 	public void clean() {
-		// TODO Auto-generated method stub
+		md.removeMarketChangeListener(this);
+		md.removeTradingMechanismTrading(this);
+				
+		listeners.clear();
+		listeners=null;
+		
+		System.out.println("Dutching Chase clean runned");
 		
 	}
 
@@ -297,4 +310,60 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 		}
 	}
 
+	@Override
+	public void MarketChange(MarketData md, int marketEventType) {
+		
+		Vector<OddData> vod=new Vector<OddData>();
+	
+		boolean someCloseIsNull=false;
+		boolean someCloseIsEnded=false; 
+		
+		if(marketEventType==MarketChangeListener.MarketUpdate)
+		{
+			for(DutchingChaseOptions dro:dcov)
+			{
+				if(dro.getClose()!=null)
+				{
+					BetData betCloseInfo=dro.getClose().getBetCloseInfo();
+					Vector<OddData> vodAux=new Vector<OddData>();
+							
+					for(OddData od:dro.getClose().getMatchedOddDataVector())
+							vodAux.add(od);
+					
+					if(dro.getClose().isEnded())
+						someCloseIsEnded=true;
+					else
+					{
+						OddData odMissing=BetUtils.getGreening(vodAux,betCloseInfo.getOddDataOriginal(),Utils.getOddBackFrame(betCloseInfo.getRd(),0));
+						vodAux.add(odMissing);
+					}
+					
+					vod.add(BetUtils.getOpenInfo(vodAux));
+					
+				}
+				else
+				{
+					someCloseIsNull=true;
+				}
+				
+				
+			}
+			
+			
+			if(someCloseIsNull)
+			{
+				writeMsgToListeners("Some close is null", Color.BLUE);
+			}
+			else
+			{
+				 if(!someCloseIsEnded)
+					 writeMsgToListeners("No close has ended yet", Color.BLUE);
+				 
+				 
+				 double netNow[]=DutchingUtils.calculateNetProfitLoss(vod);
+				 
+				 writeMsgToListeners("Net Profit/Loss if force close now :"+netNow[0], Color.BLUE);
+			}
+		}
+	}
 }

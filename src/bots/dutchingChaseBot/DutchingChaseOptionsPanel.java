@@ -33,13 +33,13 @@ public class DutchingChaseOptionsPanel extends JPanel{
 	double netBF=0;
 	//--------------------------
 	
-	static Integer[] ticksBestPriceOffset={0,1,2,3,4,5,6,7,8,9,10};
+	static Integer[] ticksBestPriceOffset={0,0,1,2,3,4,5,6,7,8,9,10};
 	
-	public static Integer[] ticksStopLoss={1,2,3,4,5,6,7,8,9,10};
+	public static Integer[] ticksStopLoss={2,1,2,3,4,5,6,7,8,9,10};
 	
-	public static Integer[] timeBestOffer={20,0,10,15,25,30,35,40,45,50};
+	public static Integer[] timeBestOffer={60,0,10,15,20,25,30,35,40,45,50};
 	
-	public static Integer[] timeForceClose={20,0,10,15,25,30,35,40,45,50};
+	public static Integer[] timeForceClose={40,0,10,15,20,25,30,35,40,45,50};
 	
 	public static Integer[] timeDelayStart={-1,0,10,15,20,25,30,35,40,45,50};
 	

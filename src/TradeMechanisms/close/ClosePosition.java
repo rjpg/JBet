@@ -626,6 +626,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		return betCloseInfo.getRd();
 	}
 	
+	public BetData getBetCloseInfo()
+	{
+		return betCloseInfo;
+	}
+	
 	private void informListenersEnd()
 	{
 		//System.out.println("size : "+listeners.size());
@@ -743,7 +748,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		betInProcess=null;
 		
-		betCloseInfo=null;
+		//betCloseInfo=null;
 		
 		System.out.println("Close Position clean runned");
 	}
