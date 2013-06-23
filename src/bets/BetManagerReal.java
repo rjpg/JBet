@@ -594,9 +594,18 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 		if(placeLow2euroBets==-1)
 			return -1;
 		
-		Vector<BetData> bdsLow2euro=bdsLow;
+
+		Vector<BetData> bdsLow2euro=new Vector<BetData>();
 		
-		if(placeLow2euroBets==-2)
+		for(BetData bd:bdsLow)
+		{
+			if(bd.getState()==BetData.PLACING)
+				bdsLow2euro.add(bd);
+		}
+		
+		//Vector<BetData> bdsLow2euro=bdsLow;
+		
+		/*if(placeLow2euroBets==-2)
 		{
 			bdsLow2euro=new Vector<BetData>();
 			for(BetData bd:bdsLow)
@@ -604,16 +613,25 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				if(bd.getState()==BetData.NOT_PLACED)
 					bdsLow2euro.add(bd);
 			}
-		}
+		}*/
+		
+		if(bdsLow2euro.isEmpty())
+			return 0;
 		
 		int updateAmount=updateAmount(bdsLow2euro);
 		
 		if(updateAmount==-1)
 			return -1;
 		
-		Vector<BetData> bdsLowUpdateAmount=bdsLow2euro;
+		Vector<BetData> bdsLowUpdateAmount=new Vector<BetData>();
 		
-		if(updateAmount==-2)
+		for(BetData bd:bdsLow2euro)
+		{
+			if(bd.getState()==BetData.PLACING)
+				bdsLowUpdateAmount.add(bd);
+		}
+		
+		/*if(updateAmount==-2)
 		{
 			bdsLowUpdateAmount=new Vector<BetData>();
 			for(BetData bd:bdsLow2euro)
@@ -621,8 +639,10 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				if(bd.getState()==BetData.NOT_PLACED)
 					bdsLowUpdateAmount.add(bd);
 			}
-		}
+		}*/
 		
+		if(bdsLowUpdateAmount.isEmpty())
+			return -1;
 		
 		int updateOdd=updateOdds(bdsLowUpdateAmount);
 		
@@ -717,6 +737,26 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			if(betResult[i].getSuccess()==true)
 			{
 				bds[i].setBetID(betResult[i].getBetId());
+				
+				if(betResult[i].getSizeMatched()>0)
+				{
+					if(betResult[i].getSizeMatched()>=bds[i].getAmount())
+					{
+						bds[i].setState(BetData.MATCHED, BetData.PLACE);
+						bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+						bds[i].setOddMached(betResult[i].getAveragePriceMatched());
+					}
+					else
+					{
+						bds[i].setState(BetData.PARTIAL_CANCELED, BetData.PLACE);
+						bds[i].setMatchedAmount(betResult[i].getSizeMatched());
+						bds[i].setOddMached(betResult[i].getAveragePriceMatched());
+					}
+					
+					if(betResult[i].getSizeMatched()<2.00)
+						cancelBetsID(new long[]{bds[i].getBetID()});
+				}
+				
 				somePlaced=true;
 			}
 			else
@@ -934,8 +974,12 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
-					while(BetUtils.fillBetFromAPI(bd)!=0);
-					bd.setTransition(BetData.PLACE);
+					if(BetUtils.fillBetFromAPI(bd)!=0)
+					{
+						bd.setState(BetData.CANCEL_WAIT_UPDATE, BetData.PLACE);
+					}
+					else
+						bd.setTransition(BetData.PLACE);
 					
 				}
 			}
@@ -947,8 +991,14 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 				}
 				else
 				{
-					while(BetUtils.fillBetFromAPI(bd)!=0);
-					bd.setTransition(BetData.PLACE);
+					
+					if(BetUtils.fillBetFromAPI(bd)!=0)
+					{
+						bd.setState(BetData.CANCEL_WAIT_UPDATE, BetData.PLACE);
+					}
+					else
+						bd.setTransition(BetData.PLACE);
+					
 				}
 			}
 		}
@@ -1070,8 +1120,15 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 			{
 				//cancelBetsID(new long[]{bds1[i].getBetID()});
 				bds1[i].setBetID(betUpdateResult1[i].getNewBetId());
-				while(BetUtils.fillBetFromAPI(bds1[i])!=0);
-				bds1[i].setTransition(BetData.PLACE);
+				
+				if(BetUtils.fillBetFromAPI(bds1[i])!=0)
+				{
+					bds1[i].setState(BetData.CANCEL_WAIT_UPDATE, BetData.PLACE);
+				}
+				else
+					bds1[i].setTransition(BetData.PLACE);
+				
+				
 				someUpdated=true;
 				
 			}
@@ -1437,8 +1494,4 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	}
 
 
-	
-
-
-	
 }
