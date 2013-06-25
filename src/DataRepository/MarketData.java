@@ -64,10 +64,13 @@ public class MarketData {
 	// true if the market is inplay
 	public boolean inPlay=false;
 
-	public boolean suspended=false;
-	public boolean error=false;
-	public boolean closed=false;
+	//States
+	public static final int ACTIVE = 0;
+	public static final int SUSPENDED = 1;
+	public static final int CLOSED = 2;
+	public static final int ERROR = 3;
 
+	public int state=ACTIVE;
 
 	private int fpsAux=0;
 	private Calendar calendarFpsAux; 
@@ -196,122 +199,13 @@ public class MarketData {
 		if(runner==null)
 		{
 			runner=new RunnersData(name, id, this);
-			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices);
+			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state);
 			runners.add(runner);
 		}
 		else
 		{
-			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices);
+			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state);
 		}
-	}
-
-	private void initializeData()
-	{
-		System.out.println("Initializing");
-
-		InflatedCompleteMarketPrices prices=null;
-		while (prices==null)
-		{
-			try {
-				prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, apiContext, selectedMarket.getMarketId());
-			} catch (Exception e) {
-				System.out.println("Error Reading InflatedCompleteMarketPrices in initializing");
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		name=selectedMarket.getName();
-		id=selectedMarket.getMarketId();
-		start=selectedMarket.getMarketTime();
-		Calendar timestamp=Calendar.getInstance();
-
-		for (InflatedCompleteRunner r : prices.getRunners()) {
-
-			String rname = null;
-			int rid = 0;
-
-			double roddLay = 0;
-			double ramountLay = 0;
-
-			double roddBack = 0;
-			double ramountBack = 0;
-
-			double rmatchedAmount = 0;
-			double rlastMatchet = 0;
-
-			Vector<OddData> oddsLay = new Vector<OddData>();
-			Vector<OddData> oddsBack = new Vector<OddData>();
-
-			Runner marketRunner = null;
-
-			for (Runner mr : selectedMarket.getRunners().getRunner()) {
-				if (mr.getSelectionId() == r.getSelectionId()) {
-					marketRunner = mr;
-					break;
-				}
-			}
-
-			for (InflatedCompletePrice p : r.getPrices()) {
-				if (p.getBackAmountAvailable() != 0.) {
-					oddsBack.add(new OddData(p.getPrice(), p.getBackAmountAvailable()));
-				} else if (p.getLayAmountAvailable() != 0) {
-					oddsLay.add(new OddData(p.getPrice(), p.getLayAmountAvailable()));
-				}
-			}
-
-			if (oddsLay.size() > 0) {
-				ramountLay = oddsLay.get(0).getAmount();
-				roddLay = oddsLay.get(0).getOdd();
-			}
-
-			if (oddsBack.size() > 0) {
-				roddBack = oddsBack.get(oddsBack.size() - 1).getOdd();
-				ramountBack = oddsBack.get(oddsBack.size() - 1).getAmount();
-			}
-
-			if (marketRunner != null) {
-				rname = marketRunner.getName();
-
-				rid = r.getSelectionId();
-
-				rmatchedAmount = r.getTotalAmountMatched();
-				rlastMatchet = r.getLastPriceMatched();
-
-				addRunner(rname, rid, timestamp, roddLay, ramountLay,
-						roddBack, ramountBack, rmatchedAmount,
-						rlastMatchet, oddsLay, oddsBack);
-			}
-		}
-
-		for(RunnersData rd:getRunners())
-		{
-			VolumeInfo[] volInfo = null;
-
-			while ( volInfo == null) {
-				try {
-					Thread.sleep(200);
-
-					volInfo = ExchangeAPI.getMarketTradedVolume(	
-							selectedExchange,
-							apiContext,
-							selectedMarket.getMarketId(),
-							rd.getId());
-				} catch (Exception e) {
-					System.out.println("Error Reading getMarketTradedVolume in initializing - for runner :"+rd.getName());
-					e.printStackTrace();
-				}	
-			}
-			HistoryData hd=rd.getDataFrames().get(rd.getDataFrames().size()-1);
-			Hashtable<Double, Double> volume=new Hashtable<Double, Double>();
-			for (int i = 0; i < volInfo.length; i++) 
-			{
-				volume.put(volInfo[i].getOdds(),  volInfo[i].getTotalMatchedAmount());	
-			}
-			System.out.println("Volume initialized for runner :"+rd.getName());
-			hd.setVolume(volume);
-		}
-
 	}
 
 
@@ -354,7 +248,19 @@ public class MarketData {
 			//	System.out.println(prices.getInPlayDelay());
 			fpsAux++;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+			if(e.getMessage().contains(new String("EVENT_SUSPENDED")))
+			{
+				setState(MarketData.SUSPENDED);
+			}
+			else if(e.getMessage().contains(new String("CLOSED")))
+			{
+				setState(MarketData.CLOSED);
+			}
+			else 
+			{
+				setState(MarketData.ERROR);
+			}
 			e.printStackTrace();
 		}
 
@@ -363,17 +269,8 @@ public class MarketData {
 			System.err.println("No frame captured in :getCompleteMarketPrices : Making copy of data from last frame");
 			//return;
 		}
-
-		// Now show the inflated compressed market prices.
-		//Display.showMarket(selectedExchange, selectedMarket, prices);
-		//name=selectedMarket.getName();
-		//id=selectedMarket.getMarketId();
-		//start=selectedMarket.getMarketTime();
-		//if(selectedMarket.getMarketStatus()==MarketStatusEnum.ACTIVE)
-		//	System.err.println("Active");
-
-
-
+		else
+			setState(MarketData.ACTIVE);
 
 
 
@@ -384,12 +281,14 @@ public class MarketData {
 			warnListenersLive();
 			//return;
 		}
-
-		/*if(prices!=null && prices.getInPlayDelay()>0)
+		else if(prices!=null && prices.getInPlayDelay()>0)
 		{
-			setInPlay(true);
-			warnListenersLive();
-		}*/
+			if(!isInPlay())
+			{
+				setInPlay(true);
+				warnListenersLive();
+			}
+		}
 		//System.out.println("---------------------------------------------------");
 
 		Calendar timestamp=currentTime;
@@ -1737,6 +1636,15 @@ public class MarketData {
 		return betManager;
 	}
 
+	
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+	
 	/*public void setInTrade(boolean inTrade) {
 		this.inTrade = inTrade;
 	}*/

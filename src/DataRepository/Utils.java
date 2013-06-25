@@ -512,6 +512,11 @@ public class Utils {
 		return rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getOddLay();
 	}
 	
+	public static int getMarketSateFrame(MarketData md,int pastFrame)
+	{
+		return md.getRunners().get(0).getDataFrames().get(md.getRunners().get(0).getDataFrames().size()-1-pastFrame).getState();
+	}
+	
 	public static boolean isWomGoingDown(RunnersData rd, int windowSize,int pastFrame)
 	{
 		if(rd.getDataFrames().size()-(pastFrame+windowSize+1)<0)
