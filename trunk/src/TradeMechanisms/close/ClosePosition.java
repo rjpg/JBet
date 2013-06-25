@@ -44,6 +44,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 	private MarketData md;
 	private boolean forceCloseOnStopLoss=true;
 	private boolean useStopProfitInBestPrice=false;
+	private int waitFramesLay1000=100;
 	
 	// False is not used - to think about it 
 	private boolean goOnfrontInBestPrice=true;
@@ -69,11 +70,12 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				cpo.isUseStopProfitInBestPrice(),
 				cpo.isGoOnfrontInBestPrice(),
 				cpo.getStartDelay(),
-				cpo.getIgnoreStopLossDelay());
+				cpo.getIgnoreStopLossDelay(),
+				cpo.getWaitFramesLay1000());
 		
 	}
 	
-	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA, int startDelayA,int ignoreStopLossDelayA)
+	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA, int startDelayA,int ignoreStopLossDelayA,int waitFramesLay1000A)
 	{
 		super();
 
@@ -87,6 +89,7 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		goOnfrontInBestPrice=goOnfrontInBestPriceA;
 		startDelay=startDelayA;
 		ignoreStopLossDelay=ignoreStopLossDelayA;
+		waitFramesLay1000=waitFramesLay1000A;
 		
 		//System.out.println("Force : "+forceCloseOnStopLoss);
 		
@@ -116,9 +119,11 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 
 	}
 	
+	
+	
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA, int startDelayA)
 	{
-		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,useStopProfifInBestPriceA,goOnfrontInBestPriceA,-1,-1);
+		this(botA,betCloseInfoA,stopLossTicksA,waitFramesNormalA,waitFramesUntilForceCloseA,updateIntervalA,forceCloseOnStopLossA,useStopProfifInBestPriceA,goOnfrontInBestPriceA,-1,-1,100);
 	}
 	
 	public ClosePosition(TradeMechanismListener botA,BetData betCloseInfoA,int stopLossTicksA, int waitFramesNormalA, int waitFramesUntilForceCloseA, int updateIntervalA, boolean forceCloseOnStopLossA,boolean useStopProfifInBestPriceA,boolean goOnfrontInBestPriceA)
@@ -405,6 +410,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 				
 			int state = processFrames();
 			
+			
+			
 			switch (state) {
 		        case  0: targetOdd=betCloseInfo.getOddRequested(); break;
 		        case  1: {
@@ -470,6 +477,8 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		updateTargetOdd();
 		
+		processWaitFramesLay1000();
+		
 		switch (getI_STATE()) {
 	        case I_PLACING: placing(); break;
 	        case I_END    : end(); break;
@@ -478,6 +487,22 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 	}
 	
+	private void processWaitFramesLay1000()
+	{
+		if(waitFramesLay1000==-1) return;
+		
+		if(betInProcess!=null && betInProcess.getOddRequested()==1000 && betInProcess.getType()==BetData.LAY)
+		{
+			waitFramesLay1000--;
+			if(waitFramesLay1000>0) 
+				return;
+			else
+				setI_STATE(I_END);
+			
+		}
+		
+			
+	}
 	
 	private void placing()
 	{

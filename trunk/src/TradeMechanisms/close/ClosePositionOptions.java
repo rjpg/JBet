@@ -17,6 +17,7 @@ public class ClosePositionOptions {
 	boolean goOnfrontInBestPrice=false;
 	int startDelay=-1;
 	int ignoreStopLossDelay=-1;
+	int waitFramesLay1000=100;
 	
 	public ClosePositionOptions(BetData betCloseInfoA) {
 		betCloseInfo=betCloseInfoA;
@@ -114,5 +115,14 @@ public class ClosePositionOptions {
 	public void setIgnoreStopLossDelay(int ignoreStopLossDelay) {
 		this.ignoreStopLossDelay = ignoreStopLossDelay;
 	}
+	
+	public int getWaitFramesLay1000() {
+		return waitFramesLay1000;
+	}
+
+	public void setWaitFamesLay1000(int waitFamesLay1000) {
+		this.waitFramesLay1000 = waitFamesLay1000;
+	}
+
 
 }

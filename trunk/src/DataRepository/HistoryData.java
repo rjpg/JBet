@@ -9,6 +9,8 @@ public class HistoryData {
 	
 	public Calendar timestamp;
 	
+	int state=MarketData.ACTIVE;
+	
 	double oddLay=0;
 	double amountLay=0;
 	
@@ -26,7 +28,7 @@ public class HistoryData {
 	
 	public Hashtable<Double, Double> volume=null;
 		
-	public HistoryData(Calendar timeA, double oddLayA,double amountLayA, double oddBackA,double amountBackA,/* double weightmoneyLayA, double weightmoneyBackA,*/ double matchedAmountA, double lastMatchetA, Vector<OddData> layPricesA, Vector<OddData> backPricesA)
+	public HistoryData(Calendar timeA, double oddLayA,double amountLayA, double oddBackA,double amountBackA,/* double weightmoneyLayA, double weightmoneyBackA,*/ double matchedAmountA, double lastMatchetA, Vector<OddData> layPricesA, Vector<OddData> backPricesA,int stateA)
 	{
 		timestamp=timeA;
 		
@@ -44,6 +46,8 @@ public class HistoryData {
 		
 		layPrices = layPricesA;
 		backPrices = backPricesA;
+		
+		state=stateA;
 	}
 	
 	public Calendar getTimestamp() {
@@ -131,6 +135,14 @@ public class HistoryData {
 
 	public void setVolume(Hashtable<Double, Double> volume) {
 		this.volume = volume;
+	}
+	
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
 	}
 	
 	public void clean()
