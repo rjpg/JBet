@@ -23,6 +23,7 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	//args
 	private Vector<DutchingChaseOptions> dcov;
 	private double globalStake;
+	private double percentProfitForceCLose=-1;
 	
 	//dynamic vars
 	private boolean ended=false;
@@ -31,8 +32,7 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 	private MarketData md;
 	
 	
-	
-	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcovA, double globalStakeA ) {
+	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcovA, double globalStakeA ,double percentProfitForceCLoseA) {
 		if(bot!=null)
 			addTradeMechanismListener(bot);
 		
@@ -40,7 +40,14 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 		
 		globalStake=globalStakeA;
 		
+		percentProfitForceCLose=percentProfitForceCLoseA;
+		
 		initialize();
+	}
+	
+	
+	public DutchingChase(TradeMechanismListener bot,Vector<DutchingChaseOptions> dcovA, double globalStakeA ) {
+		this(bot,dcovA,globalStakeA,-1);
 	}
 	
 	public DutchingChase(Vector<DutchingChaseOptions> dcoA) {
@@ -362,7 +369,20 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 				 
 				 double netNow[]=DutchingUtils.calculateNetProfitLoss(vod);
 				 
-				 writeMsgToListeners("Net Profit/Loss if force close now :"+netNow[0], Color.BLUE);
+				 if(percentProfitForceCLose>0)
+				 {
+					 writeMsgToListeners("Net Profit/Loss if force close now :"+netNow[0] + " (to execute force close = "+(globalStake*percentProfitForceCLose)+")", Color.BLUE);
+					 if(netNow[0]>(globalStake*percentProfitForceCLose))
+					 {
+						 writeMsgToListeners("Net Profit/Loss is gt Stop Profit - Calling forceClose() ", Color.GREEN);
+						 forceClose();
+						 
+					 }
+				 }
+				 else
+				 {
+					 writeMsgToListeners("Net Profit/Loss if force close now :"+netNow[0], Color.BLUE);
+				 }
 			}
 		}
 	}

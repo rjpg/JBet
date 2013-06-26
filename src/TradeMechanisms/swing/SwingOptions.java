@@ -20,7 +20,9 @@ public class SwingOptions {
 	int delayIgnoreStopLoss=-1;
 	double percentageOpen=1.00;
 	boolean insistOpen=false;
+	int waitFramesLay1000=100;
 	
+
 	public SwingOptions(BetData betOpenInfoA) {
 		betOpenInfo=betOpenInfoA;
 	}
@@ -148,5 +150,13 @@ public class SwingOptions {
 
 	public void setInsistOpen(boolean insistOpen) {
 		this.insistOpen = insistOpen;
+	}
+	
+	public int getWaitFramesLay1000() {
+		return waitFramesLay1000;
+	}
+
+	public void setWaitFramesLay1000(int waitFramesLay1000) {
+		this.waitFramesLay1000 = waitFramesLay1000;
 	}
 }
