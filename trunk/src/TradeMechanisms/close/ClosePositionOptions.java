@@ -120,8 +120,8 @@ public class ClosePositionOptions {
 		return waitFramesLay1000;
 	}
 
-	public void setWaitFamesLay1000(int waitFamesLay1000) {
-		this.waitFramesLay1000 = waitFamesLay1000;
+	public void setWaitFramesLay1000(int waitFramesLay1000) {
+		this.waitFramesLay1000 = waitFramesLay1000;
 	}
 
 

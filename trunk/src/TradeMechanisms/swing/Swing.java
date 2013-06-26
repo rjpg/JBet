@@ -49,7 +49,8 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	private double percentageOpen=1.00;
 	private boolean insistOpen=false;
-	// end args
+	private int  waitFramesLay1000=100;
+		// end args
 	
 	private double closeOdd; 
 	private int ticksLossRelative;
@@ -92,10 +93,11 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 				so.getDelayBetweenOpenClose(),
 				so.getDelayIgnoreStopLoss(),
 				so.getPercentageOpen(),
-				so.isInsistOpen());
+				so.isInsistOpen(),
+				so.getWaitFramesLay1000());
 	}
 	
-	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA,boolean useStopProfifInBestPriceA, boolean goOnfrontInBestPriceA, int delayBetweenOpenCloseA,int delayIgnoreStopLossA, double percentageOpenA, boolean insistOpenA)
+	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA,boolean useStopProfifInBestPriceA, boolean goOnfrontInBestPriceA, int delayBetweenOpenCloseA,int delayIgnoreStopLossA, double percentageOpenA, boolean insistOpenA,int  waitFramesLay1000A)
 	{
 		super();
 		
@@ -123,6 +125,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		delayIgnoreStopLoss=delayIgnoreStopLossA;
 		percentageOpen=percentageOpenA; 
 		insistOpen=insistOpenA;
+		waitFramesLay1000=waitFramesLay1000A;
 		
 		if(listenerA!=null)
 			addTradeMechanismListener(listenerA);
@@ -142,7 +145,7 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
 	{
-		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false,false,-1,-1, 1.00, false);
+		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false,false,-1,-1, 1.00, false,100);
 	}
 	
 	public Swing(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
@@ -532,11 +535,12 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 		cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
 		cpo.setStartDelay(delayBetweenOpenClose);
 		cpo.setIgnoreStopLossDelay(delayIgnoreStopLoss);
+		cpo.setWaitFramesLay1000(waitFramesLay1000);
 		
 		close=new ClosePosition(cpo);
 		
 		setI_STATE(I_CLOSING);
-				
+		
 	}
 	
 	private void refresh()

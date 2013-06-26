@@ -90,13 +90,23 @@ public class ManualDutchingChaseBot extends Bot implements TradeMechanismListene
 				Vector<DutchingChaseOptions> vdro=new Vector<DutchingChaseOptions>();
 				for(DutchingChaseOptionsPanel drop:vdcop)
 					vdro.add(drop.getDutchingChaseOptions());
-				duchingChase=new DutchingChase(ManualDutchingChaseBot.this,vdro,(Double)(comboStake.getSelectedItem()));
+				duchingChase=new DutchingChase(ManualDutchingChaseBot.this,vdro,(Double)(comboStake.getSelectedItem()),0.001);
+			}
+		});
+		
+		forceClose.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				writeMsg("Calling DuchingChase.forceClose() ", Color.GREEN);
+				duchingChase.forceClose();
 			}
 		});
 		
 		actionsPanel.add(comboStake);
 		actionsPanel.add(startButton);
 		actionsPanel.add(cancelButton);
+		actionsPanel.add(forceClose);
 		actionsPanel.add(margin);
 		actionsPanel.add(netPL);
 		
