@@ -15,6 +15,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import bots.csHighPointLadder.CSHighPointLadder;
+
+import correctscore.ScraperGoals;
+
 import DataRepository.MarketData;
 import demo.handler.GlobalAPI;
 import demo.handler.ExchangeAPI.Exchange;
@@ -30,16 +34,20 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public String username=null;
 	public String password=null;
 	
+	public ScraperGoals sg;
 	NextPreLiveCS nplcs=null;
 	
 	public LoaderCSHighPointLadderBot() {
 		// API login
 		startBetFair();
+		
+		sg=new ScraperGoals(); 
+		sg.startPolling();
+		System.out.println("Scraper is now polling");
+		
 		nplcs=new NextPreLiveCS(selectedExchange, apiContext);
 		nplcs.addMarketProviderListener(this);
 		nplcs.startPolling();
-		
-	
 	}
 	
 	private void startBetFair()
@@ -94,7 +102,7 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public void newMarketSelected(MarketProvider mp, Market m) {
 		MarketData md=new MarketData(m, selectedExchange, apiContext);
 		md.setUpdateInterval(500);
-		md.addMarketChangeListener(new LogMOPreLiveData());
+		md.addMarketChangeListener(new CSHighPointLadder(md,sg));
 		md.startPolling();
 		
 	}
