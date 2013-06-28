@@ -12,6 +12,7 @@ public class GameScoreData {
 	
 	private boolean mistakeState=false;
 	
+	protected boolean foundInPLay=false;
 
 	public GameScoreData(String tA,String tB,int gA, int gB)
 	{
@@ -90,6 +91,14 @@ public class GameScoreData {
 
 	public void setMistakeState(boolean mistakeState) {
 		this.mistakeState = mistakeState;
+	}
+	
+	public boolean isFoundInPLay() {
+		return foundInPLay;
+	}
+
+	public void setFoundInPLay(boolean foundInPLay) {
+		this.foundInPLay = foundInPLay;
 	}
 	
 	public static void main(String[] args) throws Exception {

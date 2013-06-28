@@ -25,5 +25,7 @@ public static void main(String[] args)  throws Exception {
 		System.out.println(sg.getTargetURLString());
 		System.out.println("Scraper is now polling");
 		sg.startPolling();
+		
+		
 	}
 }

@@ -126,7 +126,7 @@ public class ScraperGoals {
 			
 			for (int i = 1; i < urlNodes.getLength()-3; i++) {
 				//System.out.println("####urlNodes size:"+urlNodes.item(i).getChildNodes().getLength());
-				if(urlNodes.item(i).getChildNodes().getLength()==20)
+				if(urlNodes.item(i).getChildNodes().getLength()==21)
 				{
 					//System.out.println(nodeToString(urlNodes.item(i).getChildNodes().item(6)));
 					//System.out.print(urlNodes.item(i).getChildNodes().item(6).getChildNodes().item(0).getNodeValue());
@@ -149,7 +149,7 @@ public class ScraperGoals {
 					gB=Integer.parseInt(goals[1]);
 										
 				}
-				else if(urlNodes.item(i).getChildNodes().getLength()==19)
+				else if(urlNodes.item(i).getChildNodes().getLength()==20)
 				{
 					//System.out.println(urlNodes.item(i).getChildNodes().item(5).getChildNodes().item(0).getNodeValue());
 					//System.out.println("VS");
@@ -187,6 +187,9 @@ public class ScraperGoals {
 				{
 					if(tA.equals(gd.getTeamA())&&tB.equals(gd.getTeamB()) )
 					{
+						
+						gd.setFoundInPLay(true);
+						
 						foundGame=true;
 						if(gd.getActualGoalsA()!=gA)
 						{
@@ -207,9 +210,12 @@ public class ScraperGoals {
 				
 				if(!foundGame)
 				{
-					GameScoreData gsd=new GameScoreData(tA, tB, gA, gB);
-					gameScoreData.add(gsd);
-					
+					if(tA!=null && tB!=null)
+					{
+						GameScoreData gsd=new GameScoreData(tA, tB, gA, gB);
+						gsd.setFoundInPLay(true);
+						gameScoreData.add(gsd);
+					}
 				}
 				
 				//System.out.println("------------------------");
@@ -222,6 +228,22 @@ public class ScraperGoals {
 			System.err.println("Error: " + urle.toString()+ "(Probably no live games to scrap)");
 		}
 
+		//clean finish games
+		GameScoreData gsdArray[]=gameScoreData.toArray(new GameScoreData []{});
+		for(int i=0;i<gsdArray.length;i++)
+		{
+			if(!gsdArray[i].isFoundInPLay())
+				gameScoreData.remove(gsdArray[i]);
+			else
+				gsdArray[i].setFoundInPLay(false);
+		}
+		
+		
+		for(GameScoreData gsd: gameScoreData)
+		{
+			System.out.println("TeamA:"+gsd.getTeamA()+"-"+gsd.getActualGoalsA()+"("+gsd.getPrevGoalsA()+")\\n"+
+					"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")");
+		}
 		
 		//return urlNodes;
 	}
@@ -233,7 +255,8 @@ public class ScraperGoals {
 
 	public void UpdateListeners(GameScoreData gd)
 	{
-		/*for(GameScoreData gsd: gameScoreData)
+		/*
+		for(GameScoreData gsd: gameScoreData)
 		{
 			System.out.println("TeamA:"+gsd.getTeamA()+"-"+gsd.getActualGoalsA()+"("+gsd.getPrevGoalsA()+")\\n"+
 					"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")");
@@ -275,6 +298,10 @@ public class ScraperGoals {
 		
 		startPolling();
 		//System.out.println(list.toString());
+	}
+	
+	public Vector<GameScoreData> getGameScoreData() {
+		return gameScoreData;
 	}
 
 	
