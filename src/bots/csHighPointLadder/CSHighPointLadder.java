@@ -33,7 +33,9 @@ public class CSHighPointLadder extends Bot{
 	
 	protected int STATE=PRE_LIVE;
 	
+
 	ScraperGoals sg=null;
+	GameScoreData gsd=null;
 	
 	//Visuals
 	private JFrame frame;
@@ -61,7 +63,7 @@ public class CSHighPointLadder extends Bot{
 		writeMsg("Processing Game : "+getMd().getEventName(), Color.BLUE);
 		
 		writeMsg("Games in Scrapper : ", Color.BLACK);
-		Vector<GameScoreData> gameScoreData=sg.getGameScoreData();
+		GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
 				
 		for(GameScoreData gsd: gameScoreData)
 		{
@@ -76,10 +78,10 @@ public class CSHighPointLadder extends Bot{
 	public void update()
 	{
 		switch (STATE) {
-	        case  PRE_LIVE: ; break;
-	        case  WAIT_ODD_UNDER_3: ; break;
-	        case  EXECUTING_SWING: ; break;
-	        case  END: ; break;
+	        case  PRE_LIVE: preLive(); break;
+	        case  WAIT_ODD_UNDER_3: waitOddUnder3(); break;
+	        case  EXECUTING_SWING: executingSwing(); break;
+	        case  END: end(); break;
 	        default: ; break;
 		}
 	
@@ -87,7 +89,61 @@ public class CSHighPointLadder extends Bot{
 
 	private void preLive()
 	{
+	
+		if(getMd().isInPlay())
+		{
+			writeMsg("Market turn In Play",Color.BLUE);
+	
+			writeMsg("Games in Scrapper : ", Color.BLACK);
+			GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
+					
+			for(GameScoreData gsd: gameScoreData)
+			{
+				writeMsg("TeamA:"+gsd.getTeamA()+"-"+gsd.getActualGoalsA()+"("+gsd.getPrevGoalsA()+") - "+
+						"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")",Color.BLUE);
+			}
+			
+			fingGameInScrapper();
+			
+			if(gsd==null)
+				writeMsg("No Game Found in Scraper",Color.RED);
+			else
+				writeMsg("Game Found in Scraper : "+gsd.getTeamA()+" v "+gsd.getTeamB(),Color.GREEN);
+			
+			setSTATE(END);
+			
+		}
 		
+		
+	}
+	
+	private void fingGameInScrapper()
+	{
+		
+		String[] sarray=getMd().getEventName().split(" v ");
+		
+		String sMarket=sarray[0]+sarray[1];
+		
+		writeMsg("Teams Market Name together : "+sMarket,Color.BLUE);
+	
+		double mc = 0;
+		
+		GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
+		
+		for(GameScoreData gsda: gameScoreData)
+		{
+			String sScraper=gsda.getTeamA()+gsda.getTeamB();
+			writeMsg("Teams Scrapper Name together : "+sScraper,Color.BLUE);
+			
+			double ma = matchedChars(sMarket.toLowerCase(), sScraper.toLowerCase());
+			
+			if(ma>90.0 && ma>mc)
+			{
+				writeMsg("New Game Score Data Found : "+gsda.getTeamA()+" v "+gsda.getTeamB(),Color.GREEN);
+				gsd=gsda;
+				mc=ma;
+			}
+		}
 	}
 	
 	private void waitOddUnder3()
@@ -103,7 +159,19 @@ public class CSHighPointLadder extends Bot{
 	
 	private void end()
 	{
-		
+		writeMsg("Closing Market : "+md.getName()+" from :"+md.getEventName(),Color.BLUE);
+		md.removeMarketChangeListener(this);
+		md.stopPolling();
+		md.clean();
+		md=null;
+	}
+
+	public int getSTATE() {
+		return STATE;
+	}
+
+	public void setSTATE(int sTATE) {
+		STATE = sTATE;
 	}
 
 
@@ -122,13 +190,7 @@ public class CSHighPointLadder extends Bot{
 				writeMsg(rd.getName()+" Odd Back:"+Utils.getAmountBackFrame(rd, 0)+" @ "+Utils.getOddBackFrame(rd, 0),Color.BLUE);
 			}
 			
-			writeMsg("Closing Market : "+md.getName()+" from :"+md.getEventName(),Color.BLUE);
-			md.removeMarketChangeListener(this);
-			md.stopPolling();
-			md.clean();
-			md=null;
-		
-			
+			update();
 			
 		}
 		
