@@ -1,10 +1,12 @@
-package scrapers;
+package scrapers.xscores;
 
 import java.awt.Color;
 
 import javax.swing.UIManager;
 
-import correctscore.UpdateScoresListener;
+import scrapers.GameScoreData;
+import scrapers.UpdateScoresListener;
+
 
 
 import DataRepository.Utils;

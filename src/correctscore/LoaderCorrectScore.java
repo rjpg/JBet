@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import javax.swing.UIManager;
 
-import scrapers.ScraperGoals;
+import scrapers.xscores.ScraperGoals;
 
 import demo.util.Display;
 

@@ -1,4 +1,4 @@
-package scrapers;
+package scrapers.xscores;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -20,7 +20,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 
-import correctscore.UpdateScoresListener;
+import scrapers.GameScoreData;
+import scrapers.UpdateScoresListener;
+
 
 
 public class ScraperGoals {
