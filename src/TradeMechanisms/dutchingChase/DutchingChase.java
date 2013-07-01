@@ -374,7 +374,7 @@ public class DutchingChase extends TradeMechanism implements TradeMechanismListe
 					 writeMsgToListeners("Net Profit/Loss if force close now :"+netNow[0] + " (to execute force close = "+(globalStake*percentProfitForceCLose)+")", Color.BLUE);
 					 if(netNow[0]>(globalStake*percentProfitForceCLose))
 					 {
-						 writeMsgToListeners("Net Profit/Loss is gt Stop Profit - Calling forceClose() ", Color.GREEN);
+						 writeMsgToListeners("Net Profit/Loss is gt Stop Profit - Calling forceClose() ", Color.RED);
 						 forceClose();
 						 
 					 }
