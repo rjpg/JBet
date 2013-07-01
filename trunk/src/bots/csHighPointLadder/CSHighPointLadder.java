@@ -9,12 +9,13 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import scrapers.GameScoreData;
+import scrapers.ScraperGoals;
+
 import bots.Bot;
 
 import main.Parameters;
-import correctscore.GameScoreData;
 import correctscore.MessageJFrame;
-import correctscore.ScraperGoals;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;

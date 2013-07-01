@@ -41,6 +41,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import scrapers.GameScoreData;
+
 import demo.handler.ExchangeAPI.Exchange;
 import demo.handler.ExchangeAPI;
 import demo.handler.GlobalAPI;
