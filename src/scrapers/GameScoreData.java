@@ -1,4 +1,4 @@
-package correctscore;
+package scrapers;
 
 public class GameScoreData {
 	private String teamA=null;

@@ -1,8 +1,11 @@
-package correctscore;
+package scrapers;
 
 import java.awt.Color;
 
 import javax.swing.UIManager;
+
+import correctscore.UpdateScoresListener;
+
 
 import DataRepository.Utils;
 

@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import javax.swing.UIManager;
 
+import scrapers.ScraperGoals;
+
 import demo.util.Display;
 
 import DataRepository.Utils;
