@@ -64,7 +64,7 @@ public class CSHighPointLadder extends Bot{
 		writeMsg("Processing Game : "+getMd().getEventName(), Color.BLUE);
 		
 		writeMsg("Games in Scrapper : ", Color.BLACK);
-		GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
+		GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
 				
 		for(GameScoreData gsd: gameScoreData)
 		{
@@ -96,7 +96,7 @@ public class CSHighPointLadder extends Bot{
 			writeMsg("Market turn In Play",Color.BLUE);
 	
 			writeMsg("Games in Scrapper : ", Color.BLACK);
-			GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
+			GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
 					
 			for(GameScoreData gsd: gameScoreData)
 			{
@@ -129,7 +129,7 @@ public class CSHighPointLadder extends Bot{
 	
 		double mc = 0;
 		
-		GameScoreData[] gameScoreData=sg.getGameScoreData().toArray(new GameScoreData[]{});
+		GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
 		
 		for(GameScoreData gsda: gameScoreData)
 		{

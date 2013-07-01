@@ -304,7 +304,7 @@ public class ScraperGoals {
 		//System.out.println(list.toString());
 	}
 	
-	public Vector<GameScoreData> getGameScoreData() {
+	public Vector<GameScoreData> getGamesScoreData() {
 		return gameScoreData;
 	}
 
