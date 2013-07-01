@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import scrapers.GameScoreData;
-import scrapers.ScraperGoals;
+import scrapers.xscores.ScraperGoals;
 
 import bots.Bot;
 

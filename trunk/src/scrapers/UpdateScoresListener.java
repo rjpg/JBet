@@ -1,6 +1,5 @@
-package correctscore;
+package scrapers;
 
-import scrapers.GameScoreData;
 
 public interface UpdateScoresListener {
 	public void scoreUpdated(GameScoreData gsd);
