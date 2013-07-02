@@ -36,7 +36,7 @@ public class CSHighPointLadder extends Bot{
 	
 	protected int STATE=PRE_LIVE;
 	
-	public int TRIES_IN_PREPARING_SWING=200;
+	public int TRIES_IN_PREPARING_SWING=300;
 
 	ScraperGoals sg=null;
 	GameScoreData gsd=null;
