@@ -28,12 +28,15 @@ public class CSHighPointLadder extends Bot{
 
 	// States
 	public static final int PRE_LIVE = 0;
-	public static final int WAIT_ODD_UNDER_3 = 1;
-	public static final int EXECUTING_SWING = 2;
-	public static final int END = 3;
+	public static final int WAIT_50_MINUTES = 1;
+	public static final int WAIT_ODD_UNDER_3 = 2;
+	public static final int PREPARING_SWING = 4;
+	public static final int EXECUTING_SWING = 5;
+	public static final int END = 6;
 	
 	protected int STATE=PRE_LIVE;
 	
+	public int TRIES_IN_PREPARING_SWING=200;
 
 	ScraperGoals sg=null;
 	GameScoreData gsd=null;
@@ -80,7 +83,9 @@ public class CSHighPointLadder extends Bot{
 	{
 		switch (STATE) {
 	        case  PRE_LIVE: preLive(); break;
+	        case  WAIT_50_MINUTES: wait50minutes(); break;
 	        case  WAIT_ODD_UNDER_3: waitOddUnder3(); break;
+	        case  PREPARING_SWING: preparingSwing(); break;
 	        case  EXECUTING_SWING: executingSwing(); break;
 	        case  END: end(); break;
 	        default: ; break;
@@ -88,67 +93,155 @@ public class CSHighPointLadder extends Bot{
 	
 	}
 
+	
 	private void preLive()
 	{
 	
-		if(getMd().isInPlay())
+		if(!getMd().isInPlay())
 		{
-			writeMsg("Market turn In Play",Color.BLUE);
-	
-			writeMsg("Games in Scrapper : ", Color.BLACK);
-			GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
-					
-			for(GameScoreData gsd: gameScoreData)
+			RunnersData rd=getMd().getRunners().get(0);
+			if(rd.getDataFrames().size()>20)
 			{
-				writeMsg("TeamA:"+gsd.getTeamA()+"-"+gsd.getActualGoalsA()+"("+gsd.getPrevGoalsA()+") - "+
-						"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")",Color.BLUE);
+				writeMsg("20 samples captured in pre-Live", Color.BLUE);
+				for(RunnersData rdAux:getMd().getRunners())
+				{
+					if(rdAux.getName().contains("0 - 0"))
+					{
+						writeMsg("Runner 0 - 0 found ID :"+rdAux.getId(), Color.BLUE);
+						
+						double oddBackAvg=0;
+						for(int i=0;i<20;i++)
+						{
+							oddBackAvg+=Utils.getOddBackFrame(rdAux, i);
+						}
+						
+						oddBackAvg/=20;
+						
+						writeMsg("Runner 0 - 0 Odd AVG :"+oddBackAvg, Color.BLUE);
+						
+						if(oddBackAvg<15)
+						{
+							writeMsg("Odd AVG lower than 15.0 OK - goin to WAIT_50_MINUTES state", Color.GREEN);
+							setSTATE(WAIT_50_MINUTES);
+							update();
+							return;
+						}
+						else
+						{
+							writeMsg("Odd AVG bigger than 15.0 OK - goin to END state", Color.RED);
+							setSTATE(END);
+							update();
+							return;
+						}
+					}
+				}
+				
+				return;
 			}
 			
-			fingGameInScrapper();
-			
-			if(gsd==null)
-				writeMsg("No Game Found in Scraper",Color.RED);
-			else
-				writeMsg("Game Found in Scraper : "+gsd.getTeamA()+" v "+gsd.getTeamB(),Color.GREEN);
-			
+			return;
+		
+		}
+		else
+		{
+			writeMsg("No sufucient pre-live samples - goin to END state", Color.RED);
 			setSTATE(END);
-			
+			update();
+			return;
 		}
 		
 		
 	}
 	
-	private void fingGameInScrapper()
+	private void wait50minutes()
 	{
-		
-		String[] sarray=getMd().getEventName().split(" v ");
-		
-		String sMarket=sarray[0]+sarray[1];
-		
-		writeMsg("Teams Market Name together : "+sMarket,Color.BLUE);
-	
-		double mc = 0;
-		
-		GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
-		
-		for(GameScoreData gsda: gameScoreData)
-		{
-			String sScraper=gsda.getTeamA()+gsda.getTeamB();
-			writeMsg("Teams Scrapper Name together : "+sScraper,Color.BLUE);
-			
-			double ma = matchedChars(sMarket.toLowerCase(), sScraper.toLowerCase());
-			
-			if(ma>90.0 && ma>mc)
-			{
-				writeMsg("New Game Score Data Found : "+gsda.getTeamA()+" v "+gsda.getTeamB(),Color.GREEN);
-				gsd=gsda;
-				mc=ma;
-			}
-		}
+		writeMsg("Next sample will be recieved in 50 minutes - goin to WAIT_ODD_UNDER_3 state", Color.BLUE);
+		getMd().setUpdateInterval(1000*60*50);
+		setSTATE(WAIT_ODD_UNDER_3);
 	}
+	
 	
 	private void waitOddUnder3()
 	{
+		
+		if(getMd().getState()==MarketData.CLOSED)
+		{
+			writeMsg("Market is CLOSED - going to END state", Color.RED);
+			setSTATE(END);
+			update();
+		}
+		
+		writeMsg("Seting Market Update to 2000", Color.BLUE);
+		getMd().setUpdateInterval(2000);
+		
+		writeMsg("Finding the lower result...", Color.BLUE);
+		
+		RunnersData rdLow=getMd().getRunners().get(0);
+		
+		for(RunnersData rdAux:getMd().getRunners())
+		{
+			if(!rdAux.getName().contains("Any")) // exept Any Unquoted
+			{
+				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
+					rdLow=rdAux;
+			}
+		}
+		
+		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
+		
+		if(Utils.getOddBackFrame(rdLow, 0)>2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.70)
+		{
+			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.70 - going to PREPARING_SWING state", Color.BLUE);
+			setSTATE(PREPARING_SWING);
+		}
+		
+		//setSTATE(END);
+	}
+	
+	private void preparingSwing()
+	{
+		if(getMd().getUpdateInterval()!=500)
+		{
+			writeMsg("Seting Market Update to 500", Color.BLUE);
+			getMd().setUpdateInterval(500);	
+		}
+		writeMsg("In PREPARING_SWING state - tries left : "+TRIES_IN_PREPARING_SWING, Color.BLUE);
+		
+		TRIES_IN_PREPARING_SWING--;
+		if(TRIES_IN_PREPARING_SWING<=0)
+		{
+			writeMsg("Tries left in PREPARING_SWING state are over - going to END state", Color.RED);
+			setSTATE(END);
+			update();
+		}
+		
+		//testing suspended in last 30 samples 
+		writeMsg("Testing suspended in last 30 samples... ", Color.BLUE);
+		boolean hasBeenSuspended=false;
+		int vsize=getMd().getRunners().get(0).getDataFrames().size();
+		int limit=30;
+		if(vsize<30)
+			limit=vsize;
+		for(int i=0;i<limit;i++)
+		{
+			if(getMd().getRunners().get(0).getDataFrames().get(vsize-1-i).getState()==MarketData.SUSPENDED)
+				hasBeenSuspended=true;
+		}
+		
+		if(hasBeenSuspended)
+		{
+			writeMsg("Market has been suspended in the last 30 samples - ignoring this try ", Color.YELLOW);
+			return;
+		}
+		writeMsg("Market has not been suspended in the last 30 samples", Color.GREEN);
+		
+		//testing  at lest 5 variations in getLastMarketPrice()
+		writeMsg("Testing at lest 5 variations in getLastMarketPrice() ... ", Color.BLUE);
+		int matchedVariations=0;
+		for(int i=0;i<limit;i++)
+		{
+			
+		}
 		
 	}
 	
