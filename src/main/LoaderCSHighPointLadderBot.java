@@ -35,16 +35,16 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public String username=null;
 	public String password=null;
 	
-	public ScraperGoals sg;
+	//public ScraperGoals sg;
 	NextPreLiveCS nplcs=null;
 	
 	public LoaderCSHighPointLadderBot() {
 		// API login
 		startBetFair();
 		
-		sg=new ScraperGoals(); 
-		sg.startPolling();
-		System.out.println("Scraper is now polling");
+	//	sg=new ScraperGoals(); 
+	//	sg.startPolling();
+	//	System.out.println("Scraper is now polling");
 		
 		nplcs=new NextPreLiveCS(selectedExchange, apiContext);
 		nplcs.addMarketProviderListener(this);
@@ -103,7 +103,7 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public void newMarketSelected(MarketProvider mp, Market m) {
 		MarketData md=new MarketData(m, selectedExchange, apiContext);
 		md.setUpdateInterval(500);
-		md.addMarketChangeListener(new CSHighPointLadder(md,sg));
+		md.addMarketChangeListener(new CSHighPointLadder(md));
 		md.startPolling();
 		
 	}

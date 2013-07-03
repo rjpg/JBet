@@ -362,6 +362,11 @@ public class Utils {
 		return neighbourAux;
 	}
 	
+	public static int getTicksDiff(double oddA,double oddB)
+	{
+		return Math.abs(Utils.oddToIndex(oddA)-Utils.oddToIndex(oddB));
+	}
+	
 	public static int getTicksDiff(RunnersData rdA,RunnersData rdB)
 	{
 		double auxOddA=rdA.getDataFrames().get(rdA.getDataFrames().size()-1).getOddBack();
@@ -507,10 +512,37 @@ public class Utils {
 		return rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getOddBack();
 	}
 	
+	public static double getOddBackAVG(RunnersData rd,int windowSize, int pastFrame)
+	{
+		double ret=0;
+		for(int i=0;i<windowSize+1;i++)
+		{
+			ret+=getOddBackFrame(rd, i+pastFrame);
+		}
+		
+		ret/=windowSize+1;
+		
+		return ret;
+	}
+	
 	public static double getOddLayFrame(RunnersData rd,int pastFrame)
 	{
 		return rd.getDataFrames().get(rd.getDataFrames().size()-1-pastFrame).getOddLay();
 	}
+	
+	public static double getOddLayAVG(RunnersData rd,int windowSize, int pastFrame)
+	{
+		double ret=0;
+		for(int i=0;i<windowSize+1;i++)
+		{
+			ret+=getOddLayFrame(rd, i+pastFrame);
+		}
+		
+		ret/=windowSize+1;
+		
+		return ret;
+	}
+	
 	
 	public static int getMarketSateFrame(MarketData md,int pastFrame)
 	{
