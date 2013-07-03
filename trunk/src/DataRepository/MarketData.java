@@ -451,37 +451,34 @@ public class MarketData {
 			logWritteErrorFrame();
 			for(RunnersData rd:getRunners())
 			{
-				String rname = rd.getName();
-				int rid = rd.getId();
-
-				double roddLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddLay();
-				double ramountLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getAmountLay();
-
-				double roddBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
-				double ramountBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getAmountBack();
-
-				double rmatchedAmount = rd.getDataFrames().get(rd.getDataFrames().size()-1).getMatchedAmount();
-				double rlastMatchet = rd.getDataFrames().get(rd.getDataFrames().size()-1).getLastMatchet();
-
-				// double rweightmoneyBack=0;
-				// double rweightmoneyLay=0;
-
-				Vector<OddData> oddsLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getLayPrices();
-				Vector<OddData> oddsBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getBackPrices();
-
-				addRunner(rname, rid, timestamp, roddLay, ramountLay,
-						roddBack, ramountBack, /*
-						 * rweightmoneyLay,
-						 * rweightmoneyBack ,
-						 */rmatchedAmount,
-						 rlastMatchet, oddsLay, oddsBack);
-
-
-
-
+				if(rd.getDataFrames().size()!=0)
+				{
+					String rname = rd.getName();
+					int rid = rd.getId();
+	
+					double roddLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddLay();
+					double ramountLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getAmountLay();
+	
+					double roddBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
+					double ramountBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getAmountBack();
+	
+					double rmatchedAmount = rd.getDataFrames().get(rd.getDataFrames().size()-1).getMatchedAmount();
+					double rlastMatchet = rd.getDataFrames().get(rd.getDataFrames().size()-1).getLastMatchet();
+	
+					// double rweightmoneyBack=0;
+					// double rweightmoneyLay=0;
+	
+					Vector<OddData> oddsLay = rd.getDataFrames().get(rd.getDataFrames().size()-1).getLayPrices();
+					Vector<OddData> oddsBack = rd.getDataFrames().get(rd.getDataFrames().size()-1).getBackPrices();
+	
+					addRunner(rname, rid, timestamp, roddLay, ramountLay,
+							roddBack, ramountBack, /*
+							 * rweightmoneyLay,
+							 * rweightmoneyBack ,
+							 */rmatchedAmount,
+							 rlastMatchet, oddsLay, oddsBack);
+				}
 			}
-
-
 		}
 
 		/*System.out.print(getRunners().size());

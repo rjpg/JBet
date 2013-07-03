@@ -12,7 +12,9 @@ import javax.swing.JPanel;
 import scrapers.GameScoreData;
 import scrapers.xscores.ScraperGoals;
 
+import bets.BetData;
 import bots.Bot;
+import bots.ManualPlaceBetBot;
 
 import main.Parameters;
 import correctscore.MessageJFrame;
@@ -23,8 +25,13 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
 import GUI.MyChart2D;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.TradeMechanismUtils;
+import TradeMechanisms.swing.Swing;
+import TradeMechanisms.swing.SwingOptions;
 
-public class CSHighPointLadder extends Bot{
+public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 
 	// States
 	public static final int PRE_LIVE = 0;
@@ -38,16 +45,17 @@ public class CSHighPointLadder extends Bot{
 	
 	public int TRIES_IN_PREPARING_SWING=300;
 
-	ScraperGoals sg=null;
-	GameScoreData gsd=null;
+	public boolean end_runned=false;
+	
+	public Swing swing=null;
 	
 	//Visuals
 	private JFrame frame;
 	private MessagePanel msgPanel;
 	
-	public CSHighPointLadder(MarketData md,ScraperGoals sgA) {
+	public CSHighPointLadder(MarketData md) {
 		super(md,"CSHighPointLadder - "+md.getEventName());
-		sg=sgA;
+		
 		
 		initialize();
 	}
@@ -66,6 +74,7 @@ public class CSHighPointLadder extends Bot{
 		
 		writeMsg("Processing Game : "+getMd().getEventName(), Color.BLUE);
 		
+		/*
 		writeMsg("Games in Scrapper : ", Color.BLACK);
 		GameScoreData[] gameScoreData=sg.getGamesScoreData().toArray(new GameScoreData[]{});
 				
@@ -74,13 +83,14 @@ public class CSHighPointLadder extends Bot{
 			writeMsg("TeamA:"+gsd.getTeamA()+"-"+gsd.getActualGoalsA()+"("+gsd.getPrevGoalsA()+") - "+
 					"TeamB:"+gsd.getTeamB()+"-"+gsd.getActualGoalsB()+"("+gsd.getPrevGoalsB()+")",Color.BLUE);
 		}
-		
+		*/
 	}
 	
 	
 	
 	public void update()
 	{
+		if (end_runned) return;
 		switch (STATE) {
 	        case  PRE_LIVE: preLive(); break;
 	        case  WAIT_50_MINUTES: wait50minutes(); break;
@@ -97,6 +107,15 @@ public class CSHighPointLadder extends Bot{
 	private void preLive()
 	{
 	
+		if(Utils.getMarketMathedAmount(getMd(), 0)<5000)
+		{
+			writeMsg("No sufucient liquidity in market : "+Utils.getMarketMathedAmount(getMd(), 0), Color.RED);
+			setSTATE(END);
+			update();
+			return;
+		}
+		
+		
 		if(!getMd().isInPlay())
 		{
 			RunnersData rd=getMd().getRunners().get(0);
@@ -153,11 +172,15 @@ public class CSHighPointLadder extends Bot{
 		
 	}
 	
+	int wait50=0;
 	private void wait50minutes()
 	{
 		writeMsg("Next sample will be recieved in 50 minutes - goin to WAIT_ODD_UNDER_3 state", Color.BLUE);
 		getMd().setUpdateInterval(1000*60*50);
-		setSTATE(WAIT_ODD_UNDER_3);
+		wait50++;
+		
+		if(wait50>=2)
+			setSTATE(WAIT_ODD_UNDER_3);
 	}
 	
 	
@@ -169,6 +192,7 @@ public class CSHighPointLadder extends Bot{
 			writeMsg("Market is CLOSED - going to END state", Color.RED);
 			setSTATE(END);
 			update();
+			return;
 		}
 		
 		writeMsg("Seting Market Update to 2000", Color.BLUE);
@@ -180,16 +204,45 @@ public class CSHighPointLadder extends Bot{
 		
 		for(RunnersData rdAux:getMd().getRunners())
 		{
-			if(!rdAux.getName().contains("Any")) // exept Any Unquoted
+			if(!rdAux.getName().contains("Any")) // except Any Unquoted
 			{
 				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
 					rdLow=rdAux;
 			}
 		}
 		
+		if(rdLow.getDataFrames().get(rdLow.getDataFrames().size()-1).getState()==MarketData.SUSPENDED)
+		{
+			writeMsg("Market is suspended Testing consecutive ...", Color.BLUE);
+			int consecutiveSuspended=0;
+			int vsize=rdLow.getDataFrames().size();
+			int limit=200;
+			if(vsize<30)
+				limit=vsize;
+			
+			for(int i=0;i<limit;i++)
+				if(rdLow.getDataFrames().get(rdLow.getDataFrames().size()-1-i).getState()==MarketData.SUSPENDED)
+					consecutiveSuspended++;
+				else
+					break;
+			
+			if(consecutiveSuspended>120) // 4 minutes
+			{
+				writeMsg("Market was consecutive past 120 fsamples - going to END state", Color.RED);
+				setSTATE(END);
+				update();
+				return;
+			}
+			else
+			{
+				writeMsg("Market was not consecutive past 120 fsamples - continue in WAIT_ODD_UNDER_3 state", Color.BLUE);
+			}
+		}
+		
+		
 		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
 		
-		if(Utils.getOddBackFrame(rdLow, 0)>2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.70)
+		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.70)
 		{
 			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.70 - going to PREPARING_SWING state", Color.BLUE);
 			setSTATE(PREPARING_SWING);
@@ -200,9 +253,18 @@ public class CSHighPointLadder extends Bot{
 	
 	private void preparingSwing()
 	{
+		
+		if(getMd().getState()==MarketData.CLOSED)
+		{
+			writeMsg("Market is CLOSED - going to END state", Color.RED);
+			setSTATE(END);
+			update();
+			return;
+		}
+		
 		if(getMd().getUpdateInterval()!=500)
 		{
-			writeMsg("Seting Market Update to 500", Color.BLUE);
+			writeMsg("Setting Market Update to 500", Color.BLUE);
 			getMd().setUpdateInterval(500);	
 		}
 		writeMsg("In PREPARING_SWING state - tries left : "+TRIES_IN_PREPARING_SWING, Color.BLUE);
@@ -215,16 +277,32 @@ public class CSHighPointLadder extends Bot{
 			update();
 		}
 		
+		
+		// finding the low runner except any unquoted
+		RunnersData rdLow=getMd().getRunners().get(0);
+		
+		for(RunnersData rdAux:getMd().getRunners())
+		{
+			if(!rdAux.getName().contains("Any")) // except Any Unquoted
+			{
+				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
+					rdLow=rdAux;
+			}
+		}
+		
+		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
+		
+		
 		//testing suspended in last 30 samples 
 		writeMsg("Testing suspended in last 30 samples... ", Color.BLUE);
 		boolean hasBeenSuspended=false;
-		int vsize=getMd().getRunners().get(0).getDataFrames().size();
+		int vsize=rdLow.getDataFrames().size();
 		int limit=30;
 		if(vsize<30)
 			limit=vsize;
 		for(int i=0;i<limit;i++)
 		{
-			if(getMd().getRunners().get(0).getDataFrames().get(vsize-1-i).getState()==MarketData.SUSPENDED)
+			if(rdLow.getDataFrames().get(vsize-1-i).getState()==MarketData.SUSPENDED)
 				hasBeenSuspended=true;
 		}
 		
@@ -235,18 +313,127 @@ public class CSHighPointLadder extends Bot{
 		}
 		writeMsg("Market has not been suspended in the last 30 samples", Color.GREEN);
 		
-		//testing  at lest 5 variations in getLastMarketPrice()
-		writeMsg("Testing at lest 5 variations in getLastMarketPrice() ... ", Color.BLUE);
+		
+		
+		writeMsg("Testing odd Back AVG in last 15 samples (2.16 < oddBackAvg < 2.30)... ", Color.BLUE);
+		double oddBackAvg=Utils.getOddBackAVG(rdLow, (int)(limit/2), 0);
+		if(oddBackAvg>2.16 && oddBackAvg<2.30)
+		{
+			writeMsg("Odd Back AVG is 2.16 < oddBackAvg("+oddBackAvg+") < 2.30 ", Color.GREEN);
+		}
+		else
+		{
+			writeMsg("Odd Back AVG does not meet condition 2.16 < oddBackAvg("+oddBackAvg+") < 2.30 - ignoring this try ", Color.YELLOW);
+			return;
+		}
+		
+		//testing  at lest 5 variations in getLastMarketPrice()		
+		writeMsg("Testing at lest 5 variations in getLastMarketPrice() ... ", Color.BLUE);		
 		int matchedVariations=0;
+		double last=rdLow.getDataFrames().get(vsize-1).getLastMatchet();
 		for(int i=0;i<limit;i++)
 		{
-			
+			if(last!=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet())
+			{
+				matchedVariations++;
+				last=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet();
+			}
 		}
+		
+		if(matchedVariations>5)
+		{
+			writeMsg("There was more than 5 variations on last Matched Pricer in the last 30 samples", Color.GREEN);
+		}
+		else
+		{
+			writeMsg("There was not more than 5 variations on last Matched Pricer in the last 30 samples - ignoring this try", Color.RED);
+			return;
+		}
+		
+		writeMsg("Selecting entry Odd... ", Color.BLUE);		
+		double entryOdd=Utils.getOddBackFrame(rdLow, 0);
+		if(entryOdd<2.16)
+			entryOdd=2.16;
+		
+		if(entryOdd>2.20)
+			entryOdd=2.20;
+		writeMsg("Entry Odd : "+entryOdd, Color.BLUE);
+		
+		writeMsg("Starting Swing ...", Color.BLUE);
+		
+		int stopProfit=Utils.getTicksDiff(entryOdd, 2.02);
+		
+		BetData betOpen=new BetData(rdLow,
+				3.00,
+				entryOdd,
+				BetData.BACK,
+				false);
+		
+		SwingOptions so=new SwingOptions(betOpen, this);
+		so.setWaitFramesOpen(60*2);      // 1 minute
+		so.setWaitFramesNormal(60*3*2);   // 3 minutes
+		so.setWaitFramesBestPrice(60*2);  // 1 minute
+		so.setTicksProfit(stopProfit);
+		so.setTicksLoss(5);
+		so.setForceCloseOnStopLoss(false);
+		so.setInsistOpen(false);
+		so.setGoOnfrontInBestPrice(false);
+		so.setUseStopProfifInBestPrice(true);
+		so.setPercentageOpen(0.80);   // if 80% is open go to close  
+		so.setDelayBetweenOpenClose(-1);
+		so.setDelayIgnoreStopLoss(50);
+		so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+		
+			
+		swing=new Swing(so);
+		writeMsg("Swing Started - going to state EXECUTING_SWING", Color.BLUE);	
+		setSTATE(EXECUTING_SWING);
+		
 		
 	}
 	
 	private void executingSwing()
 	{
+		if(getMd().getState()==MarketData.CLOSED)
+		{
+			writeMsg("Market is CLOSED - going to END state", Color.RED);
+			setSTATE(END);
+			update();
+			return;
+		}
+		
+		if(swing==null)
+		{
+			writeMsg("Swing is null - going to END state", Color.RED);
+			setSTATE(END);
+			update();
+			return;
+		}
+		
+		if(swing.isEnded())
+		{
+			String[] fields=swing.getStatisticsFields().split(" ");
+			String[] values=swing.getStatisticsValues().split(" ");
+			           
+			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			writeMsg(msg,Color.BLUE);
+			writeMsg("Swing has ended - going to END state", Color.BLUE);
+			setSTATE(END);
+			update();
+			return;
+		}
+		else
+		{
+			writeMsg("Swing has not ended - Swing State: "+ TradeMechanismUtils.getStateString(swing.getState()), Color.BLUE);
+		}
+		
 		
 	}
 	
@@ -254,6 +441,7 @@ public class CSHighPointLadder extends Bot{
 	private void end()
 	{
 		writeMsg("Closing Market : "+md.getName()+" from :"+md.getEventName(),Color.BLUE);
+		end_runned=true;
 		md.removeMarketChangeListener(this);
 		md.stopPolling();
 		md.clean();
@@ -279,10 +467,10 @@ public class CSHighPointLadder extends Bot{
 	public void MarketChange(MarketData md, int marketEventType) {
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 		{
-			for(RunnersData rd:md.getRunners())
+			/*for(RunnersData rd:md.getRunners())
 			{
 				writeMsg(rd.getName()+" Odd Back:"+Utils.getAmountBackFrame(rd, 0)+" @ "+Utils.getOddBackFrame(rd, 0),Color.BLUE);
-			}
+			}*/
 			
 			update();
 			
@@ -399,6 +587,26 @@ public class CSHighPointLadder extends Bot{
     	
     	return ret;
     }
+
+    /* ------------------------ String manipulation ... END ---------------------*/ 
     
-    /* ------------------------ String manipulation ... END ---------------------*/
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		writeMsg("[Swing msg] "+msg, color);
+		
+	}
+    
+
 }
