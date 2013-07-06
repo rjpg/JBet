@@ -9,8 +9,13 @@ public class EventData {
 	public Calendar startTime;
 		
 	int matchOddsId;
+	boolean matchOddsTurnInPlay=true;
+
 	int overUnderId[]=new int[9];
+	boolean overUnderTurnInPlay=true;
+	
 	int correctScoreId;
+	boolean correctScoreTurnInPlay=true;
 	
 	public EventData(String name) {
 		eventName=name;
@@ -56,4 +61,28 @@ public class EventData {
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
 	}
+	
+	public boolean isMatchOddsTurnInPlay() {
+		return matchOddsTurnInPlay;
+	}
+
+	public void setMatchOddsTurnInPlay(boolean matchOddsTurnInPlay) {
+		this.matchOddsTurnInPlay = matchOddsTurnInPlay;
+	}
+
+	public boolean isOverUnderTurnInPlay() {
+		return overUnderTurnInPlay;
+	}
+
+	public void setOverUnderTurnInPlay(boolean overUnderTurnInPlay) {
+		this.overUnderTurnInPlay = overUnderTurnInPlay;
+	}
+	public boolean isCorrectScoreTurnInPlay() {
+		return correctScoreTurnInPlay;
+	}
+
+	public void setCorrectScoreTurnInPlay(boolean correctScoreTurnInPlay) {
+		this.correctScoreTurnInPlay = correctScoreTurnInPlay;
+	}
+
 }

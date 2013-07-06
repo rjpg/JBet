@@ -199,12 +199,12 @@ public class MarketData {
 		if(runner==null)
 		{
 			runner=new RunnersData(name, id, this);
-			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state);
+			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state,isInPlay());
 			runners.add(runner);
 		}
 		else
 		{
-			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state);
+			runner.addPricesData(timestamp, roddLay, ramountLay, roddBack, ramountBack,/*rweightmoneyLay, rweightmoneyBack,*/ rmatchedAmount, rlastMatchet, rlayPrices,rbackPrices,state,isInPlay());
 		}
 	}
 
@@ -274,14 +274,14 @@ public class MarketData {
 
 
 
-		diffaux =start.getTime().getTime()-currentTime.getTime().getTime() ;
-		if(diffaux<=0 /*|| prices.getInPlayDelay()>0*/)
-		{
-			setInPlay(true);
-			warnListenersLive();
-			//return;
-		}
-		else if(prices!=null && prices.getInPlayDelay()>0)
+//		diffaux =start.getTime().getTime()-currentTime.getTime().getTime() ;
+//		if(diffaux<=0 /*|| prices.getInPlayDelay()>0*/)
+//		{
+//			setInPlay(true);
+//			warnListenersLive();
+//		}
+//		else 	
+		if(prices!=null && prices.getInPlayDelay()>0)
 		{
 			if(!isInPlay())
 			{

@@ -129,7 +129,7 @@ public class ManualDutchingChaseBot extends Bot implements TradeMechanismListene
 	{
 		//writeMsg("Minutes to start :"+getMinutesToStart(), Color.BLUE);
 		
-		writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0), Color.BLUE);
+		writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live :"+Utils.isInPlayFrame(md,0), Color.BLUE);
 		
 		Vector<OddData> vod=new Vector<OddData>();
 		//if(vod.size()==0) return;

@@ -52,9 +52,9 @@ public class RunnersData {
 	
 	}
 	
-	public void addPricesData (Calendar timeA, double oddLayA,double amountLayA, double oddBackA,double amountBackA,/* double weightmoneyLayA, double weightmoneyBackA ,*/ double matchedAmountA, double lastMatchetA,  Vector<OddData> layPricesA, Vector<OddData> backPricesA,int state)
+	public void addPricesData (Calendar timeA, double oddLayA,double amountLayA, double oddBackA,double amountBackA,/* double weightmoneyLayA, double weightmoneyBackA ,*/ double matchedAmountA, double lastMatchetA,  Vector<OddData> layPricesA, Vector<OddData> backPricesA,int state, boolean isInPlay)
 	{
-		HistoryData d=new HistoryData(timeA, oddLayA, amountLayA, oddBackA, amountBackA,/* weightmoneyLayA, weightmoneyBackA,*/ matchedAmountA, lastMatchetA,layPricesA, backPricesA,state);
+		HistoryData d=new HistoryData(timeA, oddLayA, amountLayA, oddBackA, amountBackA,/* weightmoneyLayA, weightmoneyBackA,*/ matchedAmountA, lastMatchetA,layPricesA, backPricesA,state,isInPlay);
 		dataFrames.add(d);
 		
 		if(Parameters.HISTORICAL_DATA_FRAMES_MEMORY<1)

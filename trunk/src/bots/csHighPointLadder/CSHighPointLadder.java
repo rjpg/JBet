@@ -43,7 +43,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 	
 	protected int STATE=PRE_LIVE;
 	
-	public int TRIES_IN_PREPARING_SWING=300;
+	public int TRIES_IN_PREPARING_SWING=500;
 
 	public boolean end_runned=false;
 	
@@ -107,12 +107,16 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 	private void preLive()
 	{
 	
-		if(Utils.getMarketMathedAmount(getMd(), 0)<5000)
+		if(Utils.getMarketMathedAmount(getMd(), 0)<2000)
 		{
-			writeMsg("No sufucient liquidity in market : "+Utils.getMarketMathedAmount(getMd(), 0), Color.RED);
+			writeMsg("No sufucient liquidity in market (<2000): "+Utils.getMarketMathedAmount(getMd(), 0), Color.RED);
 			setSTATE(END);
 			update();
 			return;
+		}
+		else
+		{
+			writeMsg("Sufucient liquidity in market (>2000): "+Utils.getMarketMathedAmount(getMd(), 0), Color.GREEN);
 		}
 		
 		
@@ -138,16 +142,16 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 						
 						writeMsg("Runner 0 - 0 Odd AVG :"+oddBackAvg, Color.BLUE);
 						
-						if(oddBackAvg<15)
+						if(oddBackAvg<20)
 						{
-							writeMsg("Odd AVG lower than 15.0 OK - goin to WAIT_50_MINUTES state", Color.GREEN);
+							writeMsg("Odd AVG lower than 20.0 OK - goin to WAIT_50_MINUTES state", Color.GREEN);
 							setSTATE(WAIT_50_MINUTES);
 							update();
 							return;
 						}
 						else
 						{
-							writeMsg("Odd AVG bigger than 15.0 OK - goin to END state", Color.RED);
+							writeMsg("Odd AVG bigger than 20.0 OK - goin to END state", Color.RED);
 							setSTATE(END);
 							update();
 							return;
@@ -172,15 +176,13 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 	}
 	
-	int wait50=0;
+	
 	private void wait50minutes()
 	{
 		writeMsg("Next sample will be recieved in 50 minutes - goin to WAIT_ODD_UNDER_3 state", Color.BLUE);
 		getMd().setUpdateInterval(1000*60*50);
-		wait50++;
 		
-		if(wait50>=2)
-			setSTATE(WAIT_ODD_UNDER_3);
+		setSTATE(WAIT_ODD_UNDER_3);
 	}
 	
 	
@@ -195,9 +197,11 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			return;
 		}
 		
-		writeMsg("Seting Market Update to 2000", Color.BLUE);
-		getMd().setUpdateInterval(2000);
-		
+		if(getMd().getUpdateInterval()!=2000)
+		{
+			writeMsg("Seting Market Update to 2000", Color.BLUE);
+			getMd().setUpdateInterval(2000);
+		}
 		writeMsg("Finding the lower result...", Color.BLUE);
 		
 		RunnersData rdLow=getMd().getRunners().get(0);
@@ -211,40 +215,11 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			}
 		}
 		
-		if(rdLow.getDataFrames().get(rdLow.getDataFrames().size()-1).getState()==MarketData.SUSPENDED)
-		{
-			writeMsg("Market is suspended Testing consecutive ...", Color.BLUE);
-			int consecutiveSuspended=0;
-			int vsize=rdLow.getDataFrames().size();
-			int limit=200;
-			if(vsize<30)
-				limit=vsize;
-			
-			for(int i=0;i<limit;i++)
-				if(rdLow.getDataFrames().get(rdLow.getDataFrames().size()-1-i).getState()==MarketData.SUSPENDED)
-					consecutiveSuspended++;
-				else
-					break;
-			
-			if(consecutiveSuspended>120) // 4 minutes
-			{
-				writeMsg("Market was consecutive past 120 fsamples - going to END state", Color.RED);
-				setSTATE(END);
-				update();
-				return;
-			}
-			else
-			{
-				writeMsg("Market was not consecutive past 120 fsamples - continue in WAIT_ODD_UNDER_3 state", Color.BLUE);
-			}
-		}
-		
-		
 		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
 		
-		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.70)
+		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.50)
 		{
-			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.70 - going to PREPARING_SWING state", Color.BLUE);
+			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.50 - going to PREPARING_SWING state", Color.BLUE);
 			setSTATE(PREPARING_SWING);
 		}
 		
@@ -316,7 +291,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		
 		writeMsg("Testing odd Back AVG in last 15 samples (2.16 < oddBackAvg < 2.30)... ", Color.BLUE);
-		double oddBackAvg=Utils.getOddBackAVG(rdLow, (int)(limit/2), 0);
+		double oddBackAvg=Utils.getOddBackFrame(rdLow, /*(int)(limit/2),*/ 0);
 		if(oddBackAvg>2.16 && oddBackAvg<2.30)
 		{
 			writeMsg("Odd Back AVG is 2.16 < oddBackAvg("+oddBackAvg+") < 2.30 ", Color.GREEN);
@@ -327,26 +302,39 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			return;
 		}
 		
-		//testing  at lest 5 variations in getLastMarketPrice()		
-		writeMsg("Testing at lest 5 variations in getLastMarketPrice() ... ", Color.BLUE);		
-		int matchedVariations=0;
-		double last=rdLow.getDataFrames().get(vsize-1).getLastMatchet();
-		for(int i=0;i<limit;i++)
-		{
-			if(last!=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet())
-			{
-				matchedVariations++;
-				last=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet();
-			}
-		}
+//		//testing  at lest 5 variations in getLastMarketPrice()		
+//		writeMsg("Testing at lest 5 variations in getLastMarketPrice() ... ", Color.BLUE);		
+//		int matchedVariations=0;
+//		double last=rdLow.getDataFrames().get(vsize-1).getLastMatchet();
+//		for(int i=0;i<limit;i++)
+//		{
+//			if(last!=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet())
+//			{
+//				matchedVariations++;
+//				last=rdLow.getDataFrames().get(vsize-1-i).getLastMatchet();
+//			}
+//		}
+//		
+//		if(matchedVariations>5)
+//		{
+//			writeMsg("There was more than 5 variations on last Matched Pricer in the last 30 samples", Color.GREEN);
+//		}
+//		else
+//		{
+//			writeMsg("There was not more than 5 variations on last Matched Pricer in the last 30 samples - ignoring this try", Color.RED);
+//			return;
+//		}
 		
-		if(matchedVariations>5)
+		//Testing Amounts for Lay 
+		writeMsg("Testing Odds Lay...", Color.BLUE);	
+		double oddLay=Utils.getOddLayFrame(rdLow, 0);
+		if(oddLay>2.34)
 		{
-			writeMsg("There was more than 5 variations on last Matched Pricer in the last 30 samples", Color.GREEN);
+			writeMsg("Odd Lay under 2.34 - OK", Color.GREEN);
 		}
 		else
 		{
-			writeMsg("There was not more than 5 variations on last Matched Pricer in the last 30 samples - ignoring this try", Color.RED);
+			writeMsg("Odd Lay is above 2.34 - ignoring this try", Color.GREEN);
 			return;
 		}
 		

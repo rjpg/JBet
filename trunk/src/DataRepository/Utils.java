@@ -549,6 +549,11 @@ public class Utils {
 		return md.getRunners().get(0).getDataFrames().get(md.getRunners().get(0).getDataFrames().size()-1-pastFrame).getState();
 	}
 	
+	public static boolean isInPlayFrame(MarketData md,int pastFrame)
+	{
+		return md.getRunners().get(0).getDataFrames().get(md.getRunners().get(0).getDataFrames().size()-1-pastFrame).isInPlay();
+	}
+	
 	public static boolean isWomGoingDown(RunnersData rd, int windowSize,int pastFrame)
 	{
 		if(rd.getDataFrames().size()-(pastFrame+windowSize+1)<0)
@@ -1355,7 +1360,7 @@ public class Utils {
         
         System.out.println("AM:"+Utils.closeAmountLay(1.20,  100,  1.10  ));
         
-        
+        System.out.println("ticks dif:"+Utils.getTicksDiff(2.2, 2.02));
         //10.32 @ 6.2 (LAY)  10.32258064516129
         //9.877342419080069 @ 5.87
         //890.3128 @ 9.884166553597792 (LAY)
