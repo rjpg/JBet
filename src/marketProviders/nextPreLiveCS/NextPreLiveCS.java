@@ -94,15 +94,15 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess=findEventDataTodayGames(name);
 				if(edInprocess==null)
 				{
-				edInprocess=new EventData(name);
-				Calendar starttime=Calendar.getInstance();
-				
-				starttime.setTimeInMillis(Long.parseLong(fields[4]));
-				//System.out.println("Time Milis "+fields[4] );
-				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss,SSS");
-				System.out.println("Time : "+dateFormat.format(starttime.getTimeInMillis()));
-				edInprocess.setStartTime(starttime);
-				todayGames.add(edInprocess);
+					edInprocess=new EventData(name);
+					Calendar starttime=Calendar.getInstance();
+					
+					starttime.setTimeInMillis(Long.parseLong(fields[4]));
+					//System.out.println("Time Milis "+fields[4] );
+					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss,SSS");
+					System.out.println("Time : "+dateFormat.format(starttime.getTimeInMillis()));
+					edInprocess.setStartTime(starttime);
+					todayGames.add(edInprocess);
 				}
 				
 			}
@@ -111,12 +111,21 @@ public class NextPreLiveCS extends MarketProvider{
 			{
 				edInprocess.setMatchOddsId(Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getMatchOddsId());
+				//System.out.println("id MO is going live : \"" + fields[15]+"\"" );
+				if(fields[15].equals("Y"))
+					edInprocess.setMatchOddsTurnInPlay(true);
+				else
+					edInprocess.setMatchOddsTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Correct Score"))
 			{
 				edInprocess.setCorrectScoreId(Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setCorrectScoreTurnInPlay(true);
+				else
+					edInprocess.setCorrectScoreTurnInPlay(false);
 			}
 			
 			
@@ -124,54 +133,92 @@ public class NextPreLiveCS extends MarketProvider{
 			{
 				edInprocess.setOverUnderId(0,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 1.5 Goals"))
 			{
 				edInprocess.setOverUnderId(1,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 2.5 Goals"))
 			{
 				edInprocess.setOverUnderId(2,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 3.5 Goals"))
 			{
 				edInprocess.setOverUnderId(3,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 4.5 Goals"))
 			{
 				edInprocess.setOverUnderId(4,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 5.5 Goals"))
 			{
 				edInprocess.setOverUnderId(5,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 6.5 Goals"))
 			{
 				edInprocess.setOverUnderId(6,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 7.5 Goals"))
 			{
 				edInprocess.setOverUnderId(7,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 			if(fields[1].equals("Over/Under 8.5 Goals"))
 			{
 				edInprocess.setOverUnderId(8,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
+				if(fields[15].equals("Y"))
+					edInprocess.setOverUnderTurnInPlay(true);
+				else
+					edInprocess.setOverUnderTurnInPlay(false);
 			}
 			
 		}
@@ -205,7 +252,7 @@ public class NextPreLiveCS extends MarketProvider{
 		{
 			Calendar eventMinus1M= (Calendar) ed.getStartTime().clone();
 			eventMinus1M.add(Calendar.MINUTE, -2);
-			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(ed))
+			if (eventMinus1M.compareTo(now)>=0 &&eventMinus1M.compareTo(nowPlusTenSecs)<0 && !eventsInformed.contains(ed) && ed.isCorrectScoreTurnInPlay())
 			{
 				
 				System.out.println(" Game processing :"+ed.getEventName()+ " CS Id : "+ed.getCorrectScoreId());

@@ -298,6 +298,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 							swingPanel.isKeepIP());
 					
 					SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
+					
+					/*
 					so.setWaitFramesOpen(swingPanel.getTimeOpen());
 					so.setWaitFramesNormal(swingPanel.getTimeClose());
 					so.setWaitFramesBestPrice(swingPanel.getTimeBestPrice());
@@ -310,6 +312,21 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					so.setPercentageOpen(0.80);   // if 80% is open go to close  
 					so.setDelayBetweenOpenClose(-1);
 					so.setDelayIgnoreStopLoss(-1);
+					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+					*/
+					
+					so.setWaitFramesOpen(60*2);      // 1 minute
+					so.setWaitFramesNormal(60*3*2);   // 3 minutes
+					so.setWaitFramesBestPrice(60*2);  // 1 minute
+					so.setTicksProfit(9);
+					so.setTicksLoss(5);
+					so.setForceCloseOnStopLoss(false);
+					so.setInsistOpen(false);
+					so.setGoOnfrontInBestPrice(false);
+					so.setUseStopProfifInBestPrice(true);
+					so.setPercentageOpen(0.80);   // if 80% is open go to close  
+					so.setDelayBetweenOpenClose(-1);
+					so.setDelayIgnoreStopLoss(50);
 					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					
 					Swing swing=new Swing(so);

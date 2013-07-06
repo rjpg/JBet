@@ -46,6 +46,7 @@ import bots.StudyBot;
 import bots.WomNeighboursBot;
 import bots.dutchinBot.ManualDutchingBot;
 import bots.dutchingChaseBot.ManualDutchingChaseBot;
+import bots.horseLay3Bot.HorseLay3Bot;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.handler.GlobalAPI;
@@ -176,6 +177,7 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			if(Parameters.manualPlaceBetBot)
 			{
 				new ManualPlaceBetBot(md,this);
+				new HorseLay3Bot(md, this);
 				//new ManualDutchingBot(md);
 				new ManualDutchingChaseBot(md);
 			}
@@ -300,9 +302,9 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				//new ManualPlaceBetBot(md,this);
+				new ManualPlaceBetBot(md,this);
 				//new ManualDutchingBot(md);
-				new ManualDutchingChaseBot(md);
+				//new ManualDutchingChaseBot(md);
 
 			}
 			
@@ -545,13 +547,21 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 				next.getStartTime().get(Calendar.MINUTE)+"-"+
 				next.getMarketName());
 		
+		int tries=3;
+		while (tries>0)
+		{
 		try {
 			ret=ExchangeAPI.getMarket(selectedExchange, apiContext, next.getMarketId());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			tries--;
 		}
 		
+		if(ret!=null)
+			tries=0;
+		
+		}
 		return ret;
 	}
 	

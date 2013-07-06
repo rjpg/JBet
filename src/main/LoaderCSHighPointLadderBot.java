@@ -21,6 +21,7 @@ import bots.csHighPointLadder.CSHighPointLadder;
 
 
 import DataRepository.MarketData;
+import DataRepository.Utils;
 import demo.handler.GlobalAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
@@ -40,6 +41,9 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	
 	public LoaderCSHighPointLadderBot() {
 		// API login
+		
+		
+		
 		startBetFair();
 		
 	//	sg=new ScraperGoals(); 
@@ -103,7 +107,7 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public void newMarketSelected(MarketProvider mp, Market m) {
 		MarketData md=new MarketData(m, selectedExchange, apiContext);
 		md.setUpdateInterval(500);
-		md.addMarketChangeListener(new CSHighPointLadder(md));
+		new CSHighPointLadder(md);
 		md.startPolling();
 		
 	}
@@ -115,6 +119,8 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	}
 	
 	public static void main(String[] args) {
+		Utils.init();
+		System.out.println("Utils.init() called ");
 		new LoaderCSHighPointLadderBot();
 	}
 
