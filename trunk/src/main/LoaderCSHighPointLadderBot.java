@@ -121,6 +121,11 @@ public class LoaderCSHighPointLadderBot  implements MarketProviderListerner{
 	public static void main(String[] args) {
 		Utils.init();
 		System.out.println("Utils.init() called ");
+		
+		Parameters.log=false;  // Log or not to Log when not in replay
+		Parameters.replay=false; // replay or read from file
+		Parameters.simulation=false;
+		
 		new LoaderCSHighPointLadderBot();
 	}
 
