@@ -176,10 +176,10 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				new ManualPlaceBetBot(md,this);
+				//new ManualPlaceBetBot(md,this);
 				new HorseLay3Bot(md, this);
 				//new ManualDutchingBot(md);
-				new ManualDutchingChaseBot(md);
+				//new ManualDutchingChaseBot(md);
 			}
 			
 			if(Parameters.mecanicBot)
@@ -579,13 +579,14 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 			return;
 		}
 		
+		
 		md.stopPolling();
 		System.err.println("Stop Polling");
-		/*try {
-			Thread.sleep(2000);
+		try {
+			Thread.sleep(md.getUpdateInterval()+100);
 		} catch (Exception e) {
 			// e.printStackTrace();
-		}*/
+		}
 		md.clean();
 		System.err.println("Clean");
 		/*try {

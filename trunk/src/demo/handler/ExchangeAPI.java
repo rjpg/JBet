@@ -166,6 +166,7 @@ public class ExchangeAPI {
         
         // Send the request to the Betfair Exchange Service.
         GetAccountFundsResp resp=null;
+        
         sem.acquire();
         try {
              resp = getStub(exch).getAccountFunds(msg).getResult();

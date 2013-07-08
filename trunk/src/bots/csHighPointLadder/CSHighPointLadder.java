@@ -197,10 +197,10 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			return;
 		}
 		
-		if(getMd().getUpdateInterval()!=2000)
+		if(getMd().getUpdateInterval()!=3000)
 		{
-			writeMsg("Seting Market Update to 2000", Color.BLUE);
-			getMd().setUpdateInterval(2000);
+			writeMsg("Seting Market Update to 3000", Color.BLUE);
+			getMd().setUpdateInterval(3000);
 		}
 		writeMsg("Finding the lower result...", Color.BLUE);
 		
@@ -217,9 +217,9 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
 		
-		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.36)
+		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.28)
 		{
-			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.36 - going to PREPARING_SWING state", Color.ORANGE);
+			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.28 - going to PREPARING_SWING state", Color.ORANGE);
 			setSTATE(PREPARING_SWING);
 		}
 		
@@ -290,15 +290,15 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		
 		
-		writeMsg("Testing odd Back AVG in last 15 samples (2.16 < oddBackAvg < 2.26)... ", Color.BLUE);
+		writeMsg("Testing odd Back AVG in last 15 samples (2.16 < oddBackAvg < 2.24)... ", Color.BLUE);
 		double oddBackAvg=Utils.getOddBackFrame(rdLow, /*(int)(limit/2),*/ 0);
-		if(oddBackAvg>2.16 && oddBackAvg<2.26)
+		if(oddBackAvg>2.16 && oddBackAvg<2.24)
 		{
-			writeMsg("Odd Back AVG is 2.16 < oddBackAvg("+oddBackAvg+") < 2.26 ", Color.GREEN);
+			writeMsg("Odd Back AVG is 2.16 < oddBackAvg("+oddBackAvg+") < 2.24 ", Color.GREEN);
 		}
 		else
 		{
-			writeMsg("Odd Back AVG does not meet condition 2.16 < oddBackAvg("+oddBackAvg+") < 2.26 - ignoring this try ", Color.YELLOW);
+			writeMsg("Odd Back AVG does not meet condition 2.16 < oddBackAvg("+oddBackAvg+") < 2.24 - ignoring this try ", Color.YELLOW);
 			return;
 		}
 		
@@ -328,13 +328,13 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		//Testing Amounts for Lay 
 		writeMsg("Testing Odds Lay...", Color.BLUE);	
 		double oddLay=Utils.getOddLayFrame(rdLow, 0);
-		if(oddLay<2.30)
+		if(oddLay<2.26)
 		{
-			writeMsg("Odd Lay under 2.30 - OK (Runner : "+rdLow.getName()+" @ "+oddLay+")", Color.GREEN);
+			writeMsg("Odd Lay under 2.26 - OK (Runner : "+rdLow.getName()+" @ "+oddLay+")", Color.GREEN);
 		}
 		else
 		{
-			writeMsg("Odd Lay is above 2.30 - ignoring this try (Runner : "+rdLow.getName()+" @ "+oddLay+")", Color.GREEN);
+			writeMsg("Odd Lay is above 2.26- ignoring this try (Runner : "+rdLow.getName()+" @ "+oddLay+")", Color.GREEN);
 			return;
 		}
 		

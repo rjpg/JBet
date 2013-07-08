@@ -32,7 +32,7 @@ public class LoaderManualPlaceBetBot {
 		Parameters.neighboursCorrelationBot=false;
 		Parameters.neuralDataBot=false; 
 		
-		Parameters.simulation=false;
+		Parameters.simulation=true;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 		Parameters.WOM_DIST_CENTER=5;
 		Parameters.CHART_FRAMES=300;
