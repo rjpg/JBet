@@ -26,7 +26,7 @@ import bots.Bot;
 import bots.dutchingChaseBot.DutchingChaseOptionsPanel;
 import correctscore.MessageJFrame;
 
-public class HorseLay3Bot extends Bot{
+public class HorseLay3BotAbove6 extends Bot{
 
 	//Visuals
 	private JFrame frame;
@@ -38,12 +38,12 @@ public class HorseLay3Bot extends Bot{
 	
 	public boolean betsCanceled=false;
 	
+	public boolean finish=false;
+	public boolean win=false;
+	
 	public Vector<BetData> bets=new Vector<BetData>();
 	
 	public BetData betMatched=null;
-	
-	public boolean finish=false;
-	public boolean win=false;
 	
 	// parameters 
 	public int martingaleTries=40;
@@ -55,8 +55,8 @@ public class HorseLay3Bot extends Bot{
 	
 	public int misses=0;
 	
-	public HorseLay3Bot(MarketData md,Manager managerA,double initStake) {
-		super(md,"HorseLay3Bot - ");
+	public HorseLay3BotAbove6(MarketData md,Manager managerA,double initStake) {
+		super(md,"HorseLay3BotAbove6 - ");
 		manager=managerA;
 		amount=initStake;
 		initialize();
@@ -97,7 +97,6 @@ public class HorseLay3Bot extends Bot{
 				{
 					writeMsg("The mached Lay Bet was on the winner - Martingale for the nest race", Color.RED);
 					misses++;
-					
 					win=false;
 					
 					if(misses>=martingaleTries)
@@ -143,38 +142,21 @@ public class HorseLay3Bot extends Bot{
 				
 			}
 			
-			writeMsg("Going to the next Race",Color.RED);
+			writeMsg("Going to the next Race (finish)",Color.RED);
 			writeStatisticsToFile();
 			finish=true;
-			manager.MarketLiveMode(getMd());
+			// manager.MarketLiveMode(getMd());
 		}
 		
 		if(!betsPlaced)
 		{
 			if(getMinutesToStart()==0)
 			{
-				RunnersData rdLow=getMd().getRunners().get(0);
-				
-				for(RunnersData rdAux:getMd().getRunners())
-					if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
-							rdLow=rdAux;
-				
-				RunnersData rdLow2=getMd().getRunners().get(0);
-				
-				if(rdLow2==rdLow)
-					rdLow2=getMd().getRunners().get(1);
-				
-				for(RunnersData rdAux:getMd().getRunners())
-					if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow2, 0) && rdAux!=rdLow)
-							rdLow2=rdAux;
-				
-				writeMsg("At minute 0 the lower runner found is "+rdLow.getName()+" @ "+ Utils.getOddBackFrame(rdLow, 0)+" . The 2nd lower runner found is "+rdLow2.getName()+" @ "+ Utils.getOddBackFrame(rdLow2, 0), Color.BLUE);
-				
-				
 				for(RunnersData rdAux:getMd().getRunners())
 				{
-					if(rdAux!=rdLow && rdAux!=rdLow2)
+					if(Utils.getOddBackFrame(rdAux,0)>6.0)
 					{
+						writeMsg("Adding Runner to placeBet : "+rdAux.getName(), Color.BLUE);
 						BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
 						bets.add(bd);
 					}
@@ -223,14 +205,14 @@ public class HorseLay3Bot extends Bot{
 		 BufferedWriter out=null;
 			
 				try {
-					out = new BufferedWriter(new FileWriter("HorseLay3Bot.txt", true));
+					out = new BufferedWriter(new FileWriter("HorseLay3BotAbove6.txt", true));
 					} catch (IOException e) {
 					e.printStackTrace();
-					System.out.println("Error Open HorseLay3Bot.txt for writing");
+					System.out.println("Error Open HorseLay3BotAbove6.txt for writing");
 					}
 				if(out==null)
 				{
-					System.err.println("could not open HorseLay3Bot.txt" );
+					System.err.println("could not open HorseLay3BotAbove6.txt" );
 					return;
 				}
 				
@@ -253,7 +235,7 @@ public class HorseLay3Bot extends Bot{
 					out.newLine();
 					out.flush();
 				} catch (IOException e) {
-					System.out.println("HorseLay3Bot:Error wrtting data to log file");
+					System.out.println("HorseLay3BotAbove6:Error wrtting data to log file");
 					e.printStackTrace();
 				}
 				
