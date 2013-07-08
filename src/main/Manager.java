@@ -47,6 +47,8 @@ import bots.WomNeighboursBot;
 import bots.dutchinBot.ManualDutchingBot;
 import bots.dutchingChaseBot.ManualDutchingChaseBot;
 import bots.horseLay3Bot.HorseLay3Bot;
+import bots.horseLay3Bot.HorseLay3BotAbove6;
+import bots.horseLay3Bot.HorseLayFavorite;
 import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.handler.GlobalAPI;
@@ -176,10 +178,17 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				//new ManualPlaceBetBot(md,this);
-				new HorseLay3Bot(md, this);
+				new ManualPlaceBetBot(md,this);
+				
 				//new ManualDutchingBot(md);
 				//new ManualDutchingChaseBot(md);
+			}
+			
+			if(Parameters.horselayBots)
+			{
+				new HorseLay3Bot(md, this,3);
+				new HorseLay3BotAbove6(md, this,3);
+				new HorseLayFavorite(md, this,3);
 			}
 			
 			if(Parameters.mecanicBot)

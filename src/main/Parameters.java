@@ -32,6 +32,7 @@ public class Parameters {
 	static public boolean influenceBot=false;
 	static public boolean baseOfBot=false; // dummy bot for test
 	static public boolean manualPlaceBetBot=false; // for testing BetManager
+	static public boolean horselayBots=false; // for testing BetManager
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
