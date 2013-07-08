@@ -18,6 +18,7 @@ import DataRepository.Utils;
 import GUI.MessagePanel;
 import GUI.MyChart2D;
 import bets.BetData;
+import bets.BetUtils;
 import bots.Bot;
 import bots.dutchingChaseBot.DutchingChaseOptionsPanel;
 import correctscore.MessageJFrame;
@@ -34,8 +35,19 @@ public class HorseLay3Bot extends Bot{
 	
 	public boolean betsCanceled=false;
 	
-	
 	public Vector<BetData> bets=new Vector<BetData>();
+	
+	public BetData betMatched=null;
+	
+	// parameters 
+	public int martingaleTries=4;
+	public double oddActuation=3.00;
+	public double initialAmount=3.00;
+	//
+	
+	public double amount=initialAmount;
+	
+	public int misses=0;
 	
 	public HorseLay3Bot(MarketData md,Manager managerA) {
 		super(md,"HorseLay3Bot - ");
@@ -58,7 +70,7 @@ public class HorseLay3Bot extends Bot{
 	
 	public void update()
 	{
-		writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
+		//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
 	
 		if(Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true) //end
 		{
@@ -69,7 +81,57 @@ public class HorseLay3Bot extends Bot{
 				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
 						rdLow=rdAux;
 			
-			writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
+			writeMsg("The lower runner (winner) found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
+			
+			
+			if(betMatched!=null)
+			{
+				if(betMatched.getRd()==rdLow)
+				{
+					writeMsg("The mached Lay Bet was on the winner - Martingale for the nest race", Color.RED);
+					misses++;
+					
+					if(misses>=martingaleTries)
+					{
+						writeMsg("Reset Martingale - More than "+ martingaleTries+" consecutives misses", Color.BLUE);
+						misses=0;
+						amount=initialAmount;
+						writeMsg("Reset amount to :"+ amount, Color.BLUE);
+					}
+					else
+					{
+						writeMsg("Executing Martingale - try number "+ misses, Color.ORANGE);
+						amount=(amount*(oddActuation-1.00))+amount;
+						writeMsg("Seting amount to :"+ amount, Color.ORANGE);
+					}
+				
+				}
+				else
+				{
+					writeMsg("The mached Lay Bet was NOT on the winner", Color.GREEN);
+					writeMsg("Reset Martingale ", Color.BLUE);
+					misses=0;
+					amount=initialAmount;
+				}
+				
+			}
+			else
+			{
+				writeMsg("No Lay Bet was Macthed ", Color.BLUE);
+				writeMsg("Canceling all ", Color.BLUE);
+				Vector<BetData> betsToCancel=new Vector<BetData>();
+				for(BetData bdAux:bets)
+					if(bdAux.getState()==BetData.UNMATCHED)
+						betsToCancel.add(bdAux);
+				
+				if(!betsToCancel.isEmpty())
+					if(getMd().getBetManager().cancelBets(betsToCancel)!=0);
+					{
+						betsCanceled=true;
+						writeMsg("Bets were Canceled", Color.BLUE);
+					}
+				
+			}
 			
 			writeMsg("Going to the next Race",Color.RED);
 			manager.MarketLiveMode(getMd());
@@ -97,6 +159,49 @@ public class HorseLay3Bot extends Bot{
 				writeMsg("At minute 0 the lower runner found is "+rdLow.getName()+" @ "+ Utils.getOddBackFrame(rdLow, 0)+" . The 2nd lower runner found is "+rdLow2.getName()+" @ "+ Utils.getOddBackFrame(rdLow2, 0), Color.BLUE);
 				
 				
+				for(RunnersData rdAux:getMd().getRunners())
+				{
+					if(rdAux!=rdLow && rdAux!=rdLow2)
+					{
+						BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
+						bets.add(bd);
+					}
+				}
+				
+				if(!bets.isEmpty())
+				{
+					getMd().getBetManager().placeBets(bets);
+					writeMsg("Bets were Placed", Color.BLUE);
+					betsPlaced=true;
+				}
+			}
+		}
+		else if(betsCanceled==false )//betsPlaced==true
+		{
+			boolean someMatched=false;
+			for(BetData bdAux:bets)
+			{
+				if(bdAux.getState()==BetData.MATCHED)
+				{
+					writeMsg("Bet was Matched :"+BetUtils.printBet(bdAux), Color.BLUE);
+					betMatched=bdAux;
+					someMatched=true;
+				}
+			}
+			
+			if(someMatched)
+			{
+				Vector<BetData> betsToCancel=new Vector<BetData>();
+				for(BetData bdAux:bets)
+					if(bdAux.getState()==BetData.UNMATCHED)
+						betsToCancel.add(bdAux);
+				
+				if(!betsToCancel.isEmpty())
+					if(getMd().getBetManager().cancelBets(betsToCancel)!=0);
+					{
+						betsCanceled=true;
+						writeMsg("Bets were Canceled", Color.BLUE);
+					}
 			}
 		}
 	}
@@ -109,6 +214,9 @@ public class HorseLay3Bot extends Bot{
 		betsPlaced=false;
 		betsCanceled=false;
 		bets.clear();
+		betMatched=null;
+		
+		
 	}
 	
 	@Override
@@ -123,7 +231,7 @@ public class HorseLay3Bot extends Bot{
 	@Override
 	public void writeMsg(String s, Color c) {
 		
-		msgPanel.writeMessageText(s, color);
+		msgPanel.writeMessageText(s, c);
 	}
 
 	

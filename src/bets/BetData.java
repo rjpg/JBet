@@ -145,7 +145,7 @@ public class BetData {
 		this.state = stateA;
 		this.transition=transitionA;
 		
-		if(BetUtils.isBetFinalState(this.state))
+		if(BetUtils.isBetFinalState(this.state) && getRd().getMarketData()!=null)
 			setTimestampFinalState(getRd().getMarketData().getCurrentTime());
 		
 		if(this.state == BetData.CANCELED || this.state == BetData.PARTIAL_CANCELED)

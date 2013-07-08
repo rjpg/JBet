@@ -224,7 +224,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 				if(bds[i].getEntryAmount()<0)
 				{
 					//System.out.println("ODD Lay:"+Utils.getOddLayFrame(bds[i].getRd(), 0));
-					if(Utils.getOddLayFrame(bds[i].getRd(), 0)<bds[i].getOddRequested())
+					if(Utils.getOddLayFrame(bds[i].getRd(), 0)<bds[i].getOddRequested() && Utils.getOddLayFrame(bds[i].getRd(), 0)!=0)
 					{
 						double odd=Utils.getOddLayFrame(bds[i].getRd(), 0);
 						Vector<Double> amounts=new Vector<Double>();
@@ -450,7 +450,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 				{
 					double oddBack=Utils.getOddBackFrame(bd.getRd(), 0);
 					
-					if(oddBack>bd.getOddRequested())
+					if(oddBack>bd.getOddRequested() && oddBack!=0)
 					{
 					
 						bd.setMatchedAmount(bd.getAmount());
@@ -561,7 +561,7 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 					
 					double oddLay=Utils.getOddLayFrame(bd.getRd(), 0);
 					
-					if(oddLay<bd.getOddRequested())
+					if(oddLay<bd.getOddRequested() && oddLay!=0 )
 					{
 					
 						bd.setMatchedAmount(bd.getAmount());
