@@ -24,11 +24,8 @@ public class HorseLayFavorite extends Bot {
 	private JFrame frame;
 	private MessagePanel msgPanel;
 
-	public Manager manager = null;
-
 	public boolean betPlaced = false;
 
-	public boolean finish = false;
 	public boolean win = false;
 
 	public BetData betMatched = null;
@@ -43,14 +40,17 @@ public class HorseLayFavorite extends Bot {
 
 	public int misses = 0;
 
-	public HorseLayFavorite(MarketData md, Manager managerA, double initStake) {
+	public HorseLayFavorite(MarketData md, double initStake) {
 		super(md, "HorseLayFavorite - ");
-		manager = managerA;
+	
 		amount = initStake;
 		initialize();
 	}
 
 	public void initialize() {
+		
+		setInTrade(true);
+		
 		frame = new JFrame(this.getName());
 		frame.setSize(640, 480);
 
@@ -66,8 +66,8 @@ public class HorseLayFavorite extends Bot {
 		// writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+
 		// "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
 
-		if (Utils.getMarketSateFrame(md, 0) == MarketData.SUSPENDED
-				&& Utils.isInPlayFrame(md, 0) == true && !finish) // end
+		if (Utils.isValidWindow(getMd().getRunners().get(0), 0, 0) && Utils.getMarketSateFrame(md, 0) == MarketData.SUSPENDED
+				&& Utils.isInPlayFrame(md, 0) == true && isInTrade()) // end
 		{
 
 			RunnersData rdLow = getMd().getRunners().get(0);
@@ -113,7 +113,7 @@ public class HorseLayFavorite extends Bot {
 			}
 			writeMsg("Going to the next Race (finish)", Color.RED);
 			writeStatisticsToFile();
-			finish = true;
+			setInTrade(false);
 			// manager.MarketLiveMode(getMd());
 		}
 
@@ -138,6 +138,8 @@ public class HorseLayFavorite extends Bot {
 							BetData.LAY, false);
 					getMd().getBetManager().placeBet(bd);
 					writeMsg("Bet was Placed", Color.BLUE);
+					betMatched=bd;
+					writeMsg("Bet :"+BetUtils.printBet(bd), Color.BLUE);
 					betPlaced = true;
 				}
 
@@ -147,6 +149,7 @@ public class HorseLayFavorite extends Bot {
 	}
 
 	public void writeStatisticsToFile() {
+		writeMsg("Writing Stat file HorseLayFavorite.txt",Color.RED);
 		BufferedWriter out = null;
 
 		try {
@@ -207,7 +210,8 @@ public class HorseLayFavorite extends Bot {
 		writeMsg("************** NEW MARKET **************", Color.BLUE);
 		setMd(md);
 
-		finish = false;
+		setInTrade(true);
+		
 		win = false;
 
 		betPlaced = false;
@@ -230,5 +234,9 @@ public class HorseLayFavorite extends Bot {
 
 		msgPanel.writeMessageText(s, c);
 	}
+	
+	
+	
+	
 
 }

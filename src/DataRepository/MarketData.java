@@ -2,7 +2,7 @@ package DataRepository;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.exchange.BFExchangeServiceStub.Runner;
-import generated.exchange.BFExchangeServiceStub.VolumeInfo;
+
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -37,7 +37,7 @@ import demo.handler.ExchangeAPI;
 import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.InflatedCompleteMarketPrices;
-import demo.util.InflatedMarketPrices;
+
 import demo.util.InflatedCompleteMarketPrices.InflatedCompletePrice;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompleteRunner;
 import demo.util.RunnerTradedVolumeCompressed;
@@ -791,7 +791,7 @@ public class MarketData {
 	public void warnListenersUpdate()
 	{
 
-
+		
 		try {
 			for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
 			{
@@ -997,8 +997,8 @@ public class MarketData {
 					e.printStackTrace();
 				}
 
-
-				warnListenersUpdate(); // warn all listeners
+				if(getRunners()!=null && getRunners().size()>0 && getRunners().get(0).getDataFrames()!=null && getRunners().get(0).getDataFrames().size()>0) 
+					warnListenersUpdate(); // warn all listeners
 
 				try {
 					Thread.sleep(updateInterval);

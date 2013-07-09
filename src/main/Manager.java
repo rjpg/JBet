@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.Utils;
 import GUI.MarketMainFrame;
 import bots.BaseOfBot;
 import bots.BotAmountCat;
@@ -184,13 +185,7 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 				//new ManualDutchingChaseBot(md);
 			}
 			
-			if(Parameters.horselayBots)
-			{
-				new HorseLay3Bot(md, this,3);
-				new HorseLay3BotAbove6(md, this,3);
-				new HorseLayFavorite(md, this,3);
-			}
-			
+	
 			if(Parameters.mecanicBot)
 				for(int i=0;i<20;i++)
 					new MecanicBot(md, i);
@@ -636,8 +631,11 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 				MarketLiveMode(md);
 		
 		if(marketEventType==MarketChangeListener.MarketUpdate)
+		{
 			fps.setText("FPS:"+md.getFPS());
+			
 		
+		}
 		//System.out.println("Chamou");
 	}
 

@@ -63,6 +63,10 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 		if(md==null)
 			return;
 		
+		if(md.getRunners()==null)
+			return;
+		
+		
 		
 		
 		for(RunnersData rd:md.getRunners())
@@ -74,7 +78,8 @@ public class MarketMainFrame extends JFrame  implements MarketChangeListener{
 				{
 					found=true;
 					rdb.update();
-					now=rdb.getRunnerData().getDataFrames().get(rdb.getRunnerData().getDataFrames().size()-1).getTimestamp();
+					if(rdb.getRunnerData().getDataFrames().size()>0)
+						now=rdb.getRunnerData().getDataFrames().get(rdb.getRunnerData().getDataFrames().size()-1).getTimestamp();
 				}
 			}
 			/*if(!found)
