@@ -46,8 +46,11 @@ public class RunnerButton extends JButton{
 	
 	public void update()
 	{
-		this.setText(runnerData.getName()+":"+runnerData.getDataFrames().get(runnerData.getDataFrames().size()-1).getOddBack());
-		runnerFrame.update();
+		if(runnerData.getDataFrames().size()>0)
+		{
+			this.setText(runnerData.getName()+":"+runnerData.getDataFrames().get(runnerData.getDataFrames().size()-1).getOddBack());
+			runnerFrame.update();
+		}
 	}
 	
 	
