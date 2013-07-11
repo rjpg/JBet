@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -166,21 +169,26 @@ public class HorseLayFavorite extends Bot {
 
 		String s = "";
 
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		Calendar c=getMd().getStart();
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String timeStart=dateFormat.format(c.getTimeInMillis());
+		
 		if( betMatched==null)
 		{
-			s+="0.00 0.00 \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
+			s+="0.00 0.00 "+getMd().getRunners().size()+" "+timeStart+" \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
 		}
 		else
 		{
 			if (win)
-				s += betMatched.getAmount() + " " + oddActuation + " \""
-						+ betMatched.getRd().getName() + "\" \""
+				s += betMatched.getAmount() + " " + oddActuation +" "+getMd().getRunners().size()+" "+timeStart
+						+" \""+ betMatched.getRd().getName() + "\" \""
 						+ getMd().getEventName() + "\" \"" + getMd().getName()
 						+ "\"";
 			else
 				s += ((betMatched.getAmount() * (betMatched.getOddRequested() - 1)) * -1)
 						+ " "
-						+ oddActuation
+						+ oddActuation+" "+getMd().getRunners().size()+" "+timeStart
 						+ " \""
 						+ betMatched.getRd().getName()
 						+ "\" \""

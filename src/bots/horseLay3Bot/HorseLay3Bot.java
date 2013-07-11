@@ -7,6 +7,9 @@ import java.awt.GridLayout;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -233,18 +236,23 @@ public class HorseLay3Bot extends Bot{
 					return;
 				}
 				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+				Calendar c=getMd().getStart();
+				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+				String timeStart=dateFormat.format(c.getTimeInMillis());
+				
 				String s="";
 				
 				if( betMatched==null)
 				{
-					s+="0.00 \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
+					s+="0.00 "+getMd().getRunners().size()+" "+timeStart+" \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
 				}
 				else
 				{
 					if(win)
-						s+=betMatched.getAmount()+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=betMatched.getAmount()+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 					else
-						s+=((betMatched.getAmount()*(betMatched.getOddRequested()-1))*-1)+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=((betMatched.getAmount()*(betMatched.getOddRequested()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 				}
 				
 				try {

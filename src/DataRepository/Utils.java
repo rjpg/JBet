@@ -8,7 +8,10 @@ import generated.global.BFGlobalServiceStub.MarketSummary;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import main.Parameters;
@@ -1370,6 +1373,12 @@ public class Utils {
         		amount=(amount*(oddActuation-1.00))+amount;
         		
         	}
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		Calendar c=Calendar.getInstance();
+		//dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String timeStart=dateFormat.format(c.getTimeInMillis());
+		System.out.println("Time : "+timeStart);
         //10.32 @ 6.2 (LAY)  10.32258064516129
         //9.877342419080069 @ 5.87
         //890.3128 @ 9.884166553597792 (LAY)
