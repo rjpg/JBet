@@ -63,6 +63,9 @@ public class MarketData {
 
 	// true if the market is inplay
 	public boolean inPlay=false;
+	public int inPlayDelay=0;
+
+
 
 	//States
 	public static final int ACTIVE = 0;
@@ -217,6 +220,14 @@ public class MarketData {
 			return Calendar.getInstance();
 
 	}
+	
+	public int getInPlayDelay() {
+		return inPlayDelay;
+	}
+
+	public void setInPlayDelay(int inPlayDelay) {
+		this.inPlayDelay = inPlayDelay;
+	}
 
 	private void refresh()
 	{
@@ -281,13 +292,20 @@ public class MarketData {
 //			warnListenersLive();
 //		}
 //		else 	
-		if(prices!=null && prices.getInPlayDelay()>0)
+		if(prices!=null )
 		{
-			if(!isInPlay())
+			if(prices.getInPlayDelay()>0)
 			{
-				setInPlay(true);
-				warnListenersLive();
+				
+				if(!isInPlay())
+				{
+					setInPlayDelay(prices.getInPlayDelay());
+					setInPlay(true);
+					warnListenersLive();
+				}
 			}
+			else
+				setInPlayDelay(0);
 		}
 		//System.out.println("---------------------------------------------------");
 
@@ -609,16 +627,19 @@ public class MarketData {
 			}
 			//System.out.println("depois dos 10 min."+inside_log_time);
 
-			if (inside_log_time)
-			{
-
-				if(diffaux<=0) // do not log live markets
-				{
-
-					inside_log_time=false;
-					System.out.println("já passou a live: "+inside_log_time);
-				}
-			}
+//			if (inside_log_time)
+//			{
+//
+//				if(diffaux<=0) // do not log live markets
+//				{
+//
+//					inside_log_time=false;
+//					System.out.println("já passou a live: "+inside_log_time);
+//				}
+//			}
+//			
+			
+			
 			//System.out.println("antes dos 10 min: "+inside_log_time);
 
 			if (inside_log_time)
@@ -633,7 +654,7 @@ public class MarketData {
 
 				try {
 					//System.out.println("#"+frame+" "+timestamp.getTimeInMillis()+" "+id);
-					out.write("#"+frame+" "+timestamp.getTimeInMillis()+" "+id);
+					out.write("#"+frame+" "+timestamp.getTimeInMillis()+" "+" "+getInPlayDelay()+" "+getState());
 					out.newLine();
 					out.flush();
 					frame++;
@@ -957,7 +978,9 @@ public class MarketData {
 
 	public void clean()
 	{
-
+		setState(MarketData.ACTIVE);
+		setInPlayDelay(0);
+		setInPlay(false);
 		stopPolling();
 		for(RunnersData r:runners)
 		{
@@ -1430,7 +1453,16 @@ public class MarketData {
 						String[] sarray=s.split(" ");
 						currentTime=Calendar.getInstance();
 						currentTime.setTimeInMillis(Long.parseLong(sarray[1]));
-
+						if(sarray.length>4)
+							setInPlayDelay(Integer.parseInt(sarray[3]));
+						if(getInPlayDelay()>0)
+							setInPlay(true);
+						else
+							setInPlay(false);
+						
+						if(sarray.length>5)
+							setState(Integer.parseInt(sarray[4]));
+						
 						if(advanceOneFrame)
 						{
 							pause=true;
