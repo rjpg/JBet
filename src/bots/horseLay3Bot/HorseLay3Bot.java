@@ -238,7 +238,7 @@ public class HorseLay3Bot extends Bot{
 				
 				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 				Calendar c=getMd().getStart();
-				dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+				//dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 				String timeStart=dateFormat.format(c.getTimeInMillis());
 				
 				String s="";
