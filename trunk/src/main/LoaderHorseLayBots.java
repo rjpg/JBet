@@ -492,7 +492,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		//CategoriesManager.loadRawAMFromFile();
 		//CategoriesManager.processAMCatIntervals();
 			
-		Parameters.log=true;  // Log or not to Log when not in replay
+		Parameters.log=false;  // Log or not to Log when not in replay
 		Parameters.replay=false; 
 		Parameters.replay_file_list=false; 
 		Parameters.replay_file_list_test=false; 
