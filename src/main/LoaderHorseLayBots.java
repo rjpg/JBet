@@ -8,6 +8,7 @@ import generated.global.BFGlobalServiceStub.GetEventsResp;
 import generated.global.BFGlobalServiceStub.MarketSummary;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -29,6 +30,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import bots.BaseOfBot;
+import bots.BotAmountCat;
+import bots.InfluenceBot;
+import bots.ManualBot;
+import bots.ManualPlaceBetBot;
+import bots.MecanicBot;
+import bots.NeighboursCorrelationBot;
+import bots.NeuralBot;
+import bots.NeuralDataBot;
+import bots.StudyBot;
+import bots.WomNeighboursBot;
+import bots.dutchinBot.ManualDutchingBot;
 import bots.horseLay3Bot.HorseLay3Bot;
 import bots.horseLay3Bot.HorseLay3BotAbove6;
 import bots.horseLay3Bot.HorseLayFavorite;
@@ -163,8 +176,8 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			
 			if(Parameters.horselayBots)
 			{
-				horseLay3Bot=new HorseLay3Bot(md,9);
-				horseLay3BotAbove6=new HorseLay3BotAbove6(md,243);
+				horseLay3Bot=new HorseLay3Bot(md,3);
+				horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
 				horseLayFavorite=new HorseLayFavorite(md, 3);
 			}
 		
@@ -174,6 +187,36 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			
 			
 		} 
+		 else {
+				MarketData md = new MarketData(null, Exchange.UK,null);
+				
+				md.addMarketChangeListener(this);
+				JFrame close = getCloseFrame();
+				close.setVisible(true);
+				close.setAlwaysOnTop(true);
+				
+				// //////////////////init Bots and displays
+				// //////////////////////////////
+				if(Parameters.graphicalInterface)
+				{
+					//System.out.println("passei aqui");
+					mmf = new MarketMainFrame(md);
+					//Bot123 a=new Bot123(md);
+					mmf.setSize(400, 600);
+					mmf.setVisible(true);
+				}
+				
+				if(Parameters.horselayBots)
+				{
+					horseLay3Bot=new HorseLay3Bot(md,3);
+					horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
+					horseLayFavorite=new HorseLayFavorite(md, 3);
+				}
+	
+				// /////////////////////after////////////////////////////////////////////
+				md.runFile();
+			
+			}
 		
 		
 			
@@ -401,6 +444,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 
 	@Override
 	public void MarketChange(MarketData md, int marketEventType) {
+		//System.out.println("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0));
 		if(marketEventType==MarketChangeListener.MarketLive)
 			//if(!md.isInTrade()) // espera para fechar a operação de trading mesmo inPlay ...
 			if(Parameters.jump_to_the_next_race)
@@ -498,7 +542,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.replay_file_list_test=false; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
-		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
+		Parameters.PAUSE_BETWEEN_RACES_REPLAY=true;
 		Parameters.saveFavorite=false; 
 		Parameters.graphicalInterface=false; 
 		Parameters.graphicalInterfaceBots=true; 

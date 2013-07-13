@@ -15,6 +15,7 @@ import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
+import DataRepository.Utils;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
@@ -422,7 +423,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		}
 		else if( marketEventType==MarketChangeListener.MarketUpdate)
 		{
-		//System.out.println("Market :"+md.getName()+" "+md.getEventName());
+		//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
+		//System.out.println("Market :"+md.getName()+" "+md.getEventName()+" ");
 		if(bet!=null)
 		{
 			writeMsg(BetUtils.printBet(bet), Color.BLACK);
