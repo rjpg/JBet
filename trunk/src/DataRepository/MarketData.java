@@ -658,7 +658,7 @@ public class MarketData {
 
 				try {
 					//System.out.println("#"+frame+" "+timestamp.getTimeInMillis()+" "+id);
-					out.write("#"+frame+" "+timestamp.getTimeInMillis()+" "+" "+getInPlayDelay()+" "+getState());
+					out.write("#"+frame+" "+timestamp.getTimeInMillis()+" "+getInPlayDelay()+" "+getState());
 					out.newLine();
 					out.flush();
 					frame++;
@@ -1338,6 +1338,7 @@ public class MarketData {
 			//System.out.println("Antes do ciclo ");
 			while ((s=input.readLine()) != null)
 			{
+				//System.out.println(s);
 				while (pause) 
 				{
 					try {
@@ -1453,19 +1454,24 @@ public class MarketData {
 						}
 						//System.out.println("reading Frame");
 						s=s.substring(1);
-
+						
+						System.out.println("State : "+s);
+						
 						String[] sarray=s.split(" ");
 						currentTime=Calendar.getInstance();
 						currentTime.setTimeInMillis(Long.parseLong(sarray[1]));
-						if(sarray.length>4)
-							setInPlayDelay(Integer.parseInt(sarray[3]));
+						if(sarray.length>=3)
+							setInPlayDelay(Integer.parseInt(sarray[2]));
 						if(getInPlayDelay()>0)
 							setInPlay(true);
 						else
 							setInPlay(false);
 						
-						if(sarray.length>5)
-							setState(Integer.parseInt(sarray[4]));
+						if(sarray.length>=4)
+						{
+							setState(Integer.parseInt(sarray[3]));
+							
+						}
 						
 						if(advanceOneFrame)
 						{
@@ -1546,15 +1552,19 @@ public class MarketData {
 
 						Vector<OddData> back=new Vector<OddData>();
 						Vector<OddData> lay=new Vector<OddData>();
-
+						
 						if(!odds[0].startsWith(" /"))
 						{
+													
 							String[] sback=odds[0].split(" ");
-							for(int i=0;i<sback.length;i+=2)
+							if(!sback[0].equals(""))
 							{
-
-								OddData od=new OddData(Double.parseDouble(sback[i]), Double.parseDouble(sback[i+1])); // corrigir isto com ficheiro
-								back.add(od);
+								for(int i=0;i<sback.length;i+=2)
+								{	
+									
+									OddData od=new OddData(Double.parseDouble(sback[i]), Double.parseDouble(sback[i+1])); // corrigir isto com ficheiro
+									back.add(od);
+								}
 							}
 						}
 
