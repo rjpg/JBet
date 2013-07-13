@@ -466,7 +466,11 @@ public class MarketData {
 			}
 		} else {
 			System.out.println("prices are Null clone prices info from last frame");
-			logWritteErrorFrame();
+			
+			// **********************************
+			//   logWritteErrorFrame();
+			// **********************************
+			
 			for(RunnersData rd:getRunners())
 			{
 				if(rd.getDataFrames().size()!=0)
