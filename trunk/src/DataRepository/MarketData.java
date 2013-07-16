@@ -25,6 +25,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import logienvironment.LoginEnvironment;
 import main.Parameters;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismUtils;
@@ -123,12 +124,22 @@ public class MarketData {
 	//private int volumeCapCurrentRunner=0;
 
 
-	public MarketData(Market selectedMarketA, Exchange selectedExchangeA,APIContext apiContextA)
+	public MarketData(Market selectedMarketA, LoginEnvironment logenv)
 	{
 
 		selectedMarket=selectedMarketA ; 
-		selectedExchange=selectedExchangeA;
-		apiContext=apiContextA;
+		
+		if(logenv!=null)
+		{
+			selectedExchange=logenv.getSelectedExchange();
+			apiContext=logenv.getApiContext();
+		}
+		else
+		{
+			selectedExchange=null;
+			apiContext=null;
+		}
+			
 
 		calendarFpsAux=Calendar.getInstance();
 

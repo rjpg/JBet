@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Vector;
 
+import logienvironment.LoginEnvironment;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
 
@@ -41,10 +42,10 @@ public class NextPreLiveMO extends MarketProvider{
 	private APIContext apiContext;
 	private Exchange selectedExchange;
 
-	public NextPreLiveMO(Exchange selectedExchangeA,APIContext apiContextA) {
+	public NextPreLiveMO(LoginEnvironment loginEnv) {
 	
-		apiContext=apiContextA;
-		selectedExchange=selectedExchangeA;
+		apiContext=loginEnv.getApiContext();
+		selectedExchange=loginEnv.getSelectedExchange();
 		try {
 			loadEvents();
 		} catch (Exception e) {

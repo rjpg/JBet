@@ -9,6 +9,7 @@ import generated.global.BFGlobalServiceStub.MarketSummary;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -17,11 +18,15 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import logienvironment.LoginEnvironment;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
 import marketProviders.marketNavigator.MarketNavigator;
@@ -60,11 +65,14 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 
 	
 	
-	public static APIContext apiContext = new APIContext();
-	
-	private static Market selectedMarket;
-	private static Exchange selectedExchange;
 	private static EventType selectedEventType;
+	private static Market selectedMarket;
+	
+	LoginEnvironment loginEnv=null;
+	
+	// ---------user ------------------------
+	public String username=null;
+	public String password=null;
 	
 	public MarketData md;
 	
@@ -92,18 +100,21 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			Display.println("Starting...");
 		
 			
-			String username = "birinhos";
-			String password = "birinhos777";
+			showLoginInterface();
+
+			loginEnv = new LoginEnvironment();
 			
+			loginEnv.setUsername(username);
+			loginEnv.setPassword(password);
 			
-			selectedExchange = Exchange.UK;
+			if(loginEnv.login()==-1)
+			{
+				System.err.println("*** Failed to log in");
+				System.exit(1);
+			}
 
 			try {
-				GlobalAPI.login(apiContext, username, password);
-				Display.println("We are in");
-				showAccountFunds(Exchange.UK);
-
-				EventType[] types = GlobalAPI.getActiveEventTypes(apiContext);
+				EventType[] types = GlobalAPI.getActiveEventTypes(loginEnv.getApiContext());
 				
 				int indexFound=0;
 				for(int i=0;i<types.length;i++)
@@ -116,33 +127,19 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				}
 				
 				System.out.println(types[indexFound].getName()+"-"+indexFound);
-				//GetEventsResp resp = GlobalAPI.getEvents(apiContext, types[indexFound].getId());
-				//BFEvent[] events = resp.getEventItems().getBFEvent();
-				//indexFound=18;
-				//System.out.println(events[indexFound].getEventName());
-				// 17 "Market Racing todays"
-				selectedEventType = GlobalAPI.getActiveEventTypes(apiContext)[indexFound];
+				selectedEventType = GlobalAPI.getActiveEventTypes(loginEnv.getApiContext())[indexFound];
 				System.out.println(selectedEventType.getName());
 
 				selectedMarket = selectMarketNextEvent(selectedEventType);
 
-				InflatedMarketPrices prices = ExchangeAPI.getMarketPrices(
-						selectedExchange, apiContext,
-						selectedMarket.getMarketId());
-
-				// Now show the inflated compressed market prices.
-				Display.showMarket(selectedExchange, selectedMarket, prices);
-
 			} catch (Exception e) {
 				// If we can't log in for any reason, just exit.
-				Display.showException("*** Failed to log in", e);
+				Display.showException("*** Failed to getActiveEventTypes", e);
 				System.exit(1);
 			}
 			
 			
-			
-			
-			md = new MarketData(selectedMarket, selectedExchange,apiContext);
+			md = new MarketData(selectedMarket,loginEnv);
 			
 			JFrame close = getCloseFrame();
 			close.setVisible(true);
@@ -156,7 +153,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			if(Parameters.graphicalInterface)
 			{
 				JFrame jf=new JFrame();
-				MarketNavigator mp=new MarketNavigator(apiContext,selectedExchange);
+				MarketNavigator mp=new MarketNavigator(loginEnv);
 				mp.addMarketProviderListener(this);
 				
 				JScrollPane jsp=new JScrollPane(mp.getPanel());
@@ -188,7 +185,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			
 		} 
 		 else {
-				MarketData md = new MarketData(null, Exchange.UK,null);
+				MarketData md = new MarketData(null, null);
 				
 				md.addMarketChangeListener(this);
 				JFrame close = getCloseFrame();
@@ -222,6 +219,35 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			
 	}
 	
+	public void showLoginInterface(){
+        JPanel userPanel = new JPanel();
+        userPanel.setLayout(new GridLayout(2,2));
+
+        //Labels for the textfield components        
+        JLabel usernameLbl = new JLabel("Username:");
+        JLabel passwordLbl = new JLabel("Password:");
+
+        JTextField username = new JTextField();
+        JPasswordField passwordFld = new JPasswordField();
+        
+
+        //Add the components to the JPanel        
+        userPanel.add(usernameLbl);
+        userPanel.add(username);
+        userPanel.add(passwordLbl);
+        userPanel.add(passwordFld);
+
+        //As the JOptionPane accepts an object as the message
+        //it allows us to use any component we like - in this case 
+        //a JPanel containing the dialog components we want
+        JOptionPane.showConfirmDialog(null, userPanel, "Enter your password:",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+        this.username = username.getText();
+        this.password = passwordFld.getText();
+        
+ 
+   }
+
+	
 	public JFrame getCloseFrame()
 	{
 		if(closeFrame==null)
@@ -245,7 +271,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 						if(!Parameters.replay)
 						{
 							LoaderHorseLayBots.this.md.stopPolling();
-							LoaderHorseLayBots.logout();
+							LoaderHorseLayBots.this.logout();
 							System.out.println("bye bye");
 							System.exit(0);
 						}
@@ -273,32 +299,24 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 		return closeFrame;
 	}
 	
-	public static void logout() {
+	public void logout() {
 
 		// Logout before shutting down.
-		try {
-			GlobalAPI.logout(apiContext);
-		} catch (Exception e) {
-			// If we can't log out for any reason, there's not a lot to do.
-			Display.showException("Failed to log out", e);
-		}
-		Display.println("Logout successful");
+		if(loginEnv.logout()!=0)
+			System.out.println("Failed to Logout");
+		else
+			System.out.println("Logout successful");
 	}
 	
-	// Retrieve and display the account funds for the specified exchange
-	private static void showAccountFunds(Exchange exch) throws Exception {
-		GetAccountFundsResp funds = ExchangeAPI.getAccountFunds(exch, apiContext);
-		Display.showFunds(exch, funds);
-	}
 
 	
-	public static Market selectMarketNextEvent(EventType  selectedEventTypeA)
+	public Market selectMarketNextEvent(EventType  selectedEventTypeA)
 	{
 		Market ret=null;
 		
 		GetEventsResp resp=null;
 		try {
-			resp = GlobalAPI.getEvents(apiContext, selectedEventTypeA.getId());
+			resp = GlobalAPI.getEvents(loginEnv.getApiContext(), selectedEventTypeA.getId());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -374,7 +392,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		while (tries>0)
 		{
 		try {
-			ret=ExchangeAPI.getMarket(selectedExchange, apiContext, next.getMarketId());
+			ret=ExchangeAPI.getMarket(loginEnv.getSelectedExchange(), loginEnv.getApiContext(), next.getMarketId());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -537,7 +555,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		//CategoriesManager.processAMCatIntervals();
 			
 		Parameters.log=true;  // Log or not to Log when not in replay
-		Parameters.replay=true; 
+		Parameters.replay=false; 
 		Parameters.replay_file_list=false; 
 		Parameters.replay_file_list_test=false; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
