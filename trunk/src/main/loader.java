@@ -1,8 +1,8 @@
 package main;
 
+import bfapi.handler.ExchangeAPI.Exchange;
 import categories.CategoriesManager;
 import statistics.Statistics;
-import demo.handler.ExchangeAPI.Exchange;
 import generated.exchange.BFExchangeServiceStub.Market;
 import DataRepository.MarketData;
 import DataRepository.Utils;

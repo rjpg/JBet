@@ -17,13 +17,13 @@ import org.apache.log4j.Logger;
 
 import scrapers.xscores.ScraperGoals;
 
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 import bots.csHighPointLadder.CSHighPointLadder;
 
 
 import DataRepository.MarketData;
 import DataRepository.Utils;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
 

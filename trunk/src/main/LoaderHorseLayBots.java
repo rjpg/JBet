@@ -30,6 +30,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 import bots.BaseOfBot;
 import bots.BotAmountCat;
 import bots.InfluenceBot;
@@ -45,9 +48,6 @@ import bots.dutchinBot.ManualDutchingBot;
 import bots.horseLay3Bot.HorseLay3Bot;
 import bots.horseLay3Bot.HorseLay3BotAbove6;
 import bots.horseLay3Bot.HorseLayFavorite;
-import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedMarketPrices;
@@ -537,12 +537,12 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		//CategoriesManager.processAMCatIntervals();
 			
 		Parameters.log=true;  // Log or not to Log when not in replay
-		Parameters.replay=false; 
+		Parameters.replay=true; 
 		Parameters.replay_file_list=false; 
 		Parameters.replay_file_list_test=false; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
-		Parameters.PAUSE_BETWEEN_RACES_REPLAY=true;
+		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
 		Parameters.graphicalInterface=false; 
 		Parameters.graphicalInterfaceBots=true; 
