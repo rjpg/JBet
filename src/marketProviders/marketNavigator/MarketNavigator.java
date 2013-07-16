@@ -22,15 +22,16 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
+
 import main.Parameters;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
 import DataRepository.MarketData;
 import GUI.MarketMainFrame;
 
-import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 
 public class MarketNavigator extends MarketProvider {

@@ -1,4 +1,4 @@
-package demo.handler;
+package bfapi.handler;
 
 import generated.exchange.BFExchangeServiceStub;
 import generated.exchange.BFExchangeServiceStub.APIErrorEnum;

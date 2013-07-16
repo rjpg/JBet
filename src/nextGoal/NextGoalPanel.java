@@ -30,12 +30,12 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import bets.BetData;
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 
 import main.Manager;
 import nextGoal.InterfaceNextGoal.MarketThread;
 
-import demo.handler.ExchangeAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.InflatedMarketPrices;
 import demo.util.InflatedMarketPrices.InflatedPrice;

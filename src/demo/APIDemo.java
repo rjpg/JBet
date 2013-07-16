@@ -1,9 +1,6 @@
 package demo;
 import java.util.ArrayList;
 
-import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedCompleteMarketPrices;
@@ -26,6 +23,10 @@ import generated.global.BFGlobalServiceStub.EventType;
 import generated.global.BFGlobalServiceStub.GetEventsResp;
 import generated.global.BFGlobalServiceStub.MarketSummary;
 import org.apache.log4j.*;
+
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 
 
 /** 

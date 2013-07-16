@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import demo.handler.ExchangeAPI.Exchange;
+import bfapi.handler.ExchangeAPI.Exchange;
+
 import demo.util.InflatedCompleteMarketPrices.InflatedCompletePrice;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompleteRunner;
 import demo.util.InflatedMarketPrices.InflatedPrice;

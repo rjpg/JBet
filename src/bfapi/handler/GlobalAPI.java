@@ -1,4 +1,4 @@
-package demo.handler;
+package bfapi.handler;
 
 import generated.global.BFGlobalServiceStub;
 import generated.global.BFGlobalServiceStub.APIRequestHeader;

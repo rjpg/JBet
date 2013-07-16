@@ -32,9 +32,9 @@ import bets.BetData;
 import bets.BetManager;
 import bets.BetManagerReal;
 import bets.BetManagerSim;
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 import bots.Bot;
-import demo.handler.ExchangeAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.InflatedCompleteMarketPrices;
 
@@ -1455,7 +1455,7 @@ public class MarketData {
 						//System.out.println("reading Frame");
 						s=s.substring(1);
 						
-						System.out.println("State : "+s);
+						//System.out.println("State : "+s);
 						
 						String[] sarray=s.split(" ");
 						currentTime=Calendar.getInstance();

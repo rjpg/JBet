@@ -6,12 +6,13 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
+
 import DataRepository.Utils;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.global.BFGlobalServiceStub.EventType;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
 

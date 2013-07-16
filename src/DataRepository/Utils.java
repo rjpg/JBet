@@ -16,14 +16,14 @@ import java.util.Vector;
 
 import main.Parameters;
 
+import bfapi.handler.ExchangeAPI;
+import bfapi.handler.GlobalAPI;
+import bfapi.handler.ExchangeAPI.Exchange;
 import bots.MecanicBot;
 import bots.StudyBot;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
-import demo.handler.ExchangeAPI;
-import demo.handler.GlobalAPI;
-import demo.handler.ExchangeAPI.Exchange;
 import demo.util.APIContext;
 import demo.util.Display;
 
