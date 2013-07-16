@@ -26,6 +26,7 @@ import bfapi.handler.ExchangeAPI;
 import bfapi.handler.GlobalAPI;
 import bfapi.handler.ExchangeAPI.Exchange;
 
+import logienvironment.LoginEnvironment;
 import main.Parameters;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
@@ -57,6 +58,9 @@ public class MarketNavigator extends MarketProvider {
 		initialize();
 	}
 	
+	public MarketNavigator(LoginEnvironment loginEnv) {
+		this(loginEnv.getApiContext(),loginEnv.getSelectedExchange());
+	}
 	
 	private void initialize()
 	{

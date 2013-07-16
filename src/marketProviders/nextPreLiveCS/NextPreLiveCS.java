@@ -11,6 +11,7 @@ import bfapi.handler.ExchangeAPI;
 import bfapi.handler.GlobalAPI;
 import bfapi.handler.ExchangeAPI.Exchange;
 
+import logienvironment.LoginEnvironment;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
 import marketProviders.nextPreLiveMo.EventData;
@@ -51,6 +52,10 @@ public class NextPreLiveCS extends MarketProvider{
 
 		startPolling();
 
+	}
+	
+	public NextPreLiveCS(LoginEnvironment loginEnv) {
+		this(loginEnv.getSelectedExchange(),loginEnv.getApiContext());
 	}
 
 

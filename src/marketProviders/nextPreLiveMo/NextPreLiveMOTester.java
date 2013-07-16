@@ -1,7 +1,15 @@
 package marketProviders.nextPreLiveMo;
 
+import java.awt.GridLayout;
 import java.util.Vector;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import logienvironment.LoginEnvironment;
 import marketProviders.MarketProvider;
 import marketProviders.MarketProviderListerner;
 
@@ -19,9 +27,8 @@ import DataRepository.MarketData;
 
 public class NextPreLiveMOTester implements MarketProviderListerner{
 
-	// ---------------------- BETFAIR ----------------------------------
-	public static APIContext apiContext = new APIContext();
-	public static Exchange selectedExchange;
+	public LoginEnvironment loginEnv=null;
+	
 	// ---------user ------------------------
 	public String username=null;
 	public String password=null;
@@ -31,7 +38,7 @@ public class NextPreLiveMOTester implements MarketProviderListerner{
 	public NextPreLiveMOTester() {
 		// API login
 		startBetFair();
-		nplmo=new NextPreLiveMO(selectedExchange, apiContext);
+		nplmo=new NextPreLiveMO(loginEnv);
 		nplmo.addMarketProviderListener(this);
 		nplmo.startPolling();
 		
@@ -56,39 +63,55 @@ public class NextPreLiveMOTester implements MarketProviderListerner{
 			}
 		 */
 
-		this.setUsername("birinhos");
-		this.setPassword("6mgprldi777");
+		showLoginInterface();
 
-
-		// Perform the login before anything else.
-		try
+		loginEnv = new LoginEnvironment();
+		
+		loginEnv.setUsername(username);
+		loginEnv.setPassword(password);
+		
+		if(loginEnv.login()==-1)
 		{
-			GlobalAPI.login(apiContext, username, password);
-		}
-		catch (Exception e)
-		{
-			// If we can't log in for any reason, just exit.
-			Display.showException("*** Failed to log in", e);
+			System.err.println("*** Failed to log in");
 			System.exit(1);
 		}
-
-		selectedExchange = Exchange.UK;
-
+	
 		
 	}
 	
-	public void setUsername(String username) {
-		this.username = username;
-	}
 	
+	public void showLoginInterface(){
+        JPanel userPanel = new JPanel();
+        userPanel.setLayout(new GridLayout(2,2));
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+        //Labels for the textfield components        
+        JLabel usernameLbl = new JLabel("Username:");
+        JLabel passwordLbl = new JLabel("Password:");
+
+        JTextField username = new JTextField();
+        JPasswordField passwordFld = new JPasswordField();
+        
+
+        //Add the components to the JPanel        
+        userPanel.add(usernameLbl);
+        userPanel.add(username);
+        userPanel.add(passwordLbl);
+        userPanel.add(passwordFld);
+
+        //As the JOptionPane accepts an object as the message
+        //it allows us to use any component we like - in this case 
+        //a JPanel containing the dialog components we want
+        JOptionPane.showConfirmDialog(null, userPanel, "Enter your password:",JOptionPane.OK_OPTION, JOptionPane.PLAIN_MESSAGE);
+        this.username = username.getText();
+        this.password = passwordFld.getText();
+        
+ 
+   }
+
 	
 	@Override
 	public void newMarketSelected(MarketProvider mp, Market m) {
-		MarketData md=new MarketData(m, selectedExchange, apiContext);
+		MarketData md=new MarketData(m, loginEnv);
 		md.setUpdateInterval(500);
 		md.addMarketChangeListener(new LogMOPreLiveData());
 		md.startPolling();
