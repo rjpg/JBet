@@ -101,6 +101,8 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			
 		}
 		return actionsPanel;
+		
+		
 	}
 	
 	public JPanel getBetPanel()
