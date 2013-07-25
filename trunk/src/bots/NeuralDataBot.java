@@ -8,8 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-import categories.CategoriesManager;
-import categories.Category;
+import categories.categories2011.CategoriesManager;
+import categories.categories2011.Category;
 
 import main.Parameters;
 import correctscore.MessageJFrame;

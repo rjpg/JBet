@@ -1,6 +1,6 @@
 package main;
 
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 import statistics.Statistics;
 import DataRepository.Utils;
 

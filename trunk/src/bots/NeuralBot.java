@@ -24,8 +24,8 @@ import bets.BetData;
 
 import statistics.Statistics;
 
-import categories.CategoriesManager;
-import categories.Category;
+import categories.categories2011.CategoriesManager;
+import categories.categories2011.Category;
 
 import main.Parameters;
 import correctscore.MessageJFrame;

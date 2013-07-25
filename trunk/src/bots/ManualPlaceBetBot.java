@@ -177,6 +177,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 	
 	public JButton getCancelButton()
 	{
+		
 		if(cancelButton==null)
 		{
 			cancelButton=new JButton("Cancel");

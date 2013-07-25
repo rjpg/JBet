@@ -6,7 +6,7 @@ import org.encog.util.arrayutil.NormalizeArray;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 
 public class LoaderCreateDirectoryCats {
 	public static void main(String[] args)  throws Exception {

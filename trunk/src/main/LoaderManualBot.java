@@ -2,7 +2,7 @@ package main;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 
 public class LoaderManualBot {
 

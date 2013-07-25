@@ -1,4 +1,4 @@
-package categories;
+package categories.categories2011;
 
 public class Histogram {
 

@@ -14,8 +14,8 @@ import org.encog.util.simple.EncogUtility;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManager;
-import categories.ProcessThreshold;
+import categories.categories2011.CategoriesManager;
+import categories.categories2011.ProcessThreshold;
 
 public class LoaderNormalizeRawData {
 	public static void main(String[] args)  throws Exception {
