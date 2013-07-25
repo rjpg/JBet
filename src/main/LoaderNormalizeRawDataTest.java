@@ -10,7 +10,7 @@ import org.encog.util.simple.EncogUtility;
 
 import statistics.Statistics;
 import DataRepository.Utils;
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 
 public class LoaderNormalizeRawDataTest {
 	public static void main(String[] args)  throws Exception {

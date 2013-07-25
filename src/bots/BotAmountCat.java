@@ -6,7 +6,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 
 import main.Parameters;
 import correctscore.MessageJFrame;

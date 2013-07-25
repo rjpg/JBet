@@ -1,4 +1,4 @@
-package categories;
+package categories.categories2011;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

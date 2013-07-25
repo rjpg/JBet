@@ -1,7 +1,7 @@
 package main;
 
 import bfapi.handler.ExchangeAPI.Exchange;
-import categories.CategoriesManager;
+import categories.categories2011.CategoriesManager;
 import statistics.Statistics;
 import generated.exchange.BFExchangeServiceStub.Market;
 import DataRepository.MarketData;
