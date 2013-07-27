@@ -81,7 +81,7 @@ public class MarketData {
 	//------------------------
 
 	//------ demand freq------
-	protected int updateInterval = 400;
+	protected int updateInterval = 700;
 	//------------------------
 
 
@@ -263,11 +263,16 @@ public class MarketData {
 
 		InflatedCompleteMarketPrices prices=null;
 		try {
+			//Calendar  currentTimeAux = Calendar.getInstance();
 			prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange,apiContext, selectedMarket.getMarketId());
 			//	prices = ExchangeAPI.getCompleteMarketPrices(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
 			//	MUBet[] bets=ExchangeAPI.getMUBets(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
 			//	bets=ExchangeAPI.getMUBets(selectedExchange, Manager.apiContext, selectedMarket.getMarketId());
 			//	System.out.println(prices.getInPlayDelay());
+			
+			//Calendar  currentTimeAux2 = Calendar.getInstance();
+			//System.out.println("Diff Time: "+(currentTimeAux2.getTime().getTime()-currentTimeAux.getTime().getTime()));
+			
 			fpsAux++;
 		} catch (Exception e) {
 			
@@ -765,24 +770,6 @@ public class MarketData {
 		}
 	}
 
-	private void refreshBets()
-	{
-		if(Parameters.replay)
-		{
-			for(BetData bd:bets)
-			{
-
-			}
-
-			//		for (MarketChangeListener mcl:listeners)
-			//			mcl.MarketBetUpdated(bd);
-		}
-		else // connection
-		{
-
-		}
-
-	}
 
 
 

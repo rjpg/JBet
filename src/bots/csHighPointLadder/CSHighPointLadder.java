@@ -107,7 +107,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 	private void preLive()
 	{
 	
-		if(Utils.getMarketMathedAmount(getMd(), 0)<2000)
+		if(Utils.getMarketMathedAmount(getMd(), 0)<100)
 		{
 			writeMsg("No sufucient liquidity in market (<2000): "+Utils.getMarketMathedAmount(getMd(), 0), Color.RED);
 			setSTATE(END);
@@ -142,7 +142,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 						
 						writeMsg("Runner 0 - 0 Odd AVG :"+oddBackAvg, Color.BLUE);
 						
-						if(oddBackAvg<20)
+						if(oddBackAvg<50)
 						{
 							writeMsg("Odd AVG lower than 20.0 OK - goin to WAIT_50_MINUTES state", Color.GREEN);
 							setSTATE(WAIT_50_MINUTES);
@@ -208,7 +208,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		for(RunnersData rdAux:getMd().getRunners())
 		{
-			if(!rdAux.getName().contains("Any")) // except Any Unquoted
+			if(!rdAux.getName().contains("Any") && Utils.getOddBackFrame(rdAux, 0)>1.50) // except Any Unquoted
 			{
 				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
 					rdLow=rdAux;
@@ -217,7 +217,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		writeMsg("The lower runner found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
 		
-		if(Utils.getOddBackFrame(rdLow, 0) > 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.28)
+		if(Utils.getOddBackFrame(rdLow, 0) >= 2.20 && Utils.getOddBackFrame(rdLow, 0) < 2.30)
 		{
 			writeMsg("The lower runner found "+rdLow.getName()+" is between 2.20 and 2.28 - going to PREPARING_SWING state", Color.ORANGE);
 			setSTATE(PREPARING_SWING);
@@ -258,7 +258,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		for(RunnersData rdAux:getMd().getRunners())
 		{
-			if(!rdAux.getName().contains("Any")) // except Any Unquoted
+			if(!rdAux.getName().contains("Any")  && Utils.getOddBackFrame(rdAux, 0)>1.50) // except Any Unquoted
 			{
 				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
 					rdLow=rdAux;
@@ -292,7 +292,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		
 		writeMsg("Testing odd Back AVG in last 15 samples (2.16 < oddBackAvg < 2.24)... ", Color.BLUE);
 		double oddBackAvg=Utils.getOddBackFrame(rdLow, /*(int)(limit/2),*/ 0);
-		if(oddBackAvg>2.16 && oddBackAvg<2.28)
+		if(oddBackAvg>=2.16 && oddBackAvg<=2.28)
 		{
 			writeMsg("Odd Back AVG is 2.16 < oddBackAvg("+oddBackAvg+") < 2.28 ", Color.GREEN);
 		}
@@ -328,7 +328,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 		//Testing Amounts for Lay 
 		writeMsg("Testing Odds Lay...", Color.BLUE);	
 		double oddLay=Utils.getOddLayFrame(rdLow, 0);
-		if(oddLay<2.30 && oddLay!=0)
+		if(oddLay<=2.30 && oddLay!=0)
 		{
 			writeMsg("Odd Lay under 2.30 - OK (Runner : "+rdLow.getName()+" @ "+oddLay+")", Color.GREEN);
 		}
@@ -358,9 +358,9 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 				false);
 		
 		SwingOptions so=new SwingOptions(betOpen, this);
-		so.setWaitFramesOpen(60*2);      // 1 minute
-		so.setWaitFramesNormal(60*3*2);   // 3 minutes
-		so.setWaitFramesBestPrice(60*2);  // 1 minute
+		so.setWaitFramesOpen((int)(60.*1.5));      // 0.75 minute 1,5
+		so.setWaitFramesNormal((int)((60.*3)*1.5));   //2.25- 3 minutes
+		so.setWaitFramesBestPrice((int)(60*1.5));  // 0.75 - 1.5 minute
 		so.setTicksProfit(stopProfit);
 		so.setTicksLoss(5);
 		so.setForceCloseOnStopLoss(false);
