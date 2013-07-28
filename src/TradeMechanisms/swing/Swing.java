@@ -641,6 +641,26 @@ public class Swing extends TradeMechanism implements TradeMechanismListener{
 				setI_STATE(I_END);
 				refresh();
 				return;
+			}else if(close.getState()==PARTIAL_CLOSED )
+			{
+				setState(PARTIAL_CLOSED);
+				matchedInfoClose=close.getMatchedInfo();
+				closeInfo=BetUtils.getOpenInfo(close.getMatchedOddDataVector());
+				System.out.println("Did not close with : "+closeInfo);
+				writeMsgToListeners("Swing not Closed with : "+closeInfo, Color.BLUE);
+				setI_STATE(I_END);
+				refresh();
+				return;
+			}else if(open.getState()==OPEN)
+			{
+				setState(OPEN);
+				matchedInfoClose=close.getMatchedInfo();
+				closeInfo=BetUtils.getOpenInfo(close.getMatchedOddDataVector());
+				System.out.println("Did not close with : "+closeInfo);
+				writeMsgToListeners("Swing not Closed with : "+closeInfo, Color.BLUE);
+				setI_STATE(I_END);
+				refresh();
+				return;
 			}
 			
 		}
