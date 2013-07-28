@@ -702,6 +702,43 @@ public class Utils {
 		return womBack;
 	}
 	
+	public static double getWomFrame(RunnersData rd,int depth,boolean includeGaps,int frame)
+	{
+		
+		HistoryData hd=rd.getDataFrames().get(rd.getDataFrames().size()-1-frame); // get info from frame (from present to..) received on this runner
+		// index 0 is the first frame received and  (rd.getDataFrames().size()-1) is the last 
+		
+		double oddBack=hd.getOddBack();   // offer for Back bets
+		double oddLay=hd.getOddLay();     // offer for Lay bets
+		
+		Vector<OddData> bp=hd.getBackPrices();  // get all Back prices with amounts (OddData) 
+		Vector<OddData> lp=hd.getLayPrices();  // get all Lay prices with amounts (OddData)
+		
+		// sum first 3 amounts of the vector that are the ones more near to best price on back prices
+		double womBack=0;
+		for(int i=0;i<depth;i++)
+		{
+			if(bp.size()>i)   // if there are at least 3
+				womBack+=bp.get(i).getAmount();
+		}
+		
+		// sum first 3 amounts of the vector that are the ones more near to best price on back prices
+		double womLay=0;
+		for(int i=0;i<depth;i++)
+		{
+			if(lp.size()>i)   // if there are at least 3
+				womLay+=lp.get(i).getAmount();
+		}
+		
+		double womTotal=womBack+womLay;
+		
+		double womDiff=womBack-womLay;
+		
+		return (womDiff*100.)/womTotal;
+		
+	}
+	
+	
 	public static double getAmountLayFrameLayPivot(RunnersData rd,int frame, int depth)
 	{
 		double womLay=0;
