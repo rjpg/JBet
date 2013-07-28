@@ -178,10 +178,10 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			
 			if(Parameters.manualPlaceBetBot)
 			{
-				//new ManualPlaceBetBot(md,this);
+				new ManualPlaceBetBot(md,this);
 				
 				//new ManualDutchingBot(md);
-				new ManualDutchingChaseBot(md);
+				//new ManualDutchingChaseBot(md);
 			}
 			
 	
