@@ -705,30 +705,59 @@ public class Utils {
 	public static double getWomFrame(RunnersData rd,int depth,boolean includeGaps,int frame)
 	{
 		
-		HistoryData hd=rd.getDataFrames().get(rd.getDataFrames().size()-1-frame); // get info from frame (from present to..) received on this runner
+		HistoryData hd=rd.getDataFrames().get(rd.getDataFrames().size()-1-frame); // get info from frame (present to int frame..) received on this runner
 		// index 0 is the first frame received and  (rd.getDataFrames().size()-1) is the last 
 		
-		double oddBack=hd.getOddBack();   // offer for Back bets
-		double oddLay=hd.getOddLay();     // offer for Lay bets
-		
+		double oddBack=hd.getOddBack();   //odd offer for Back bets
+				
 		Vector<OddData> bp=hd.getBackPrices();  // get all Back prices with amounts (OddData) 
+			
+		double womBack=0;
+		// sum first "int depth" amounts of the vector that are the ones more near to best price on back prices
+		int i=0;
+		while (i<depth && Utils.indexToOdd(Utils.oddToIndex(oddBack)-i)!=-1)  //while depth and valid odd for depth
+		{
+			double amountValueB=0;
+			
+			for(int x=0;x<bp.size();x++)  // search for odd Utils.indexToOdd(Utils.oddToIndex(oddBack)-i) in ladder 
+			{
+				if(bp.get(x).getOdd()==Utils.indexToOdd(Utils.oddToIndex(oddBack)-i))
+				{
+					amountValueB=bp.get(x).getAmount();
+				}
+			}
+			womBack+=amountValueB;
+			i++;
+			if(amountValueB==0 && !includeGaps) // if not includeGaps and there was a gap find next valid price 
+				i--;
+		}
+		
+		System.out.println("wom amount back = "+womBack);
+		
+		double oddLay=hd.getOddLay();     //odd offer for Lay bets
 		Vector<OddData> lp=hd.getLayPrices();  // get all Lay prices with amounts (OddData)
 		
-		// sum first 3 amounts of the vector that are the ones more near to best price on back prices
-		double womBack=0;
-		for(int i=0;i<depth;i++)
+		double womLay=0;
+		// sum first "int depth" amounts of the vector that are the ones more near to best price on back prices
+		i=0;
+		while (i<depth && Utils.indexToOdd(Utils.oddToIndex(oddLay)+i)!=-1)  //while depth and valid odd for depth
 		{
-			if(bp.size()>i)   // if there are at least 3
-				womBack+=bp.get(i).getAmount();
+			double amountValueL=0;
+			
+			for(int x=0;x<lp.size();x++)  // search for odd Utils.indexToOdd(Utils.oddToIndex(oddBack)-i) in ladder 
+			{
+				if(lp.get(x).getOdd()==Utils.indexToOdd(Utils.oddToIndex(oddLay)+i))
+				{
+					amountValueL=lp.get(x).getAmount();
+				}
+			}
+			womLay+=amountValueL;
+			i++;
+			if(amountValueL==0 && !includeGaps) // if not includeGaps and there was a gap find next valid price 
+				i--;
 		}
 		
-		// sum first 3 amounts of the vector that are the ones more near to best price on back prices
-		double womLay=0;
-		for(int i=0;i<depth;i++)
-		{
-			if(lp.size()>i)   // if there are at least 3
-				womLay+=lp.get(i).getAmount();
-		}
+		System.out.println("wom amount Lay = "+womLay);
 		
 		double womTotal=womBack+womLay;
 		

@@ -1022,9 +1022,9 @@ public class MarketData {
 					e.printStackTrace();
 				}
 
-				if(getRunners()!=null && getRunners().size()>0 && getRunners().get(0).getDataFrames()!=null && getRunners().get(0).getDataFrames().size()>0) 
+				if((getRunners()!=null && getRunners().size()>0 && getRunners().get(0).getDataFrames()!=null && getRunners().get(0).getDataFrames().size()>0) || getState()==CLOSED) 
 					warnListenersUpdate(); // warn all listeners
-
+				
 				try {
 					Thread.sleep(updateInterval);
 				} catch (Exception e) {

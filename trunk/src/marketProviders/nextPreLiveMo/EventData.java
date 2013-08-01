@@ -12,7 +12,7 @@ public class EventData {
 	boolean matchOddsTurnInPlay=true;
 
 	int overUnderId[]=new int[9];
-	boolean overUnderTurnInPlay=true;
+	boolean overUnderTurnInPlay[]=new boolean[9];
 	
 	int correctScoreId;
 	boolean correctScoreTurnInPlay=true;
@@ -70,12 +70,12 @@ public class EventData {
 		this.matchOddsTurnInPlay = matchOddsTurnInPlay;
 	}
 
-	public boolean isOverUnderTurnInPlay() {
-		return overUnderTurnInPlay;
+	public boolean isOverUnderTurnInPlay(int index) {
+		return overUnderTurnInPlay[index];
 	}
 
-	public void setOverUnderTurnInPlay(boolean overUnderTurnInPlay) {
-		this.overUnderTurnInPlay = overUnderTurnInPlay;
+	public void setOverUnderTurnInPlay(int index,boolean overUnderTurnInPlay) {
+		this.overUnderTurnInPlay[index] = overUnderTurnInPlay;
 	}
 	public boolean isCorrectScoreTurnInPlay() {
 		return correctScoreTurnInPlay;
