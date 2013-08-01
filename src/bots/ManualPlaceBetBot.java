@@ -426,19 +426,21 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		}
 		else if( marketEventType==MarketChangeListener.MarketUpdate)
 		{
-		//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
-		//System.out.println("Market :"+md.getName()+" "+md.getEventName()+" ");
-		if(bet!=null)
-		{
-			writeMsg(BetUtils.printBet(bet), Color.BLACK);
-			if(BetUtils.isBetFinalState(bet.getState()))
-				bet=null;
 			
-		}
-		
-		if(bet2!=null)
-			if(BetUtils.isBetFinalState(bet2.getState()))
-				bet2=null;
+			writeMsg("WOM :"+Utils.getWomFrame(md.getRunners().get(0), 3, false, 0),Color.BLUE);
+			//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
+			//System.out.println("Market :"+md.getName()+" "+md.getEventName()+" ");
+			if(bet!=null)
+			{
+				writeMsg(BetUtils.printBet(bet), Color.BLACK);
+				if(BetUtils.isBetFinalState(bet.getState()))
+					bet=null;
+				
+			}
+			
+			if(bet2!=null)
+				if(BetUtils.isBetFinalState(bet2.getState()))
+					bet2=null;
 		}
 		
 	}

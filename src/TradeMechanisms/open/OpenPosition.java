@@ -138,10 +138,10 @@ public class OpenPosition extends TradeMechanism implements MarketChangeListener
 			{
 				
 				md.getBetManager().cancelBet(betInProcess);
-				System.out.println("to cancel cancel bet :"+BetUtils.printBet(betInProcess));
+				//System.out.println("to cancel cancel bet :"+BetUtils.printBet(betInProcess));
 			}
 			
-			System.out.println("NOT cancel bet :"+BetUtils.printBet(betInProcess));
+			//System.out.println("NOT cancel bet :"+BetUtils.printBet(betInProcess));
 		}
 		
 		switch (getI_STATE()) {

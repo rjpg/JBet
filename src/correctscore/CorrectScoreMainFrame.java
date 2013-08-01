@@ -327,7 +327,7 @@ public class CorrectScoreMainFrame  implements UpdateScoresListener{
 		rootLog.setLevel(lev);
 		
 		Display.println("Welcome to After Goal Correct Score Bot");
-		/*
+		
 		try {
 			this.setUsername(Display.getStringAnswer("Betfair username:"));
 			this.setPassword(Display.getStringAnswer("Betfair password:"));
@@ -335,10 +335,6 @@ public class CorrectScoreMainFrame  implements UpdateScoresListener{
 			System.out.println("Error reading Username and/or Password");
 			e1.printStackTrace();
 		}
-		*/
-	
-		this.setUsername("birinhos");
-		this.setPassword("6mgprldi777");
 		
 		
 		// Perform the login before anything else.

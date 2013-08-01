@@ -140,9 +140,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(0,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(0,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(0,false);
 			}
 			
 			if(fields[1].equals("Over/Under 1.5 Goals"))
@@ -151,9 +151,9 @@ public class NextPreLiveCS extends MarketProvider{
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(1,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(1,false);
 			}
 			
 			if(fields[1].equals("Over/Under 2.5 Goals"))
@@ -161,9 +161,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(2,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(2,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(2,false);
 			}
 			
 			if(fields[1].equals("Over/Under 3.5 Goals"))
@@ -172,9 +172,9 @@ public class NextPreLiveCS extends MarketProvider{
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(3,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(3,false);
 			}
 			
 			if(fields[1].equals("Over/Under 4.5 Goals"))
@@ -182,9 +182,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(4,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(4,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(4,false);
 			}
 			
 			if(fields[1].equals("Over/Under 5.5 Goals"))
@@ -192,9 +192,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(5,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(5,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(5,false);
 			}
 			
 			if(fields[1].equals("Over/Under 6.5 Goals"))
@@ -202,9 +202,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(6,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(6,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(6,false);
 			}
 			
 			if(fields[1].equals("Over/Under 7.5 Goals"))
@@ -212,9 +212,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(7,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(7,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(7,false);
 			}
 			
 			if(fields[1].equals("Over/Under 8.5 Goals"))
@@ -222,9 +222,9 @@ public class NextPreLiveCS extends MarketProvider{
 				edInprocess.setOverUnderId(8,Integer.parseInt(fields[0]));
 				//System.out.println("id MO: " + edInprocess.getCorrectScoreId());
 				if(fields[15].equals("Y"))
-					edInprocess.setOverUnderTurnInPlay(true);
+					edInprocess.setOverUnderTurnInPlay(8,true);
 				else
-					edInprocess.setOverUnderTurnInPlay(false);
+					edInprocess.setOverUnderTurnInPlay(8,false);
 			}
 			
 		}
