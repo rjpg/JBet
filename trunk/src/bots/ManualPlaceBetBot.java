@@ -25,6 +25,8 @@ import TradeMechanisms.open.OpenPosition;
 import TradeMechanisms.swing.Swing;
 import TradeMechanisms.swing.SwingOptions;
 import TradeMechanisms.swing.SwingPanel;
+import TradeMechanisms.trailingStop.TrailingStop;
+import TradeMechanisms.trailingStop.TrailingStopOptions;
 import bets.BetData;
 import bets.BetPanel;
 import bets.BetUtils;
@@ -301,7 +303,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 							swingPanel.getBackLayBetData(),
 							swingPanel.isKeepIP());
 					
-					SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
+				/*	SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
 					
 					
 					so.setWaitFramesOpen(swingPanel.getTimeOpen());
@@ -333,9 +335,32 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					so.setDelayIgnoreStopLoss(50);
 					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					*/
-					Swing swing=new Swing(so);
 					
-					swings.add(swing);
+					//Swing swing=new Swing(so);
+					//swings.add(swing);
+					
+					TrailingStopOptions tso=new TrailingStopOptions(betOpen, ManualPlaceBetBot.this);
+					
+					
+					tso.setWaitFramesOpen(swingPanel.getTimeOpen());
+					tso.setWaitFramesNormal(swingPanel.getTimeClose());
+					tso.setWaitFramesBestPrice(swingPanel.getTimeBestPrice());
+					tso.setTicksProfit(swingPanel.getTicksProfit());
+					tso.setTicksLoss(swingPanel.getTicksStopLoss());
+					tso.setForceCloseOnStopLoss(swingPanel.isforceCloseOnStopLoss());
+					tso.setInsistOpen(false);
+					tso.setGoOnfrontInBestPrice(true);
+					tso.setUseStopProfifInBestPrice(true);
+					tso.setPercentageOpen(0.80);   // if 80% is open go to close  
+					tso.setDelayBetweenOpenClose(-1);
+					tso.setDelayIgnoreStopLoss(-1);
+					tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+					tso.setMovingAverageSamples(4);
+					tso.setReference(TrailingStopOptions.REF_MIDLE);
+					
+					TrailingStop trailing=new TrailingStop(tso);
+					
+				
 					
 				}
 			});
@@ -500,6 +525,24 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			String[] values=tm.getStatisticsValues().split(" ");
 			           
 			String msg="----- Swing Statistics -----\n";
+			
+			for(int i=0;i<fields.length;i++)
+			{
+				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+			}
+			
+			msg+="------------ || ------------";
+			msgjf.writeMessageText(msg,Color.BLUE);
+			
+		}
+		
+		if(tm instanceof TrailingStop)
+		{
+			
+			String[] fields=tm.getStatisticsFields().split(" ");
+			String[] values=tm.getStatisticsValues().split(" ");
+			           
+			String msg="----- TralingStop Statistics -----\n";
 			
 			for(int i=0;i<fields.length;i++)
 			{
