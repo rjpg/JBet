@@ -345,18 +345,18 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					tso.setWaitFramesOpen(swingPanel.getTimeOpen());
 					tso.setWaitFramesNormal(swingPanel.getTimeClose());
 					tso.setWaitFramesBestPrice(swingPanel.getTimeBestPrice());
-					tso.setTicksProfit(swingPanel.getTicksProfit());
+					tso.setTicksProfit(-1);
 					tso.setTicksLoss(swingPanel.getTicksStopLoss());
 					tso.setForceCloseOnStopLoss(swingPanel.isforceCloseOnStopLoss());
 					tso.setInsistOpen(false);
 					tso.setGoOnfrontInBestPrice(true);
 					tso.setUseStopProfifInBestPrice(true);
-					tso.setPercentageOpen(0.80);   // if 80% is open go to close  
+					tso.setPercentageOpen(0.20);   // if 80% is open go to close  
 					tso.setDelayBetweenOpenClose(-1);
 					tso.setDelayIgnoreStopLoss(-1);
 					tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
-					tso.setMovingAverageSamples(4);
-					tso.setReference(TrailingStopOptions.REF_MIDLE);
+					tso.setMovingAverageSamples(0);
+					tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
 					
 					TrailingStop trailing=new TrailingStop(tso);
 					

@@ -3,6 +3,7 @@ package TradeMechanisms.trailingStop;
 import java.awt.Color;
 import java.util.Vector;
 
+import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.OddData;
 import DataRepository.RunnersData;
@@ -17,11 +18,12 @@ import TradeMechanisms.open.OpenPositionOptions;
 import bets.BetData;
 import bets.BetUtils;
 
-public class TrailingStop extends TradeMechanism implements TradeMechanismListener{
+public class TrailingStop extends TradeMechanism implements TradeMechanismListener,MarketChangeListener{
 
 	private static final int I_OPENING = 0;
-	private static final int I_CLOSING = 1;
-	private static final int I_END = 2;
+	private static final int I_TRAILING = 1;
+	private static final int I_CLOSING = 2;
+	private static final int I_END = 3;
 	
 	
 	private int I_STATE=I_OPENING;
@@ -55,6 +57,8 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 	private int reference=TrailingStopOptions.REF_BEST_PRICE;
 	private int movingAverageSamples=1;
 		// end args
+	
+	private double oddStopLoss=0;
 	
 	private double closeOdd; 
 	private int ticksLossRelative;
@@ -152,84 +156,6 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 		initialize();
 	}
 	
-	public TrailingStop(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, int updateIntervalA)
-	{
-		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,updateIntervalA,false,false,-1,-1, 1.00, false,100,TrailingStopOptions.REF_BEST_PRICE,1);
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA)
-	{
-		this(listenerA, betOpenA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
-	}
-
-	
-	public TrailingStop(TradeMechanismListener listenerA, BetData betOpenA, int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int ticksProfitA,int ticksLossA) {
-		this(listenerA, betOpenA, waitFramesOpenA,waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA,true);
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA, boolean useStopProfifInBestPriceA) {
-		super();
-		
-		if(directionBLA==BetData.BACK)
-			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.BACK,ipKeepA);
-		else
-			betOpen=new BetData(rdA,stakeSizeA,entryOddA,BetData.LAY,ipKeepA);
-		
-		md=betOpen.getRd().getMarketData();
-		
-		//this(listenerA,betOpen,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,ticksProfitA,ticksLossA);
-		waitFramesOpen=waitFramesOpenA;
-		waitFramesNormal=waitFramesNormalA;
-		waitFramesBestPrice=waitFramesBestPriceA;
-		ticksProfit=ticksProfitA;
-		ticksLoss=ticksLossA;
-		
-		forceCloseOnStopLoss=forceCloseOnStopLossA;
-		
-		updateInterval=updateIntervalA;
-		
-		useStopProfifInBestPrice=useStopProfifInBestPriceA;
-		
-		if(listenerA!=null)
-			addTradeMechanismListener(listenerA);
-	
-		//statistics init data
-		eventName=md.getEventName();
-		marketName=md.getName();
-		matchedOnRunner=betOpen.getRd().getDataFrames().get(0).getMatchedAmount();
-		long nowMin=md.getCurrentTime().getTimeInMillis();
-		long startMin=md.getStart().getTimeInMillis();
-		long sub=startMin-nowMin;
-		secToStart=(int)(sub/1000);
-		numberOfRunners=md.getRunners().size();
-			
-		initialize();
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,int updateIntervalA) {
-		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,updateIntervalA,false);
-	}
-		
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA) {
-		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,TradeMechanism.SYNC_MARKET_DATA_UPDATE);
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA, boolean ipKeepA,boolean useStopProfifInBestPriceA) {
-		this( listenerA, rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA, forceCloseOnStopLossA,  ipKeepA,TradeMechanism.SYNC_MARKET_DATA_UPDATE,useStopProfifInBestPriceA);
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA,boolean forceCloseOnStopLossA) {
-		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true,false);
-	}
-	
-	public TrailingStop(TradeMechanismListener listenerA, RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA) {
-		this( listenerA, rdA, stakeSizeA, entryOddA,waitFramesOpenA, waitFramesNormalA,waitFramesBestPriceA,directionBLA,ticksProfitA,ticksLossA,true);
-	}
-		
-	public TrailingStop( RunnersData rdA, double stakeSizeA, double entryOddA,int waitFramesOpenA, int waitFramesNormalA,int waitFramesBestPriceA,int directionBLA,int ticksProfitA,int ticksLossA) {
-		this(null,rdA, stakeSizeA, entryOddA, waitFramesOpenA, waitFramesNormalA, waitFramesBestPriceA, directionBLA, ticksProfitA, ticksLossA);
-	}
-	
 	public void initialize()
 	{
 		
@@ -268,6 +194,11 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 			}
 		}
 		
+		
+		
+		oddStopLoss=closeOddStopLoss;
+		
+		
 		writeMsgToListeners("Swing Start in state : "+TradeMechanismUtils.getStateString(STATE), Color.BLUE);
 		writeMsgToListeners("Swing Entry Odd : "+betOpen.getOddRequested(), Color.BLUE);
 		writeMsgToListeners("Swing Profit Odd : "+closeOdd, Color.BLUE);
@@ -281,6 +212,11 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 	
 	@Override
 	public void forceClose() {
+		
+		delayBetweenOpenClose=0;
+		waitFramesNormal=0;
+		waitFramesBestPrice=0;
+		
 		if(close!=null)
 		{
 			close.forceClose();
@@ -292,6 +228,10 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 			open.forceClose();
 			return;
 		}
+		
+		
+		
+		
 		
 	}
 
@@ -330,7 +270,10 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 		if(betOpen.getType()==BetData.BACK)
 		{
 			double closeAMP=Utils.closeAmountLay(betOpen.getOddRequested(), betOpen.getAmount(),   closeOdd);
-			potentialP=closeAMP-betOpen.getAmount();
+			if(closeOdd==-1)
+				potentialP=betOpen.getAmount()*(betOpen.getOddRequested()-1);
+			else
+				potentialP=closeAMP-betOpen.getAmount();
 			
 			double closeAML=Utils.closeAmountLay(betOpen.getOddRequested(), betOpen.getAmount(),  closeOddStopLoss);
 			potentialL=closeAML-betOpen.getAmount();
@@ -340,7 +283,10 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 		else
 		{
 			double closeAMP=Utils.closeAmountBack(betOpen.getOddRequested(), betOpen.getAmount(),   closeOdd);
-			potentialP=betOpen.getAmount()-closeAMP;
+			if(closeOdd==-1)
+				potentialP=betOpen.getAmount();
+			else
+				potentialP=betOpen.getAmount()-closeAMP;
 			
 			double closeAML=Utils.closeAmountBack(betOpen.getOddRequested(), betOpen.getAmount(),   closeOddStopLoss);
 			potentialL=betOpen.getAmount()-closeAML;
@@ -443,7 +389,7 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 
 	@Override
 	public void clean() {
-		System.out.println("Swind clean runned");
+		System.out.println("TrailingStop clean runned");
 		
 	}
 	//--------------------------------- TM END --------------------------
@@ -520,6 +466,93 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 		I_STATE = i_STATE;
 	}
 	
+	private double getOddReference()
+	{
+		double ref;
+		
+		double aux=0;
+		if(movingAverageSamples>1 && Utils.isValidWindow(betOpen.getRd(), movingAverageSamples, 0))
+		{
+			if(reference==TrailingStopOptions.REF_BEST_PRICE)
+			{
+				
+				for(int i=0;i<movingAverageSamples;i++)
+				{
+					if(betOpen.getType()==BetData.LAY)
+						aux+=Utils.getOddBackFrame(betOpen.getRd(), i);
+					else
+						aux+=Utils.getOddLayFrame(betOpen.getRd(), i);
+				}
+				aux/=movingAverageSamples;
+			} else if(reference==TrailingStopOptions.REF_BEST_OFFER)
+			{
+				
+				for(int i=0;i<movingAverageSamples;i++)
+				{
+					if(betOpen.getType()==BetData.LAY)
+						aux+=Utils.getOddLayFrame(betOpen.getRd(), i);
+					else
+						aux+=Utils.getOddBackFrame(betOpen.getRd(), i);
+				}
+				aux/=movingAverageSamples;
+			} else // REF_MIDLE
+			{
+				
+				for(int i=0;i<movingAverageSamples;i++)
+				{
+					aux+=((Utils.getOddLayFrame(betOpen.getRd(), i)+Utils.getOddBackFrame(betOpen.getRd(), i))/2.);
+				}
+				aux/=movingAverageSamples;
+			}
+		}
+		else
+		{
+			if(reference==TrailingStopOptions.REF_BEST_PRICE)
+			{
+				if(betOpen.getType()==BetData.LAY)
+					aux=Utils.getOddBackFrame(betOpen.getRd(), 0);
+				else
+					aux=Utils.getOddLayFrame(betOpen.getRd(), 0);
+				
+			} else if(reference==TrailingStopOptions.REF_BEST_OFFER)
+			{
+				if(betOpen.getType()==BetData.LAY)
+					aux=Utils.getOddLayFrame(betOpen.getRd(), 0);
+				else
+					aux=Utils.getOddBackFrame(betOpen.getRd(), 0);
+				
+			} else // REF_MIDLE
+			{
+				aux=((Utils.getOddLayFrame(betOpen.getRd(), 0)+Utils.getOddBackFrame(betOpen.getRd(), 0))/2.);
+			}
+		}
+		
+		ref=Utils.nearValidOdd(aux);
+		
+		return ref;
+	}
+	
+	private void updateOddStopLoss()
+	{
+		if(betOpen.getType()==BetData.LAY)
+		{
+			double ref=getOddReference();
+			ref=Utils.indexToOdd(Utils.oddToIndex(ref)-ticksLoss);
+			
+			if(ref>oddStopLoss)
+				oddStopLoss=ref;
+		}
+		else
+		{
+			double ref=getOddReference();
+			ref=Utils.indexToOdd(Utils.oddToIndex(ref)+ticksLoss);
+			
+			if(ref<oddStopLoss)
+				oddStopLoss=ref;
+		}
+	}
+	
+	
 	private void open()
 	{
 		OpenPositionOptions opo=new OpenPositionOptions(betOpen,this);
@@ -533,41 +566,50 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 	
 	private void close()
 	{
-		
-		OddData odClose=BetUtils.getEquivalent(openInfo, closeOdd);
-		if(openInfo.getType()==BetData.BACK)
-			odClose.setType(BetData.LAY);
+		if(ticksProfit<1)
+		{
+			setState(I_TRAILING);
+			md.addMarketChangeListener(this);
+			
+			
+		}
 		else
-			odClose.setType(BetData.BACK);
-		
-		odClose.setRd(betOpen.getRd());
-		
-		System.out.println("closing on : "+odClose+" stop Loss :"+ticksLoss);
-		
-		betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
-		/////////////debug
-		if(close !=null)
-			System.err.println("Running close for the second time in swing !!!!!!");
-		/////////////
-		
-		ClosePositionTrailingStopOptions cpo=new ClosePositionTrailingStopOptions(betClose, this);
-		cpo.setMovingStopLossTicks(ticksLoss);
-		cpo.setWaitFramesNormal(waitFramesNormal);
-		cpo.setWaitFramesUntilForceClose(waitFramesBestPrice);
-		cpo.setUpdateInterval(updateInterval);
-		cpo.setForceCloseOnStopLoss(forceCloseOnStopLoss);
-		cpo.setUseStopProfitInBestPrice(useStopProfifInBestPrice);
-		cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
-		cpo.setStartDelay(delayBetweenOpenClose);
-		cpo.setIgnoreStopLossDelay(delayIgnoreStopLoss);
-		cpo.setWaitFramesLay1000(waitFramesLay1000);
-		cpo.setReference(reference);
-		cpo.setMovingAverageSamples(movingAverageSamples);
-		cpo.setInitialRelativeStopLossTicks(ticksLossRelative);
-		
-		close=new ClosePositionTrailingStop(cpo);
-		
-		setI_STATE(I_CLOSING);
+		{
+			OddData odClose=BetUtils.getEquivalent(openInfo, closeOdd);
+			if(openInfo.getType()==BetData.BACK)
+				odClose.setType(BetData.LAY);
+			else
+				odClose.setType(BetData.BACK);
+			
+			odClose.setRd(betOpen.getRd());
+			
+			System.out.println("closing on : "+odClose+" stop Loss :"+ticksLoss);
+			
+			betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
+			/////////////debug
+			if(close !=null)
+				System.err.println("Running close for the second time in swing !!!!!!");
+			/////////////
+			
+			ClosePositionTrailingStopOptions cpo=new ClosePositionTrailingStopOptions(betClose, this);
+			cpo.setMovingStopLossTicks(ticksLoss);
+			cpo.setWaitFramesNormal(waitFramesNormal);
+			cpo.setWaitFramesUntilForceClose(waitFramesBestPrice);
+			cpo.setUpdateInterval(updateInterval);
+			cpo.setForceCloseOnStopLoss(forceCloseOnStopLoss);
+			cpo.setUseStopProfitInBestPrice(useStopProfifInBestPrice);
+			cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
+			cpo.setStartDelay(delayBetweenOpenClose);
+			cpo.setIgnoreStopLossDelay(delayIgnoreStopLoss);
+			cpo.setWaitFramesLay1000(waitFramesLay1000);
+			cpo.setReference(reference);
+			cpo.setMovingAverageSamples(movingAverageSamples);
+			cpo.setInitialRelativeStopLossTicks(ticksLossRelative);
+			
+			close=new ClosePositionTrailingStop(cpo);
+			
+			setI_STATE(I_CLOSING);
+		}
 		
 	}
 	
@@ -635,6 +677,87 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 		else
 			System.out.println("process Open did not end");
 	
+		
+	}
+	
+	void processTrailing()
+	{
+		if(delayBetweenOpenClose >0)
+		{
+			delayBetweenOpenClose--;
+			return;
+		}
+		
+		updateOddStopLoss();
+		
+		System.out.println("ODD STOPLOSS : "+oddStopLoss);
+		
+		boolean closeFlag=false;
+		
+		if(betOpen.getType()==BetData.LAY)
+		{
+			if(getOddReference()<oddStopLoss)
+				closeFlag=true;
+		}
+		else
+		{
+			if(getOddReference()>oddStopLoss)
+				closeFlag=true;
+		}
+		
+		if(waitFramesNormal--<0)
+		{
+			closeFlag=true;
+		}
+		
+		if(closeFlag)
+		{
+			md.removeMarketChangeListener(this);
+			
+			OddData odClose;
+			if(openInfo.getType()==BetData.BACK)
+			{
+				odClose=BetUtils.getEquivalent(openInfo, Utils.getOddBackFrame(betOpen.getRd(), 0));
+				odClose.setType(BetData.LAY);
+			}
+			else
+			{
+				odClose=BetUtils.getEquivalent(openInfo, Utils.getOddLayFrame(betOpen.getRd(), 0));
+				odClose.setType(BetData.BACK);
+			}
+				
+			
+			odClose.setRd(betOpen.getRd());
+			
+			System.out.println("closing on : "+odClose+" stop Loss :"+ticksLoss);
+			
+			betClose=new BetData(odClose.getRd(),odClose,betOpen.isKeepInPlay());
+			/////////////debug
+			if(close !=null)
+				System.err.println("Running close for the second time in swing !!!!!!");
+			/////////////
+			
+			ClosePositionTrailingStopOptions cpo=new ClosePositionTrailingStopOptions(betClose, this);
+			cpo.setMovingStopLossTicks(1);
+			cpo.setWaitFramesNormal(0);
+			cpo.setWaitFramesUntilForceClose(waitFramesBestPrice);
+			cpo.setUpdateInterval(updateInterval);
+			cpo.setForceCloseOnStopLoss(forceCloseOnStopLoss);
+			cpo.setUseStopProfitInBestPrice(useStopProfifInBestPrice);
+			cpo.setGoOnfrontInBestPrice(goOnfrontInBestPrice);
+			cpo.setStartDelay(-1);
+			cpo.setIgnoreStopLossDelay(-1);
+			cpo.setWaitFramesLay1000(waitFramesLay1000);
+			cpo.setReference(reference);
+			cpo.setMovingAverageSamples(0);
+			cpo.setInitialRelativeStopLossTicks(1);
+			
+			close=new ClosePositionTrailingStop(cpo);
+			
+			setI_STATE(I_CLOSING);
+
+			
+		}
 		
 	}
 	
@@ -742,5 +865,14 @@ public class TrailingStop extends TradeMechanism implements TradeMechanismListen
 	@Override
 	public boolean isPause() {
 		return pause;
+	}
+
+	@Override
+	public void MarketChange(MarketData md, int marketEventType) {
+		if(marketEventType==MarketChangeListener.MarketUpdate)
+		{
+			processTrailing();
+		}
+		
 	}
 }
