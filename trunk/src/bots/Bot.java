@@ -141,5 +141,18 @@ public abstract class Bot implements MarketChangeListener{
 			return -1;
 	}
 
+	public int getSecondsToStart()
+	{
+		if(getMd()!=null)
+		{
+			long nowMin=getMd().getCurrentTime().getTimeInMillis();
+			long startMin=getMd().getStart().getTimeInMillis();
+			long sub=startMin-nowMin;
+		
+			return (int)(sub/1000);
+		}
+		else
+			return -1;
+	}
 	
 }

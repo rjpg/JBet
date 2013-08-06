@@ -16,7 +16,7 @@ public class LoaderTestLogFiles {
 	Parameters.log=false;  // Log or not to Log when not in replay
 	Parameters.replay=true; // replay or read from file
 	Parameters.replay_file_list=true; // replay or read from file
-	Parameters.replay_file_list_test=true; 
+	Parameters.replay_file_list_test=false; 
 	Parameters.REALISTIC_TIME_REPLAY=false;
 	Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 	Parameters.saveFavorite=false; // replay or read from file
