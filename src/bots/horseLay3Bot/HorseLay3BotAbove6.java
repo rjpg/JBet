@@ -46,10 +46,13 @@ public class HorseLay3BotAbove6 extends Bot{
 	public BetData betMatched=null;
 	
 	// parameters 
-	public int martingaleTries=40;
-	public double oddActuation=3.00;
+	public int martingaleTries=1;
+	public double oddActuation=4.00;
 	public double initialAmount=3.00;
 	//
+	
+	public boolean useVisualInterface=false;
+	
 	
 	public double amount=initialAmount;
 	
@@ -66,15 +69,17 @@ public class HorseLay3BotAbove6 extends Bot{
 		
 		setInTrade(true);
 		
-		frame=new JFrame(this.getName());
-		frame.setSize(640,480);
-		
-		msgPanel=new MessagePanel();
-		
-		frame.setContentPane(msgPanel);
-		
-		frame.setVisible(true);
-		
+		if(useVisualInterface)
+		{
+			frame=new JFrame(this.getName());
+			frame.setSize(640,480);
+			
+			msgPanel=new MessagePanel();
+			
+			frame.setContentPane(msgPanel);
+			
+			frame.setVisible(true);
+		}
 	}
 	
 	public void update()
@@ -112,6 +117,9 @@ public class HorseLay3BotAbove6 extends Bot{
 					{
 						writeMsg("Executing Martingale - try number "+ misses, Color.ORANGE);
 						amount=(amount*(oddActuation-1.00))+amount;
+						
+						if(amount==9) amount=6;
+						
 						writeMsg("Seting amount to :"+ amount, Color.ORANGE);
 					}
 				
@@ -152,15 +160,23 @@ public class HorseLay3BotAbove6 extends Bot{
 		
 		if(!betsPlaced)
 		{
-			if(getMinutesToStart()==0)
+			if(getSecondsToStart()<20)
 			{
+				//System.out.println("minutes to start "+getMinutesToStart());
 				for(RunnersData rdAux:getMd().getRunners())
 				{
 					if(Utils.getOddBackFrame(rdAux,0)>6.0)
 					{
-						writeMsg("Adding Runner to placeBet : "+rdAux.getName(), Color.BLUE);
-						BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
-						bets.add(bd);
+						//if(Utils.isValidWindow(rdAux, 200, 0))
+						//{
+							//System.out.println("valid window");
+						//	if( Utils.oddToIndex((Utils.getOddBackFrame(rdAux, 0))-Utils.oddToIndex(Utils.getOddBackFrame(rdAux, 200)))>0)
+						//	{
+								writeMsg("Adding Runner to placeBet : "+rdAux.getName(), Color.BLUE);
+								BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
+								bets.add(bd);
+						//	}
+						}
 					}
 				}
 				
@@ -283,8 +299,10 @@ public class HorseLay3BotAbove6 extends Bot{
 
 	@Override
 	public void writeMsg(String s, Color c) {
-		
-		msgPanel.writeMessageText(s, c);
+		if(useVisualInterface)
+		{
+			msgPanel.writeMessageText(s, c);
+		}
 	}
 
 	

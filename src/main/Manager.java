@@ -154,6 +154,7 @@ public class Manager  implements MarketChangeListener,MarketProviderListerner{
 			{
 				JFrame jf=new JFrame();
 				MarketNavigator mp=new MarketNavigator(loginEnv);
+				
 				mp.addMarketProviderListener(this);
 				
 				JScrollPane jsp=new JScrollPane(mp.getPanel());

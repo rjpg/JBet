@@ -34,7 +34,7 @@ public class HorseLayFavorite extends Bot {
 	public BetData betMatched = null;
 
 	// parameters
-	public int martingaleTries = 40;
+	public int martingaleTries = 0;
 	public double oddActuation = 3.00;
 	public double initialAmount = 3.00;
 	//

@@ -205,9 +205,9 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				
 				if(Parameters.horselayBots)
 				{
-					horseLay3Bot=new HorseLay3Bot(md,3);
+					//horseLay3Bot=new HorseLay3Bot(md,3);
 					horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
-					horseLayFavorite=new HorseLayFavorite(md, 3);
+					//horseLayFavorite=new HorseLayFavorite(md, 3);
 				}
 	
 				// /////////////////////after////////////////////////////////////////////
@@ -554,9 +554,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		//CategoriesManager.loadRawAMFromFile();
 		//CategoriesManager.processAMCatIntervals();
 			
-		Parameters.log=true;  // Log or not to Log when not in replay
-		Parameters.replay=false; 
-		Parameters.replay_file_list=false; 
+		Parameters.log=false;  // Log or not to Log when not in replay
+		Parameters.replay=true; 
+		Parameters.replay_file_list=true; 
 		Parameters.replay_file_list_test=false; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
