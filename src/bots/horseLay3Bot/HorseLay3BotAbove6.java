@@ -51,7 +51,7 @@ public class HorseLay3BotAbove6 extends Bot{
 	public double initialAmount=3.00;
 	//
 	
-	public boolean useVisualInterface=false;
+	public boolean useVisualInterface=true;
 	
 	
 	public double amount=initialAmount;
@@ -176,7 +176,7 @@ public class HorseLay3BotAbove6 extends Bot{
 								BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
 								bets.add(bd);
 						//	}
-						}
+						//}
 					}
 				}
 				
