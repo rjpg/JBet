@@ -52,6 +52,7 @@ import bots.WomNeighboursBot;
 import bots.dutchinBot.ManualDutchingBot;
 import bots.horseLay3Bot.HorseLay3Bot;
 import bots.horseLay3Bot.HorseLay3BotAbove6;
+import bots.horseLay3Bot.HorseLayEnd;
 import bots.horseLay3Bot.HorseLayFavorite;
 import demo.util.APIContext;
 import demo.util.Display;
@@ -79,6 +80,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 	public HorseLay3Bot horseLay3Bot;
 	public HorseLay3BotAbove6 horseLay3BotAbove6;
 	public HorseLayFavorite horseLayFavorite;
+	public HorseLayEnd horseLayEnd;
 	
 	// close (logout Frame)
 	JFrame closeFrame;
@@ -206,8 +208,9 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				if(Parameters.horselayBots)
 				{
 					//horseLay3Bot=new HorseLay3Bot(md,3);
-					horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
+					//horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
 					//horseLayFavorite=new HorseLayFavorite(md, 3);
+					horseLayEnd=new HorseLayEnd(md, 3);
 				}
 	
 				// /////////////////////after////////////////////////////////////////////
