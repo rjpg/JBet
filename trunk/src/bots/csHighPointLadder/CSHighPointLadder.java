@@ -30,6 +30,8 @@ import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.TradeMechanismUtils;
 import TradeMechanisms.swing.Swing;
 import TradeMechanisms.swing.SwingOptions;
+import TradeMechanisms.trailingStop.TrailingStop;
+import TradeMechanisms.trailingStop.TrailingStopOptions;
 
 public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 
@@ -48,6 +50,10 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 	public boolean end_runned=false;
 	
 	public Swing swing=null;
+	
+	public TrailingStop trailingStop=null;
+	
+	public boolean useSwing=false;
 	
 	//Visuals
 	private JFrame frame;
@@ -356,27 +362,52 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 				entryOdd,
 				BetData.BACK,
 				false);
-		
-		SwingOptions so=new SwingOptions(betOpen, this);
-		so.setWaitFramesOpen((int)(60.*1.5));      // 0.75 minute 1,5
-		so.setWaitFramesNormal((int)((60.*3)*1.5));   //2.25- 3 minutes
-		so.setWaitFramesBestPrice((int)(60*1.5));  // 0.75 - 1.5 minute
-		so.setTicksProfit(stopProfit);
-		so.setTicksLoss(5);
-		so.setForceCloseOnStopLoss(false);
-		so.setInsistOpen(false);
-		so.setGoOnfrontInBestPrice(false);
-		so.setUseStopProfifInBestPrice(true);
-		so.setPercentageOpen(0.80);   // if 80% is open go to close  
-		so.setDelayBetweenOpenClose(-1);
-		so.setDelayIgnoreStopLoss(50);
-		so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
-		
+		if(useSwing)
+		{
+			SwingOptions so=new SwingOptions(betOpen, this);
+			so.setWaitFramesOpen((int)(60.*1.5));      // 0.75 minute 1,5
+			so.setWaitFramesNormal((int)((60.*3)*1.5));   //2.25- 3 minutes
+			so.setWaitFramesBestPrice((int)(60*1.5));  // 0.75 - 1.5 minute
+			so.setTicksProfit(stopProfit);
+			so.setTicksLoss(5);
+			so.setForceCloseOnStopLoss(false);
+			so.setInsistOpen(false);
+			so.setGoOnfrontInBestPrice(false);
+			so.setUseStopProfifInBestPrice(true);
+			so.setPercentageOpen(0.80);   // if 80% is open go to close  
+			so.setDelayBetweenOpenClose(-1);
+			so.setDelayIgnoreStopLoss(50);
+			so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 			
-		swing=new Swing(so);
-		writeMsg("Swing Started - going to state EXECUTING_SWING", Color.BLUE);	
-		setSTATE(EXECUTING_SWING);
-		
+				
+			swing=new Swing(so);
+			writeMsg("Swing Started - going to state EXECUTING_SWING", Color.BLUE);	
+			setSTATE(EXECUTING_SWING);
+		}
+		else
+		{
+			TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
+			tso.setWaitFramesOpen((int)(60.*1.5));      // 0.75 minute 1,5
+			tso.setWaitFramesNormal((int)((60.*3)*1.5));   //2.25- 3 minutes
+			tso.setWaitFramesBestPrice((int)(60*1.5));  // 0.75 - 1.5 minute
+			tso.setTicksProfit(stopProfit);
+			tso.setTicksLoss(5);
+			tso.setForceCloseOnStopLoss(false);
+			tso.setInsistOpen(false);
+			tso.setGoOnfrontInBestPrice(false);
+			tso.setUseStopProfifInBestPrice(true);
+			tso.setPercentageOpen(0.80);   // if 80% is open go to close  
+			tso.setDelayBetweenOpenClose(-1);
+			tso.setDelayIgnoreStopLoss(50);
+			tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+			
+			tso.setMovingAverageSamples(0);
+			tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
+				
+			trailingStop=new TrailingStop(tso);
+			writeMsg("TrailingStop Started - going to state EXECUTING_SWING", Color.BLUE);	
+			setSTATE(EXECUTING_SWING);
+		}
 		
 	}
 	
@@ -390,38 +421,77 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			return;
 		}
 		
-		if(swing==null)
-		{
-			writeMsg("Swing is null - going to END state", Color.RED);
-			setSTATE(END);
-			update();
-			return;
-		}
 		
-		if(swing.isEnded())
+		if(useSwing)
 		{
-			String[] fields=swing.getStatisticsFields().split(" ");
-			String[] values=swing.getStatisticsValues().split(" ");
-			           
-			String msg="----- Swing Statistics -----\n";
 			
-			for(int i=0;i<fields.length;i++)
+			if(swing==null)
 			{
-				msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+				writeMsg("Swing is null - going to END state", Color.RED);
+				setSTATE(END);
+				update();
+				return;
 			}
 			
-			msg+="------------ || ------------";
-			writeMsg(msg,Color.BLUE);
-			writeMsg("Swing has ended - going to END state", Color.BLUE);
-			setSTATE(END);
-			update();
-			return;
+			if(swing.isEnded())
+			{
+				String[] fields=swing.getStatisticsFields().split(" ");
+				String[] values=swing.getStatisticsValues().split(" ");
+				           
+				String msg="----- Swing Statistics -----\n";
+				
+				for(int i=0;i<fields.length;i++)
+				{
+					msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+				}
+				
+				msg+="------------ || ------------";
+				writeMsg(msg,Color.BLUE);
+				writeMsg("Swing has ended - going to END state", Color.BLUE);
+				setSTATE(END);
+				update();
+				return;
+			}
+			else
+			{
+				writeMsg("Swing has not ended - Swing State: "+ TradeMechanismUtils.getStateString(swing.getState()), Color.BLUE);
+			}
 		}
 		else
 		{
-			writeMsg("Swing has not ended - Swing State: "+ TradeMechanismUtils.getStateString(swing.getState()), Color.BLUE);
+				
+			if(trailingStop==null)
+			{
+				writeMsg("TrailingStop is null - going to END state", Color.RED);
+				setSTATE(END);
+				update();
+				return;
+			}
+			
+			if(trailingStop.isEnded())
+			{
+				String[] fields=trailingStop.getStatisticsFields().split(" ");
+				String[] values=trailingStop.getStatisticsValues().split(" ");
+				           
+				String msg="----- TrailingStop Statistics -----\n";
+				
+				for(int i=0;i<fields.length;i++)
+				{
+					msg+="["+i+"] "+fields[i]+" : "+values[i]+"\n";
+				}
+				
+				msg+="------------ || ------------";
+				writeMsg(msg,Color.BLUE);
+				writeMsg("TrailingStop has ended - going to END state", Color.BLUE);
+				setSTATE(END);
+				update();
+				return;
+			}
+			else
+			{
+				writeMsg("TrailingStop has not ended - trailingStop State: "+ TradeMechanismUtils.getStateString(trailingStop.getState()), Color.BLUE);
+			}
 		}
-		
 		
 	}
 	
@@ -592,7 +662,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 
 	@Override
 	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
-		writeMsg("[Swing msg] "+msg, color);
+		writeMsg("[tradeMechanism msg] "+msg, color);
 		
 	}
     
