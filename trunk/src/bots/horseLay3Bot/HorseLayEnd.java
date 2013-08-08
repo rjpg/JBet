@@ -19,7 +19,7 @@ import bets.BetData;
 import bets.BetUtils;
 import bots.Bot;
 
-public class HorseLay3Bot extends Bot{
+public class HorseLayEnd extends Bot{
 
 	//Visuals
 	private JFrame frame;
@@ -33,11 +33,14 @@ public class HorseLay3Bot extends Bot{
 	
 	public BetData betMatched=null;
 	
+	public BetData betCloseMatched=null;
+	
 	public boolean win=false;
 	
 	// parameters 
 	public int martingaleTries=40;
-	public double oddActuation=3.00;
+	public double oddActuation=1.01;
+	public double oddExit=1.05;
 	public double initialAmount=3.00;
 	//
 	
@@ -45,8 +48,8 @@ public class HorseLay3Bot extends Bot{
 	
 	public int misses=0;
 	
-	public HorseLay3Bot(MarketData md,double initStake) {
-		super(md,"HorseLay3Bot - ");
+	public HorseLayEnd(MarketData md,double initStake) {
+		super(md,"HorseLayEnd - ");
 		amount=initStake;
 		initialize();
 	}
@@ -73,20 +76,15 @@ public class HorseLay3Bot extends Bot{
 		if(Utils.isValidWindow(getMd().getRunners().get(0), 0, 0) && Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true && isInTrade()) //end
 		{
 			
-			RunnersData rdLow=getMd().getRunners().get(0);
 			
-			for(RunnersData rdAux:getMd().getRunners())
-				if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
-						rdLow=rdAux;
-			
-			writeMsg("The lower runner (winner) found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
+			writeMsg("End of race", Color.BLUE);
 			
 			
 			if(betMatched!=null)
 			{
-				if(betMatched.getRd()==rdLow)
+				if(betCloseMatched.getState()!=BetData.MATCHED)
 				{
-					writeMsg("The mached Lay Bet was on the winner - Martingale for the nest race", Color.RED);
+					writeMsg("The close bet was not matched  - Martingale for the nest race", Color.RED);
 					misses++;
 					
 					win=false;
@@ -108,7 +106,7 @@ public class HorseLay3Bot extends Bot{
 				}
 				else
 				{
-					writeMsg("The mached Lay Bet was NOT on the winner", Color.GREEN);
+					writeMsg("The close bet was mached", Color.GREEN);
 					writeMsg("Reset Martingale ", Color.BLUE);
 					misses=0;
 					amount=initialAmount;
@@ -144,31 +142,12 @@ public class HorseLay3Bot extends Bot{
 		{
 			if(getMinutesToStart()==0)
 			{
-				RunnersData rdLow=getMd().getRunners().get(0);
-				
-				for(RunnersData rdAux:getMd().getRunners())
-					if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
-							rdLow=rdAux;
-				
-				RunnersData rdLow2=getMd().getRunners().get(0);
-				
-				if(rdLow2==rdLow)
-					rdLow2=getMd().getRunners().get(1);
-				
-				for(RunnersData rdAux:getMd().getRunners())
-					if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow2, 0) && rdAux!=rdLow)
-							rdLow2=rdAux;
-				
-				writeMsg("At minute 0 the lower runner found is "+rdLow.getName()+" @ "+ Utils.getOddBackFrame(rdLow, 0)+" . The 2nd lower runner found is "+rdLow2.getName()+" @ "+ Utils.getOddBackFrame(rdLow2, 0), Color.BLUE);
-				
+							
 				
 				for(RunnersData rdAux:getMd().getRunners())
 				{
-					if(rdAux!=rdLow && rdAux!=rdLow2)
-					{
-						BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
-						bets.add(bd);
-					}
+					BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
+					bets.add(bd);
 				}
 				
 				if(!bets.isEmpty())
@@ -182,6 +161,8 @@ public class HorseLay3Bot extends Bot{
 		else if(betsCanceled==false )//betsPlaced==true
 		{
 			boolean someMatched=false;
+			
+			
 			for(BetData bdAux:bets)
 			{
 				if(bdAux.getState()==BetData.MATCHED)
@@ -206,6 +187,9 @@ public class HorseLay3Bot extends Bot{
 						writeMsg("Bets were Canceled", Color.BLUE);
 					}
 			}
+			
+			betCloseMatched=new BetData(betMatched.getRd(),amount, oddExit,BetData.BACK,true);
+			writeMsg("Close bet was placed :"+BetUtils.printBet(betCloseMatched), Color.BLUE);
 		}
 	}
 	
