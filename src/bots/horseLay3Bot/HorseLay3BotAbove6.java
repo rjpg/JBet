@@ -1,33 +1,25 @@
 package bots.horseLay3Bot;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import main.Manager;
 import main.Parameters;
+
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
-import GUI.MyChart2D;
 import bets.BetData;
 import bets.BetUtils;
 import bots.Bot;
-import bots.dutchingChaseBot.DutchingChaseOptionsPanel;
-import correctscore.MessageJFrame;
 
 public class HorseLay3BotAbove6 extends Bot{
 
@@ -51,7 +43,7 @@ public class HorseLay3BotAbove6 extends Bot{
 	public double initialAmount=3.00;
 	//
 	
-	public boolean useVisualInterface=true;
+	public boolean useVisualInterface=false;
 	
 	
 	public double amount=initialAmount;
@@ -85,7 +77,14 @@ public class HorseLay3BotAbove6 extends Bot{
 	public void update()
 	{
 		//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
-	
+		if(md.getStart().get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY)
+			return;
+		
+		if(md.getRunners()==null
+				|| md.getRunners().size()==0
+				|| md.getRunners().get(0).getDataFrames().size()==0)
+			return;
+		
 		if(Utils.isValidWindow(getMd().getRunners().get(0), 0, 0) && Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true && isInTrade()) //end
 		{
 			
@@ -102,7 +101,7 @@ public class HorseLay3BotAbove6 extends Bot{
 			{
 				if(betMatched.getRd()==rdLow)
 				{
-					writeMsg("The mached Lay Bet was on the winner - Martingale for the nest race", Color.RED);
+					writeMsg("The mached Lay Bet was on the winner - Martingale for the next race", Color.RED);
 					misses++;
 					win=false;
 					
