@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
@@ -38,7 +39,7 @@ public class HorseLayEnd extends Bot{
 	public boolean win=false;
 	
 	// parameters 
-	public int martingaleTries=40;
+	public int martingaleTries=1;
 	public double oddActuation=1.01;
 	public double oddExit=1.05;
 	public double initialAmount=3.00;
@@ -47,6 +48,11 @@ public class HorseLayEnd extends Bot{
 	public double amount=initialAmount;
 	
 	public int misses=0;
+	
+	public boolean useVisualInterface=false;
+	
+	public double volumeDiff=0;
+	
 	
 	public HorseLayEnd(MarketData md,double initStake) {
 		super(md,"HorseLayEnd - ");
@@ -58,14 +64,17 @@ public class HorseLayEnd extends Bot{
 	{
 		setInTrade(true);
 		
-		frame=new JFrame(this.getName());
-		frame.setSize(640,480);
-		
-		msgPanel=new MessagePanel();
-		
-		frame.setContentPane(msgPanel);
-		
-		frame.setVisible(true);
+		if(useVisualInterface)
+		{
+			frame=new JFrame(this.getName());
+			frame.setSize(640,480);
+			
+			msgPanel=new MessagePanel();
+			
+			frame.setContentPane(msgPanel);
+			
+			frame.setVisible(true);
+		}
 		
 	}
 	
@@ -110,6 +119,13 @@ public class HorseLayEnd extends Bot{
 					writeMsg("Reset Martingale ", Color.BLUE);
 					misses=0;
 					amount=initialAmount;
+					double volumeDiffaux=0;
+					for(int i=0;i<20;i++)
+					{
+						volumeDiffaux+=Utils.getVolumeFrame(betMatched.getRd(), 0, Utils.indexToOdd(Utils.oddToIndex(oddExit+i)));
+					}
+					volumeDiff=volumeDiffaux-volumeDiff;
+					
 					win=true;
 				}
 				
@@ -170,6 +186,7 @@ public class HorseLayEnd extends Bot{
 					writeMsg("Bet was Matched :"+BetUtils.printBet(bdAux), Color.BLUE);
 					betMatched=bdAux;
 					someMatched=true;
+					
 				}
 			}
 			
@@ -181,32 +198,42 @@ public class HorseLayEnd extends Bot{
 						betsToCancel.add(bdAux);
 				
 				if(!betsToCancel.isEmpty())
+				{
 					if(getMd().getBetManager().cancelBets(betsToCancel)!=0);
 					{
 						betsCanceled=true;
 						writeMsg("Bets were Canceled", Color.BLUE);
 					}
+				}
+				betCloseMatched=new BetData(betMatched.getRd(),amount, oddExit,BetData.BACK,true);
+				getMd().getBetManager().placeBet(betCloseMatched);
+				writeMsg("Close bet was placed :"+BetUtils.printBet(betCloseMatched), Color.BLUE);
+				for(int i=0;i<20;i++)
+				{
+					volumeDiff+=Utils.getVolumeFrame(betMatched.getRd(), 0, Utils.indexToOdd(Utils.oddToIndex(oddExit+i)));
+				}
+				
 			}
 			
-			betCloseMatched=new BetData(betMatched.getRd(),amount, oddExit,BetData.BACK,true);
-			writeMsg("Close bet was placed :"+BetUtils.printBet(betCloseMatched), Color.BLUE);
+			
 		}
 	}
 	
 	public void writeStatisticsToFile()
 	{
-		writeMsg("Writing Stat file HorseLay3Bot.txt",Color.RED);
+		String fileName="HorseLayEnd.txt";
+		writeMsg("Writing Stat file "+fileName,Color.RED);
 		 BufferedWriter out=null;
 			
 				try {
-					out = new BufferedWriter(new FileWriter("HorseLay3Bot.txt", true));
+					out = new BufferedWriter(new FileWriter(fileName, true));
 					} catch (IOException e) {
 					e.printStackTrace();
-					System.out.println("Error Open HorseLay3Bot.txt for writing");
+					System.out.println("Error Open "+fileName+" for writing");
 					}
 				if(out==null)
 				{
-					System.err.println("could not open HorseLay3Bot.txt" );
+					System.err.println("could not open "+fileName );
 					return;
 				}
 				
@@ -217,24 +244,26 @@ public class HorseLayEnd extends Bot{
 				
 				String s="";
 				
-				if( betMatched==null)
+				if( betCloseMatched==null)
 				{
 					s+="0.00 "+getMd().getRunners().size()+" "+timeStart+" \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
 				}
 				else
 				{
 					if(win)
-						s+=betMatched.getAmount()+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=(betCloseMatched.getMatchedAmount()*(betCloseMatched.getOddMached()-1.01))+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 					else
-						s+=((betMatched.getAmount()*(betMatched.getOddRequested()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 				}
+				
+				s+=" "+volumeDiff;
 				
 				try {
 					out.write(s);
 					out.newLine();
 					out.flush();
 				} catch (IOException e) {
-					System.out.println("HorseLay3Bot:Error wrtting data to log file");
+					System.out.println( fileName +" :Error wrtting data to log file");
 					e.printStackTrace();
 				}
 				
@@ -258,7 +287,9 @@ public class HorseLayEnd extends Bot{
 		betsCanceled=false;
 		bets.clear();
 		betMatched=null;
+		betCloseMatched=null;
 		
+		volumeDiff=0;
 		
 	}
 	
@@ -273,8 +304,10 @@ public class HorseLayEnd extends Bot{
 
 	@Override
 	public void writeMsg(String s, Color c) {
-		
-		msgPanel.writeMessageText(s, c);
+		if(useVisualInterface)
+		{
+			msgPanel.writeMessageText(s, c);
+		}
 	}
 
 	
