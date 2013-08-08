@@ -473,6 +473,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 			fps.setText("FPS:"+md.getFPS());
 			
 			if(Parameters.horselayBots 
+					&& md.getRunners()!=null
+					&& md.getRunners().size()>0
+					&& md.getRunners().get(0).getDataFrames().size()>0
 					&& Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true
 					&& horseLay3Bot!=null 
 					&& horseLay3BotAbove6!=null
