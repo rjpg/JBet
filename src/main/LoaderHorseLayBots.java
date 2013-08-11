@@ -208,9 +208,9 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				if(Parameters.horselayBots)
 				{
 					//horseLay3Bot=new HorseLay3Bot(md,3);
-					//horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
+					horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
 					//horseLayFavorite=new HorseLayFavorite(md, 3);
-					horseLayEnd=new HorseLayEnd(md, 3);
+					//horseLayEnd=new HorseLayEnd(md, 3);
 				}
 	
 				// /////////////////////after////////////////////////////////////////////

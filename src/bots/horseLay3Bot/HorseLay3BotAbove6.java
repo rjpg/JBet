@@ -77,8 +77,8 @@ public class HorseLay3BotAbove6 extends Bot{
 	public void update()
 	{
 		//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
-		if(md.getStart().get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY)
-			return;
+		//if(md.getStart().get(Calendar.DAY_OF_WEEK)==Calendar.SUNDAY)
+		//	return;
 		
 		if(md.getRunners()==null
 				|| md.getRunners().size()==0
@@ -253,6 +253,8 @@ public class HorseLay3BotAbove6 extends Bot{
 					else
 						s+=((betMatched.getAmount()*(betMatched.getOddRequested()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 				}
+				
+				s+=" "+md.getStart().get(Calendar.DAY_OF_WEEK);
 				
 				try {
 					out.write(s);

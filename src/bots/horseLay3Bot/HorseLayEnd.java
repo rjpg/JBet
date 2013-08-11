@@ -12,7 +12,6 @@ import javax.swing.JFrame;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
-import DataRepository.OddData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
@@ -36,18 +35,17 @@ public class HorseLayEnd extends Bot{
 	
 	public BetData betCloseMatched=null;
 	
+	public boolean placeClose=false;
+	
 	public boolean win=false;
 	
 	// parameters 
-	public int martingaleTries=1;
+	
 	public double oddActuation=1.01;
 	public double oddExit=1.05;
-	public double initialAmount=3.00;
+	public double amount=200.00;
 	//
 	
-	public double amount=initialAmount;
-	
-	public int misses=0;
 	
 	public boolean useVisualInterface=false;
 	
@@ -56,7 +54,7 @@ public class HorseLayEnd extends Bot{
 	
 	public HorseLayEnd(MarketData md,double initStake) {
 		super(md,"HorseLayEnd - ");
-		amount=initStake;
+		
 		initialize();
 	}
 	
@@ -91,34 +89,20 @@ public class HorseLayEnd extends Bot{
 			
 			if(betMatched!=null)
 			{
-				if(betCloseMatched.getState()!=BetData.MATCHED)
+				if(betCloseMatched==null || betCloseMatched.getState()!=BetData.MATCHED)
 				{
-					writeMsg("The close bet was not matched  - Martingale for the nest race", Color.RED);
-					misses++;
+					writeMsg("The close bet was not matched ", Color.RED);
+					
 					
 					win=false;
 					
-					if(misses>=martingaleTries)
-					{
-						writeMsg("Reset Martingale - More than "+ martingaleTries+" consecutives misses", Color.BLUE);
-						misses=0;
-						amount=initialAmount;
-						writeMsg("Reset amount to :"+ amount, Color.BLUE);
-					}
-					else
-					{
-						writeMsg("Executing Martingale - try number "+ misses, Color.ORANGE);
-						amount=(amount*(oddActuation-1.00))+amount;
-						writeMsg("Seting amount to :"+ amount, Color.ORANGE);
-					}
+					
 				
 				}
 				else
 				{
 					writeMsg("The close bet was mached", Color.GREEN);
-					writeMsg("Reset Martingale ", Color.BLUE);
-					misses=0;
-					amount=initialAmount;
+				
 					double volumeDiffaux=0;
 					for(int i=0;i<20;i++)
 					{
@@ -205,17 +189,22 @@ public class HorseLayEnd extends Bot{
 						writeMsg("Bets were Canceled", Color.BLUE);
 					}
 				}
-				betCloseMatched=new BetData(betMatched.getRd(),amount, oddExit,BetData.BACK,true);
-				getMd().getBetManager().placeBet(betCloseMatched);
-				writeMsg("Close bet was placed :"+BetUtils.printBet(betCloseMatched), Color.BLUE);
-				for(int i=0;i<20;i++)
-				{
-					volumeDiff+=Utils.getVolumeFrame(betMatched.getRd(), 0, Utils.indexToOdd(Utils.oddToIndex(oddExit+i)));
-				}
+				
+				placeClose=true;
 				
 			}
 			
 			
+		} else if(placeClose)
+		{
+			betCloseMatched=new BetData(betMatched.getRd(),amount, oddExit,BetData.BACK,true);
+			getMd().getBetManager().placeBet(betCloseMatched);
+			writeMsg("Close bet was placed :"+BetUtils.printBet(betCloseMatched), Color.BLUE);
+			for(int i=0;i<20;i++)
+			{
+				volumeDiff+=Utils.getVolumeFrame(betMatched.getRd(), 0, Utils.indexToOdd(Utils.oddToIndex(oddExit+i)));
+			}
+			placeClose=false;
 		}
 	}
 	
@@ -253,7 +242,14 @@ public class HorseLayEnd extends Bot{
 					if(win)
 						s+=(betCloseMatched.getMatchedAmount()*(betCloseMatched.getOddMached()-1.01))+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
 					else
-						s+=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+					{
+						double loose=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1);
+						if(betCloseMatched.getState()==BetData.PARTIAL_MATCHED)
+						{
+							loose+=(betCloseMatched.getMatchedAmount()*(betCloseMatched.getOddMached()-1));
+						}
+						s+=loose+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+					}
 				}
 				
 				s+=" "+volumeDiff;
@@ -270,7 +266,7 @@ public class HorseLayEnd extends Bot{
 				try {
 					out.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 	}
@@ -285,6 +281,8 @@ public class HorseLayEnd extends Bot{
 		
 		betsPlaced=false;
 		betsCanceled=false;
+		placeClose=false;
+		
 		bets.clear();
 		betMatched=null;
 		betCloseMatched=null;
