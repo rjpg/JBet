@@ -1,5 +1,8 @@
 package bots.horseLay3Bot;
 
+import generated.exchange.BFExchangeServiceStub.RacingSilkV2;
+import horses.HorsesUtils;
+
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -49,6 +52,8 @@ public class HorseLay3BotAbove6 extends Bot{
 	public double amount=initialAmount;
 	
 	public int misses=0;
+	
+	public double raceMatchedAmount=0;
 	
 	public HorseLay3BotAbove6(MarketData md,double initStake) {
 		super(md,"HorseLay3BotAbove6 - ");
@@ -159,11 +164,38 @@ public class HorseLay3BotAbove6 extends Bot{
 		
 		if(!betsPlaced)
 		{
-			if(getSecondsToStart()<20)
+			if(getSecondsToStart()<20 && getSecondsToStart()>-20)
 			{
+				//System.out.println("Seconds tostart :" + getSecondsToStart());
+					
+				raceMatchedAmount=0;
+				for(RunnersData rdAux:getMd().getRunners())
+				{
+					raceMatchedAmount+=Utils.getMatchedAmount(rdAux, 0);
+				}
+				
+				
+				if(getMd().getRunners().size()<=3 || getMd().getRunners().size()>8)
+					return;
+				
+				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>=20.111111111111114)
+					return;
+				
+				if(md.getStart().get(Calendar.DAY_OF_WEEK)<=1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
+					return;
+				
+				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>=281.3333)
+					return;
+				                                                //  1128191,72  
+				if(raceMatchedAmount<45100.2 || raceMatchedAmount>795344.4555555556)
+					return;
+				
 				//System.out.println("minutes to start "+getMinutesToStart());
 				for(RunnersData rdAux:getMd().getRunners())
 				{
+					
+					//raceMatchedAmount+=Utils.getMatchedAmount(rdAux, 0);
+					
 					if(Utils.getOddBackFrame(rdAux,0)>6.0)
 					{
 						//if(Utils.isValidWindow(rdAux, 200, 0))
@@ -236,25 +268,25 @@ public class HorseLay3BotAbove6 extends Bot{
 				
 				String s="";
 				
-				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-				Calendar c=getMd().getStart();
+				//SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+				//Calendar c=getMd().getStart();
 				//dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-				String timeStart=dateFormat.format(c.getTimeInMillis());
+				//String timeStart=dateFormat.format(c.getTimeInMillis());
 				
 				
 				if( betMatched==null)
 				{
-					s+="0.00 "+getMd().getRunners().size()+" "+timeStart+" \"NO_Name\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\""; 
+					s+="0.00"; 
 				}
 				else
 				{
 					if(win)
-						s+=betMatched.getAmount()+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=betMatched.getMatchedAmount();
 					else
-						s+=((betMatched.getAmount()*(betMatched.getOddRequested()-1))*-1)+" "+getMd().getRunners().size()+" "+timeStart+" \""+betMatched.getRd().getName()+"\" \""+getMd().getEventName()+"\" \""+getMd().getName()+"\"";
+						s+=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1);
 				}
 				
-				s+=" "+md.getStart().get(Calendar.DAY_OF_WEEK);
+				s+=" "+getMd().getRunners().size()+" "+md.getStart().get(Calendar.HOUR_OF_DAY)+" "+md.getStart().get(Calendar.DAY_OF_WEEK)+" "+HorsesUtils.getTimeRaceInSeconds(getMd().getName())+" "+raceMatchedAmount;
 				
 				try {
 					out.write(s);
@@ -285,6 +317,8 @@ public class HorseLay3BotAbove6 extends Bot{
 		betsCanceled=false;
 		bets.clear();
 		betMatched=null;
+		
+		raceMatchedAmount=0;
 		
 		
 	}
