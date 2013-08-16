@@ -83,6 +83,7 @@ public class OddSelector extends JPanel{
 		JScrollPane jScrollPane = new JScrollPane();
 		jScrollPane.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		jScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		jScrollPane.getVerticalScrollBar().setUnitIncrement(20);
 		
 		jScrollPane.setViewportView(oddsPanel);
 		this.setLayout(new BorderLayout());
