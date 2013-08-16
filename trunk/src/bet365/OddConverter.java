@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import DataRepository.Utils;
 import GUI.MessagePanel;
@@ -17,7 +18,7 @@ import GUI.MessagePanel;
 public class OddConverter {
 	
 	public int runners=3;
-	public double bet365Ladder[]=new double[95];
+	public double bet365Ladder[]=new double[146];
 	
 	public JFrame frame;
 	
@@ -51,6 +52,7 @@ public class OddConverter {
 		
 		frame=new JFrame("Bet365 odd Converter");
 		frame.setSize(640,480);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		JPanel aux=new JPanel();
 		aux.setLayout(new GridLayout(1,runners));
 		
