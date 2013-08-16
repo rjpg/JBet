@@ -17,7 +17,7 @@ import GUI.MessagePanel;
 public class OddConverter {
 	
 	public int runners=3;
-	public double bet365Ladder[]=new double[79];
+	public double bet365Ladder[]=new double[95];
 	
 	public JFrame frame;
 	
@@ -159,6 +159,6 @@ public class OddConverter {
 	
 	public static void main(String[] args) {
 		Utils.init();
-		new OddConverter(5);
+		new OddConverter(3);
 	}
 }

@@ -32,7 +32,7 @@ public class ProcessOptimalIntervals {
 	
 	public void readFile()
 	{
-		File f=new File("HorseLay4BotAbove6.txt");
+		File f=new File("HorseLay3BotAbove6.txt");
 		BufferedReader input=null;
 		try {
 			input= new BufferedReader(new FileReader(f));
@@ -242,21 +242,21 @@ public class ProcessOptimalIntervals {
 			boolean passed=true;
 			for(int x=1;x<data[i].length;x++)
 			{
-				System.out.println("data["+i+"]["+x+"]="+data[i][x]+">=currentMin["+x+"]="+currentMin[x]+" && data["+i+"]["+x+"]="+data[i][x]+"<=currentMax["+x+"]="+currentMax[x]);
-				try {
-					Display.getStringAnswer("pause");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					
-				}
-				if(data[i][x]<=currentMin[x] || data[i][x]>=currentMax[x])
+				//System.out.println("data["+i+"]["+x+"]="+data[i][x]+">=currentMin["+x+"]="+currentMin[x]+" && data["+i+"]["+x+"]="+data[i][x]+"<=currentMax["+x+"]="+currentMax[x]);
+//				try {
+//					Display.getStringAnswer("pause");
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//					
+//				}
+				if(data[i][x]<currentMin[x] || data[i][x]>currentMax[x])
 				{
-					System.out.println("not passed");
+					//System.out.println("not passed");
 					passed=false;
 				}
-				else
-					System.out.println("passed");
+				//else
+				//	System.out.println("passed");
 			}
 			
 			if(passed)

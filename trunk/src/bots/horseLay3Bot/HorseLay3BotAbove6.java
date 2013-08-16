@@ -43,7 +43,8 @@ public class HorseLay3BotAbove6 extends Bot{
 	// parameters 
 	public int martingaleTries=1;
 	public double oddActuation=4.00;
-	public double initialAmount=3.00;
+	public double initialAmount=100.00;
+	public double oddAbove=6.0;
 	//
 	
 	public boolean useVisualInterface=false;
@@ -51,7 +52,7 @@ public class HorseLay3BotAbove6 extends Bot{
 	
 	public double amount=initialAmount;
 	
-	public int misses=0;
+	//public int misses=0;
 	
 	public double raceMatchedAmount=0;
 	
@@ -100,17 +101,16 @@ public class HorseLay3BotAbove6 extends Bot{
 						rdLow=rdAux;
 			
 			writeMsg("The lower runner (winner) found is "+rdLow.getName()+" with the odd : "+ Utils.getOddBackFrame(rdLow, 0), Color.BLUE);
-			
-			
+						
 			if(betMatched!=null)
 			{
 				if(betMatched.getRd()==rdLow)
 				{
 					writeMsg("The mached Lay Bet was on the winner - Martingale for the next race", Color.RED);
-					misses++;
+					//misses++;
 					win=false;
 					
-					if(misses>=martingaleTries)
+					/*if(misses>=martingaleTries)
 					{
 						writeMsg("Reset Martingale - More than "+ martingaleTries+" consecutives misses", Color.BLUE);
 						misses=0;
@@ -125,14 +125,14 @@ public class HorseLay3BotAbove6 extends Bot{
 						if(amount==9) amount=6;
 						
 						writeMsg("Seting amount to :"+ amount, Color.ORANGE);
-					}
+					}*/
 				
 				}
 				else
 				{
 					writeMsg("The mached Lay Bet was NOT on the winner", Color.GREEN);
-					writeMsg("Reset Martingale ", Color.BLUE);
-					misses=0;
+					//writeMsg("Reset Martingale ", Color.BLUE);
+					//misses=0;
 					amount=initialAmount;
 					win=true;
 				}
@@ -144,7 +144,7 @@ public class HorseLay3BotAbove6 extends Bot{
 				writeMsg("Canceling all ", Color.BLUE);
 				Vector<BetData> betsToCancel=new Vector<BetData>();
 				for(BetData bdAux:bets)
-					if(bdAux.getState()==BetData.UNMATCHED)
+					if(bdAux.getState()==BetData.UNMATCHED || bdAux.getState()==BetData.PARTIAL_MATCHED)
 						betsToCancel.add(bdAux);
 				
 				if(!betsToCancel.isEmpty())
@@ -175,28 +175,45 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				
 				
-				if(getMd().getRunners().size()<=3 || getMd().getRunners().size()>8)
+				if(getMd().getRunners().size()<5 || getMd().getRunners().size()>8)
 					return;
 				
-				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>=20.111111111111114)
+				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
 					return;
 				
-				if(md.getStart().get(Calendar.DAY_OF_WEEK)<=1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
+				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
 					return;
 				
 				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>=281.3333)
 					return;
 				                                                //  1128191,72  
-				if(raceMatchedAmount<45100.2 || raceMatchedAmount>795344.4555555556)
+				if(raceMatchedAmount<46100.2 || raceMatchedAmount>695344.4555555556)
 					return;
 				
+				/*
+				
+				if(getMd().getRunners().size()<2.0 || getMd().getRunners().size()>8.0)
+					return;
+				
+				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
+					return;
+				
+				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
+					return;
+				
+				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>130.0)
+					return;
+				                                                //  1128191,72  
+				if(raceMatchedAmount<1270.53 || raceMatchedAmount>1978889.7433333334)
+					return;
+				*/
 				//System.out.println("minutes to start "+getMinutesToStart());
 				for(RunnersData rdAux:getMd().getRunners())
 				{
 					
 					//raceMatchedAmount+=Utils.getMatchedAmount(rdAux, 0);
 					
-					if(Utils.getOddBackFrame(rdAux,0)>6.0)
+					if(Utils.getOddBackFrame(rdAux,0)>oddAbove)
 					{
 						//if(Utils.isValidWindow(rdAux, 200, 0))
 						//{
@@ -224,7 +241,7 @@ public class HorseLay3BotAbove6 extends Bot{
 			boolean someMatched=false;
 			for(BetData bdAux:bets)
 			{
-				if(bdAux.getState()==BetData.MATCHED)
+				if(bdAux.getState()==BetData.MATCHED || bdAux.getState()==BetData.PARTIAL_MATCHED)
 				{
 					writeMsg("Bet was Matched :"+BetUtils.printBet(bdAux), Color.BLUE);
 					betMatched=bdAux;
@@ -236,8 +253,9 @@ public class HorseLay3BotAbove6 extends Bot{
 			{
 				Vector<BetData> betsToCancel=new Vector<BetData>();
 				for(BetData bdAux:bets)
-					if(bdAux.getState()==BetData.UNMATCHED)
-						betsToCancel.add(bdAux);
+					if(bdAux.getState()==BetData.UNMATCHED || bdAux.getState()==BetData.PARTIAL_MATCHED)
+						if(bdAux!=betMatched)
+							betsToCancel.add(bdAux);
 				
 				if(!betsToCancel.isEmpty())
 					if(getMd().getBetManager().cancelBets(betsToCancel)!=0);
