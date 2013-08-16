@@ -391,7 +391,7 @@ public class CSHighPointLadder extends Bot implements TradeMechanismListener{
 			tso.setWaitFramesNormal((int)((60.*3)*1.5));   //2.25- 3 minutes
 			tso.setWaitFramesBestPrice((int)(60*1.5));  // 0.75 - 1.5 minute
 			tso.setTicksProfit(stopProfit);
-			tso.setTicksLoss(5);
+			tso.setTicksLoss(4);
 			tso.setForceCloseOnStopLoss(false);
 			tso.setInsistOpen(false);
 			tso.setGoOnfrontInBestPrice(false);

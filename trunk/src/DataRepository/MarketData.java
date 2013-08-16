@@ -2,6 +2,7 @@ package DataRepository;
 
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.exchange.BFExchangeServiceStub.Runner;
+import horses.HorsesUtils;
 
 
 import java.awt.BorderLayout;
@@ -1403,6 +1404,13 @@ public class MarketData {
 					else
 						name="No Name";
 					
+					if(HorsesUtils.getTimeRaceInSeconds(name)==-1)
+					{
+						System.err.println("Invalid GR or IRE race");
+						pause=true;
+					}
+						
+						
 					if(sarrayMS.length>=4)
 						eventName=sarrayMS[3];
 					
