@@ -97,6 +97,22 @@ public abstract class CategoryNode {
 			}
 	}
 	
+	public static Vector<CategoryNode> getAncestorsById(CategoryNode cat,int id)
+	{
+		
+		if(cat.getIdStart()==id /*&& cat.getIdEnd()==id+1*/)
+			return cat.getAncestors();
+		
+		for(CategoryNode cn:cat.getChilds())
+		{
+			System.out.println("cat path : "+cn.getPath()+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
+			if(cn.getIdStart()<=id && cn.getIdEnd()>id)
+				return getAncestorsById(cn,id);
+		}
+			
+		return null;
+	}
+	
 	public abstract boolean isRunnerOnThisCategory(RunnersData rd);
 	
 	
@@ -148,7 +164,13 @@ public abstract class CategoryNode {
 	public static void main(String[] args) {
 		Root root=new Root(0);
 		
-		//CategoryNode.printIDs(root);
-		CategoryNode.buildDirectories(root);
+		CategoryNode.printIDs(root);
+		//CategoryNode.buildDirectories(root);
+		
+		Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);
+		
+		for(CategoryNode cn:cnv)
+			System.out.print(cn.getPath()+"\\");
+		
 	}
 }

@@ -286,6 +286,8 @@ public class ProcessOptimalIntervals {
 	}
 	
 	public static void main(String[] args) {
-		new ProcessOptimalIntervals("HorseLay4.0BotAbove6.0.txt");
+		System.out.println("arg "+args[0]);
+		//"HorseLay4.0BotAbove6.0.txt"
+		new ProcessOptimalIntervals(args[0]);
 	}
 }
