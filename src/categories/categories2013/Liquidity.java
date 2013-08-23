@@ -1,5 +1,7 @@
 package categories.categories2013;
 
+import java.util.Vector;
+
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 
@@ -8,7 +10,8 @@ public class Liquidity extends CategoryNode{
 	double valueStart;
 	double valueEnd;
 	
-	public Liquidity(double valueStartA,double valueEndA,String path) {
+	public Liquidity(Vector<CategoryNode> ancestorsA,double valueStartA,double valueEndA,String path) {
+		super(ancestorsA);
 		valueStart=valueStartA;
 		valueEnd=valueEndA;
 		setPath(path);
@@ -17,7 +20,7 @@ public class Liquidity extends CategoryNode{
 
 	public void initialize()
 	{
-		
+		addChild(new LeafCategory(getAncestors()));
 	}
 
 	@Override

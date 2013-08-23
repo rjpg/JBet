@@ -26,13 +26,16 @@ public class ProcessOptimalIntervals {
 	
 	public int precision=10;
 	
-	public ProcessOptimalIntervals() {
+	public String fileName="HorseLay3BotAbove6.txt";
+	
+	public ProcessOptimalIntervals(String fname) {
+		fileName=fname;
 		readFile();
 	}
 	
 	public void readFile()
 	{
-		File f=new File("HorseLay3BotAbove6.txt");
+		File f=new File(fileName);
 		BufferedReader input=null;
 		try {
 			input= new BufferedReader(new FileReader(f));
@@ -283,6 +286,6 @@ public class ProcessOptimalIntervals {
 	}
 	
 	public static void main(String[] args) {
-		new ProcessOptimalIntervals();
+		new ProcessOptimalIntervals("HorseLay4.0BotAbove6.0.txt");
 	}
 }

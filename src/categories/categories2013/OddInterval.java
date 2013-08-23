@@ -1,5 +1,7 @@
 package categories.categories2013;
 
+import java.util.Vector;
+
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 
@@ -9,7 +11,8 @@ public class OddInterval extends CategoryNode{
 	double oddStart;
 	double oddEnd;
 	
-	public OddInterval(double oddStartA,double oddEndA,String path) {
+	public OddInterval(Vector<CategoryNode> ancestorsA,double oddStartA,double oddEndA,String path) {
+		super(ancestorsA);
 		oddStart=oddStartA;
 		oddEnd=oddEndA;
 		setPath(path);
@@ -19,9 +22,9 @@ public class OddInterval extends CategoryNode{
 	public void initialize()
 	{
 		
-		addChild(new Liquidity(0, 2000, "lowLiquidity"));
-		addChild(new Liquidity(2000.01, 10000, "lowLiquidity"));
-		addChild(new Liquidity(10000.01, Double.MAX_VALUE, "lowLiquidity"));
+		addChild(new Liquidity(getAncestors(),0, 2000, "lowLiquidity"));
+		addChild(new Liquidity(getAncestors(),2000.01, 10000, "mediumLiquidity"));
+		addChild(new Liquidity(getAncestors(),10000.01, Double.MAX_VALUE, "highLiquidity"));
 	}
 
 	@Override

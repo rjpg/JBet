@@ -1,18 +1,28 @@
 package categories.categories2013;
 
+import java.io.File;
 import java.util.Vector;
+
+import categories.categories2011.CategoriesManager;
 
 import DataRepository.RunnersData;
 
 public abstract class CategoryNode {
 
-	public Vector<CategoryNode> childs;
+	public Vector<CategoryNode> ancestors;
+	
+	public Vector<CategoryNode> childs=new Vector<CategoryNode>();
 
 	public int idStart=0;
 	public int idEnd=0;
 	
 	public String path="";
 		
+	public CategoryNode(Vector<CategoryNode> ancestorsA) {
+		ancestors=(Vector<CategoryNode>) ancestorsA.clone();
+		getAncestors().add(this);
+	}
+	
 	public CategoryNode getNextLevel(RunnersData rd) {
 		for(CategoryNode cn:getChilds())
 			if(cn.isRunnerOnThisCategory(rd))
@@ -22,15 +32,71 @@ public abstract class CategoryNode {
 	
 	public int buildChilds(int startId) {
 		setIdStart(startId);
-				
+		
+//		String s="\\";
+//		for(CategoryNode cn:getAncestors())
+//			s+="\\"+cn.getPath();
+//		System.out.println(s);
+		
 		int id=startId;
+		if(getChilds().size()==0)
+			id++;
+		
 		for(CategoryNode cn:getChilds())
 		{
 			id=cn.buildChilds(id);
 		}
 		setIdEnd(id);
+		
+		
 		return id;
 	}
+	
+	public static void printIDs(CategoryNode cat)
+	{
+		if(cat.getChilds().size()==0)
+		{
+			String s="";
+			for(CategoryNode cn:cat.getAncestors())
+				s+="\\"+cn.getPath();
+			System.out.println(s+" Start ID="+cat.getIdStart()+" End ID="+cat.getIdEnd());
+			
+		}
+		for(CategoryNode cn:cat.getChilds())
+		{
+			printIDs(cn);
+		}
+	}
+	
+	public static void buildDirectories(CategoryNode cat)
+	{
+		
+		  
+		  if(cat.getChilds().size()==0)
+			{
+				String s="";
+				for(CategoryNode cn:cat.getAncestors())
+					s+="\\"+cn.getPath();
+				//System.out.println(s+" Start ID="+cat.getIdStart()+" End ID="+cat.getIdEnd());
+				s=s.substring(1);
+				try{ 
+					boolean success = new File(s).mkdirs();
+					  if (success) {
+						  System.out.println("Directories: " 
+								  + s + " created");
+					  }
+
+				  }catch (Exception e){//Catch exception if any
+					  System.err.println("Error: " + e.getMessage());
+				  }
+				
+			}
+			for(CategoryNode cn:cat.getChilds())
+			{
+				CategoryNode.buildDirectories(cn);
+			}
+	}
+	
 	public abstract boolean isRunnerOnThisCategory(RunnersData rd);
 	
 	
@@ -71,4 +137,18 @@ public abstract class CategoryNode {
 		childs.add(child);
 	}
 
+	public Vector<CategoryNode> getAncestors() {
+		return ancestors;
+	}
+
+	public void setAncestors(Vector<CategoryNode> ancestors) {
+		this.ancestors = ancestors;
+	}
+	
+	public static void main(String[] args) {
+		Root root=new Root(0);
+		
+		//CategoryNode.printIDs(root);
+		CategoryNode.buildDirectories(root);
+	}
 }

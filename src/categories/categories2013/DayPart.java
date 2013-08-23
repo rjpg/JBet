@@ -1,6 +1,7 @@
 package categories.categories2013;
 
 import java.util.Calendar;
+import java.util.Vector;
 
 import horses.HorsesUtils;
 import DataRepository.RunnersData;
@@ -10,7 +11,8 @@ public class DayPart extends CategoryNode{
 	int hourStartInterval;
 	int hourEndInterval;
 	
-	public DayPart(int hourStartIntervalA,int hourEndIntervalA,String path) {
+	public DayPart(Vector<CategoryNode> ancestorsA,int hourStartIntervalA,int hourEndIntervalA,String path) {
+		super( ancestorsA);
 		hourStartInterval=hourStartIntervalA;
 		hourEndInterval=hourEndIntervalA;
 		setPath(path);
@@ -20,9 +22,9 @@ public class DayPart extends CategoryNode{
 	
 	public void initialize()
 	{
-		addChild(new NumberOfRunners(1, 5, "few"));
-		addChild(new NumberOfRunners(5, 10, "medium"));
-		addChild(new NumberOfRunners(11, 25, "many"));
+		addChild(new NumberOfRunners(getAncestors(),1, 5, "fewRunners"));
+		addChild(new NumberOfRunners(getAncestors(),5, 10, "mediumRunners"));
+		addChild(new NumberOfRunners(getAncestors(),11, 25, "manyRunners"));
 	}
 	
 	@Override

@@ -1,11 +1,14 @@
 package categories.categories2013;
 
+import java.util.Vector;
+
 import horses.HorsesUtils;
 import DataRepository.RunnersData;
 
 public class Root extends CategoryNode{
 
 	public Root(int startId) {
+		super(new Vector<CategoryNode>());
 		setPath("root");
 		initialize();
 		buildChilds(startId);
@@ -14,8 +17,8 @@ public class Root extends CategoryNode{
 	public void initialize()
 	{
 		
-		addChild(new Length(0, 120, "short"));
-		addChild(new Length(121, 1000, "long"));
+		addChild(new Length(getAncestors(),0, 120, "shortLenhgt"));
+		addChild(new Length(getAncestors(),121, 1000, "longLenght"));
 	}
 
 	@Override
