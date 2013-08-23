@@ -176,7 +176,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			if(Parameters.horselayBots)
 			{
 				horseLay3Bot=new HorseLay3Bot(md,3);
-				horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
+				horseLay3BotAbove6=new HorseLay3BotAbove6(md,4,6);
 				horseLayFavorite=new HorseLayFavorite(md, 3);
 			}
 		
@@ -208,7 +208,9 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				if(Parameters.horselayBots)
 				{
 					//horseLay3Bot=new HorseLay3Bot(md,3);
-					horseLay3BotAbove6=new HorseLay3BotAbove6(md,3);
+					for(int i = 2;i<7;i++)
+						for(int x= i+1;x<8;x++)
+							horseLay3BotAbove6=new HorseLay3BotAbove6(md,i,x);
 					//horseLayFavorite=new HorseLayFavorite(md, 3);
 					//horseLayEnd=new HorseLayEnd(md, 3);
 				}
@@ -475,21 +477,21 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		{
 			fps.setText("FPS:"+md.getFPS());
 			
-			if(Parameters.horselayBots 
-					&& md.getRunners()!=null
-					&& md.getRunners().size()>0
-					&& md.getRunners().get(0).getDataFrames().size()>0
-					&& Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true
-					&& horseLay3Bot!=null 
-					&& horseLay3BotAbove6!=null
-					&& horseLayFavorite!=null
-					&& !horseLay3Bot.isInTrade()
-					&& !horseLay3BotAbove6.isInTrade()
-					&& !horseLayFavorite.isInTrade())
-			{
-				//System
-				MarketLiveMode(md);
-			}
+//			if(Parameters.horselayBots 
+//					&& md.getRunners()!=null
+//					&& md.getRunners().size()>0
+//					&& md.getRunners().get(0).getDataFrames().size()>0
+//					&& Utils.getMarketSateFrame(md,0)==MarketData.SUSPENDED && Utils.isInPlayFrame(md,0)==true
+//					&& horseLay3Bot!=null 
+//					&& horseLay3BotAbove6!=null
+//					&& horseLayFavorite!=null
+//					&& !horseLay3Bot.isInTrade()
+//					&& !horseLay3BotAbove6.isInTrade()
+//					&& !horseLayFavorite.isInTrade())
+//			{
+//				//System
+//				MarketLiveMode(md);
+//			}
 			
 		}
 		//System.out.println("Chamou");

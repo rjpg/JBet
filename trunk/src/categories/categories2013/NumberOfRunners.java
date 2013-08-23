@@ -1,5 +1,7 @@
 package categories.categories2013;
 
+import java.util.Vector;
+
 import DataRepository.RunnersData;
 
 public class NumberOfRunners extends CategoryNode{
@@ -7,7 +9,8 @@ public class NumberOfRunners extends CategoryNode{
 	int numberStartInterval;
 	int numberEndInterval;
 	
-	public NumberOfRunners(int numberStartIntervalA,int numberEndIntervalA,String path) {
+	public NumberOfRunners(Vector<CategoryNode> ancestorsA,int numberStartIntervalA,int numberEndIntervalA,String path) {
+		super(ancestorsA);
 		numberStartInterval=numberStartIntervalA;
 		numberEndInterval=numberEndIntervalA;
 		setPath(path);
@@ -17,9 +20,9 @@ public class NumberOfRunners extends CategoryNode{
 	
 	public void initialize()
 	{
-		addChild(new TimePreLive(10, 5, "farFromBegining"));
-		addChild(new Favorite(6, 2, "mediumFromBegining"));
-		addChild(new Favorite(1, 0, "nearFromBegining"));
+		addChild(new TimePreLive(getAncestors(),10, 5, "farFromBegining"));
+		addChild(new TimePreLive(getAncestors(),6, 2, "mediumFromBegining"));
+		addChild(new TimePreLive(getAncestors(),1, 0, "nearFromBegining"));
 	}
 	
 	@Override

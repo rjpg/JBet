@@ -17,6 +17,7 @@ import main.Parameters;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.OddData;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MessagePanel;
@@ -41,24 +42,30 @@ public class HorseLay3BotAbove6 extends Bot{
 	public BetData betMatched=null;
 	
 	// parameters 
-	public int martingaleTries=1;
+	//public int martingaleTries=1;
 	public double oddActuation=4.00;
-	public double initialAmount=100.00;
-	public double oddAbove=6.0;
+	public double amount=3.00;
+	public double oddAbove=6.00;
 	//
+	
+	Vector<OddData> odAtPlace=new Vector<OddData>();
 	
 	public boolean useVisualInterface=false;
 	
 	
-	public double amount=initialAmount;
+	
 	
 	//public int misses=0;
 	
 	public double raceMatchedAmount=0;
 	
-	public HorseLay3BotAbove6(MarketData md,double initStake) {
+	public HorseLay3BotAbove6(MarketData md, double oddActuationA,double  oddAboveA) {
+		
 		super(md,"HorseLay3BotAbove6 - ");
-		amount=initStake;
+		
+		oddAbove=oddAboveA;
+		oddActuation=oddActuationA;
+		
 		initialize();
 	}
 	
@@ -133,7 +140,7 @@ public class HorseLay3BotAbove6 extends Bot{
 					writeMsg("The mached Lay Bet was NOT on the winner", Color.GREEN);
 					//writeMsg("Reset Martingale ", Color.BLUE);
 					//misses=0;
-					amount=initialAmount;
+					//amount=initialAmount;
 					win=true;
 				}
 				
@@ -175,20 +182,20 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				
 				
-				if(getMd().getRunners().size()<5 || getMd().getRunners().size()>8)
-					return;
-				
-				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
-					return;
-				
-				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
-					return;
-				
-				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>=281.3333)
-					return;
-				                                                //  1128191,72  
-				if(raceMatchedAmount<46100.2 || raceMatchedAmount>695344.4555555556)
-					return;
+//				if(getMd().getRunners().size()<2 || getMd().getRunners().size()>11)
+//					return;
+//				
+//				if(md.getStart().get(Calendar.HOUR_OF_DAY)<14.777777777777779 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
+//					return;
+//											
+//				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>133.77777777777777)
+//					return;
+//				                                                //  1128191,72  
+//				if(raceMatchedAmount<46100.2 || raceMatchedAmount>695574.7422222223)
+//					return;
+//				
+//				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
+//					return;
 				
 				/*
 				
@@ -213,8 +220,9 @@ public class HorseLay3BotAbove6 extends Bot{
 					
 					//raceMatchedAmount+=Utils.getMatchedAmount(rdAux, 0);
 					
-					if(Utils.getOddBackFrame(rdAux,0)>oddAbove)
+					if(Utils.getOddBackFrame(rdAux,0)>oddAbove /*&& Utils.oddToIndex(Utils.getOddBackFrame(rdAux,0))<=217*/)
 					{
+						
 						//if(Utils.isValidWindow(rdAux, 200, 0))
 						//{
 							//System.out.println("valid window");
@@ -223,6 +231,8 @@ public class HorseLay3BotAbove6 extends Bot{
 								writeMsg("Adding Runner to placeBet : "+rdAux.getName(), Color.BLUE);
 								BetData bd=new BetData(rdAux,amount, oddActuation,BetData.LAY,true);
 								bets.add(bd);
+								OddData od=new OddData(Utils.getOddBackFrame(rdAux, 0),0,BetData.BACK,rdAux);
+								odAtPlace.add(od);
 						//	}
 						//}
 					}
@@ -269,18 +279,20 @@ public class HorseLay3BotAbove6 extends Bot{
 	
 	public void writeStatisticsToFile()
 	{
-		writeMsg("Writing Stat file HorseLay3BotAbove6.txt",Color.RED);
+		
+		String fileName="HorseLay"+oddActuation+"BotAbove"+oddAbove+".txt";
+		writeMsg("Writing Stat file "+fileName,Color.RED);
 		 BufferedWriter out=null;
 			
 				try {
-					out = new BufferedWriter(new FileWriter("HorseLay3BotAbove6.txt", true));
+					out = new BufferedWriter(new FileWriter(fileName, true));
 					} catch (IOException e) {
 					e.printStackTrace();
-					System.out.println("Error Open HorseLay3BotAbove6.txt for writing");
+					System.out.println("Error Open "+fileName+" for writing");
 					}
 				if(out==null)
 				{
-					System.err.println("could not open HorseLay3BotAbove6.txt" );
+					System.err.println("could not open "+fileName);
 					return;
 				}
 				
@@ -291,6 +303,7 @@ public class HorseLay3BotAbove6 extends Bot{
 				//dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 				//String timeStart=dateFormat.format(c.getTimeInMillis());
 				
+				double initialodd=0;
 				
 				if( betMatched==null)
 				{
@@ -298,20 +311,38 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				else
 				{
+					OddData odFound=null;
+					for(OddData od:odAtPlace)
+						if(od.getRd()==betMatched.getRd())
+							odFound=od;
+					
+					if(odFound!=null)
+						initialodd=odFound.getOdd();
+					
 					if(win)
 						s+=betMatched.getMatchedAmount();
 					else
 						s+=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1);
 				}
 				
-				s+=" "+getMd().getRunners().size()+" "+md.getStart().get(Calendar.HOUR_OF_DAY)+" "+md.getStart().get(Calendar.DAY_OF_WEEK)+" "+HorsesUtils.getTimeRaceInSeconds(getMd().getName())+" "+raceMatchedAmount;
+				
+				int initialOddint=Utils.oddToIndex(initialodd);
+				
+				if(initialOddint==-1)
+					initialOddint=Utils.oddToIndex(oddAbove);
+				
+				if(initialOddint>Utils.oddToIndex(60))
+					initialOddint=Utils.oddToIndex(60);
+				
+				
+				s+=" "+getMd().getRunners().size()+" "+md.getStart().get(Calendar.HOUR_OF_DAY)/*+" "+initialOddint/*md.getStart().get(Calendar.DAY_OF_WEEK)*/+" "+HorsesUtils.getTimeRaceInSeconds(getMd().getName())+" "+raceMatchedAmount;
 				
 				try {
 					out.write(s);
 					out.newLine();
 					out.flush();
 				} catch (IOException e) {
-					System.out.println("HorseLay3BotAbove6:Error wrtting data to log file");
+					System.out.println(fileName+":Error wrtting data to log file");
 					e.printStackTrace();
 				}
 				
@@ -335,6 +366,8 @@ public class HorseLay3BotAbove6 extends Bot{
 		betsCanceled=false;
 		bets.clear();
 		betMatched=null;
+		
+		odAtPlace=new Vector<OddData>();
 		
 		raceMatchedAmount=0;
 		

@@ -1494,6 +1494,7 @@ public class Utils {
         //135.02038747294012
         // 134.33922894459704
         // 1022.8799999999999
+		
 	}
 	
 	// Select a market by the following process

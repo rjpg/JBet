@@ -1,6 +1,7 @@
 package categories.categories2013;
 
 import java.util.Calendar;
+import java.util.Vector;
 
 import DataRepository.RunnersData;
 
@@ -9,7 +10,8 @@ public class TimePreLive extends CategoryNode{
 	int minuteStartInterval;
 	int minuteEndInterval;
 	
-	public TimePreLive(int minuteStartIntervalA,int minuteEndIntervalA,String path) {
+	public TimePreLive(Vector<CategoryNode> ancestorsA,int minuteStartIntervalA,int minuteEndIntervalA,String path) {
+		super(ancestorsA);
 		minuteStartInterval=minuteStartIntervalA;
 		minuteEndInterval=minuteEndIntervalA;
 		setPath(path);
@@ -19,9 +21,9 @@ public class TimePreLive extends CategoryNode{
 	
 	public void initialize()
 	{
-		addChild(new OddInterval(1.01,4,"Low"));
-		addChild(new OddInterval(4.1,6,"Midle"));
-		addChild(new OddInterval(6.2,12,"high"));
+		addChild(new OddInterval(getAncestors(),1.01,4,"lowOdd"));
+		addChild(new OddInterval(getAncestors(),4.1,6,"midleOdd"));
+		addChild(new OddInterval(getAncestors(),6.2,12,"highOdd"));
 	}
 	
 	@Override
