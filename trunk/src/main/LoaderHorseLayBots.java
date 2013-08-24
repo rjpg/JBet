@@ -54,6 +54,7 @@ import bots.horseLay3Bot.HorseLay3Bot;
 import bots.horseLay3Bot.HorseLay3BotAbove6;
 import bots.horseLay3Bot.HorseLayEnd;
 import bots.horseLay3Bot.HorseLayFavorite;
+import bots.horseLay3Bot.HorseLayOptions;
 import demo.util.APIContext;
 import demo.util.Display;
 import demo.util.InflatedMarketPrices;
@@ -176,7 +177,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 			if(Parameters.horselayBots)
 			{
 				horseLay3Bot=new HorseLay3Bot(md,3);
-				horseLay3BotAbove6=new HorseLay3BotAbove6(md,4,6);
+				//horseLay3BotAbove6=new HorseLay3BotAbove6(md,4,6);
 				horseLayFavorite=new HorseLayFavorite(md, 3);
 			}
 		
@@ -208,9 +209,94 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				if(Parameters.horselayBots)
 				{
 					//horseLay3Bot=new HorseLay3Bot(md,3);
-					for(int i = 2;i<7;i++)
-						for(int x= i+1;x<8;x++)
-							horseLay3BotAbove6=new HorseLay3BotAbove6(md,i,x);
+					
+//					HorseLayOptions olo=new HorseLayOptions();
+//					for(int i = 2;i<7;i++)
+//					{
+//						for(int x= i+1;x<8;x++)
+//						{
+//							olo.setEntryOdd(i);
+//							olo.setAboveOdd(x);
+//							horseLay3BotAbove6=new HorseLay3BotAbove6(md,olo);
+//						}
+//					}
+					
+					Vector<HorseLayOptions> olov=new Vector<HorseLayOptions>();
+					
+					HorseLayOptions olo0=new HorseLayOptions();
+					olo0.setEntryOdd(2);
+					olo0.setAboveOdd(3);
+					olo0.setNumberOffRunnersLow(8);
+					olo0.setNumberOffRunnersHigh(14);
+					olo0.setTimeHourLow(17.444444444444446);
+					olo0.setTimeHourHigh(20.111111111111114);
+					olo0.setLenghtInSecondsLow(60.0);
+					olo0.setLenghtInSecondsHigh(392.0);
+					olo0.setLiquidityLow(46100.2);
+					olo0.setLiquidityHigh(695574.7422222223);
+					
+					olov.add(olo0);
+					
+					HorseLayOptions olo1=new HorseLayOptions();
+					olo1.setEntryOdd(2);
+					olo1.setAboveOdd(5);
+					olo1.setNumberOffRunnersLow(2);
+					olo1.setNumberOffRunnersHigh(8);
+					olo1.setTimeHourLow(15.666666666666668);
+					olo1.setTimeHourHigh(20.111111111111114);
+					olo1.setLenghtInSecondsLow(60.0);
+					olo1.setLenghtInSecondsHigh(133.77777777777777);
+					olo1.setLiquidityLow(46100.2);
+					olo1.setLiquidityHigh(695574.7422222223);
+					
+					olov.add(olo1);
+					
+					HorseLayOptions olo2=new HorseLayOptions();
+					olo2.setEntryOdd(3);
+					olo2.setAboveOdd(6);
+					olo2.setNumberOffRunnersLow(2);
+					olo2.setNumberOffRunnersHigh(26.0);
+					olo2.setTimeHourLow(13.0);
+					olo2.setTimeHourHigh(20.111111111111114);
+					olo2.setLenghtInSecondsLow(60.0);
+					olo2.setLenghtInSecondsHigh(133.77777777777777);
+					olo2.setLiquidityLow(370837.4711111111);
+					olo2.setLiquidityHigh(1020312.0133333334);
+					
+					olov.add(olo2);
+					
+					HorseLayOptions olo3=new HorseLayOptions();
+					olo3.setEntryOdd(4);
+					olo3.setAboveOdd(6);
+					olo3.setNumberOffRunnersLow(2);
+					olo3.setNumberOffRunnersHigh(11.0);
+					olo3.setTimeHourLow(14.777777777777779);
+					olo3.setTimeHourHigh(20.111111111111114);
+					olo3.setLenghtInSecondsLow(60.0);
+					olo3.setLenghtInSecondsHigh(133.77777777777777);
+					olo3.setLiquidityLow(46100.2);
+					olo3.setLiquidityHigh(695574.7422222223);
+					
+					olov.add(olo3);
+					
+					HorseLayOptions olo4=new HorseLayOptions();
+					olo4.setEntryOdd(6);
+					olo4.setAboveOdd(7);
+					olo4.setNumberOffRunnersLow(2);
+					olo4.setNumberOffRunnersHigh(23);
+					olo4.setTimeHourLow(14.777777777777779);
+					olo4.setTimeHourHigh(20.111111111111114);
+					olo4.setLenghtInSecondsLow(60.0);
+					olo4.setLenghtInSecondsHigh(133.77777777777777);
+					olo4.setLiquidityLow(370837.4711111111);
+					olo4.setLiquidityHigh(2319261.097777778);
+					
+					olov.add(olo4);
+					
+					for(HorseLayOptions olo:olov)
+						new HorseLay3BotAbove6(md,olo);
+						
+					
 					//horseLayFavorite=new HorseLayFavorite(md, 3);
 					//horseLayEnd=new HorseLayEnd(md, 3);
 				}

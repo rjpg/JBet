@@ -641,6 +641,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		System.err.println("Start Pooling");
 		md.startPolling();
 	
+		
 	
 	}
 

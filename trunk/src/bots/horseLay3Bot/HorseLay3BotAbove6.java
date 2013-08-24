@@ -1,19 +1,15 @@
 package bots.horseLay3Bot;
 
-import generated.exchange.BFExchangeServiceStub.RacingSilkV2;
 import horses.HorsesUtils;
 
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-
-import main.Parameters;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
@@ -46,6 +42,8 @@ public class HorseLay3BotAbove6 extends Bot{
 	public double oddActuation=4.00;
 	public double amount=3.00;
 	public double oddAbove=6.00;
+	
+	public HorseLayOptions olo=null;
 	//
 	
 	Vector<OddData> odAtPlace=new Vector<OddData>();
@@ -59,12 +57,14 @@ public class HorseLay3BotAbove6 extends Bot{
 	
 	public double raceMatchedAmount=0;
 	
-	public HorseLay3BotAbove6(MarketData md, double oddActuationA,double  oddAboveA) {
+	public HorseLay3BotAbove6(MarketData md,HorseLayOptions oloA) {
 		
 		super(md,"HorseLay3BotAbove6 - ");
 		
-		oddAbove=oddAboveA;
-		oddActuation=oddActuationA;
+		olo=oloA;
+		
+		oddAbove=olo.getAboveOdd();
+		oddActuation=olo.getEntryOdd();
 		
 		initialize();
 	}
@@ -182,20 +182,20 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				
 				
-//				if(getMd().getRunners().size()<2 || getMd().getRunners().size()>11)
-//					return;
-//				
-//				if(md.getStart().get(Calendar.HOUR_OF_DAY)<14.777777777777779 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
-//					return;
-//											
-//				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>133.77777777777777)
-//					return;
-//				                                                //  1128191,72  
-//				if(raceMatchedAmount<46100.2 || raceMatchedAmount>695574.7422222223)
-//					return;
-//				
-//				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
-//					return;
+				if(getMd().getRunners().size()<olo.getNumberOffRunnersLow() || getMd().getRunners().size()>olo.getNumberOffRunnersHigh())
+					return;
+				
+				if(md.getStart().get(Calendar.HOUR_OF_DAY)<olo.getTimeHourLow() || md.getStart().get(Calendar.HOUR_OF_DAY)>olo.getTimeHourHigh())
+					return;
+											
+				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<olo.getLenghtInSecondsLow() || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>olo.getLenghtInSecondsHigh())
+					return;
+				                                                //  1128191,72  
+				if(raceMatchedAmount<olo.getLiquidityLow() || raceMatchedAmount>olo.getLiquidityHigh())
+					return;
+				
+				//if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
+				//	return;
 				
 				/*
 				
@@ -381,6 +381,8 @@ public class HorseLay3BotAbove6 extends Bot{
 			
 		if(marketEventType==MarketChangeListener.MarketUpdate)
 			update();			
+		
+		
 	}
 
 	@Override
