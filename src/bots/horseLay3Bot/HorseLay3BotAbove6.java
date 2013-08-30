@@ -28,6 +28,7 @@ public class HorseLay3BotAbove6 extends Bot{
 	private MessagePanel msgPanel;
 	
 	public boolean betsPlaced=false;
+	public boolean tryedToPlace=false;
 	
 	public boolean betsCanceled=false;
 	
@@ -86,6 +87,8 @@ public class HorseLay3BotAbove6 extends Bot{
 			frame.setVisible(true);
 		}
 	}
+	
+	
 	
 	public void update()
 	{
@@ -175,6 +178,9 @@ public class HorseLay3BotAbove6 extends Bot{
 			{
 				//System.out.println("Seconds tostart :" + getSecondsToStart());
 					
+				if(tryedToPlace)
+					return;
+				
 				raceMatchedAmount=0;
 				for(RunnersData rdAux:getMd().getRunners())
 				{
@@ -182,6 +188,19 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				
 				
+				
+				if(!olo.isEntryConditions(getMd().getRunners().size(), md.getStart().get(Calendar.HOUR_OF_DAY), HorsesUtils.getTimeRaceInSeconds(getMd().getName()), raceMatchedAmount))
+				{
+					tryedToPlace=true;
+					System.out.println("NOT Enter");
+					return;
+				}
+				else
+				{
+					tryedToPlace=true;
+					System.out.println("Enter");
+				}
+				/*
 				if(getMd().getRunners().size()<olo.getNumberOffRunnersLow() || getMd().getRunners().size()>olo.getNumberOffRunnersHigh())
 					return;
 				
@@ -363,6 +382,8 @@ public class HorseLay3BotAbove6 extends Bot{
 		win=false;
 		
 		betsPlaced=false;
+		tryedToPlace=false;
+		
 		betsCanceled=false;
 		bets.clear();
 		betMatched=null;
