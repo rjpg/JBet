@@ -68,5 +68,57 @@
 	<classpathentry kind="lib" path="lib/axis2/XmlSchema-1.4.3.jar"/>
 	<classpathentry kind="lib" path="lib/encog/encog-core-3.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/axis2/xercesImpl-2.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/blas.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/collections-generic.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/colt.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/commons-collections.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/concurrent.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/encog.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/groovy-all-1.7.7.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/itextpdf-5.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/ivy-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jama.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jcommon.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jep.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jfreechart.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jmathplot.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/joone-engine.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jugpreview.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jung-algorithms.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jung-api.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jung-graph-impl.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jung-visualization.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/junit.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/jxl.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/kdb.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/launcher.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/looks.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/mail.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/microba.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/poi-3.8-20120326.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/poi-excelant-3.8-20120326.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/poi-ooxml-3.8-20120326.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/poi-ooxml-schemas-3.8-20120326.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/poi-scratchpad-3.8-20120326.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/rapidminer.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/rm_doc.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/rsyntaxtextarea.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/SassyReader-0.5.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/slf4j-simple-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/swingx-all-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/vldocking.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/ws-commons-util-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xmlbeans-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xmlpull.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xmlrpc-client-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xmlrpc-common-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xpp3.jar"/>
+	<classpathentry kind="lib" path="lib/rapidMinner/xstream.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
