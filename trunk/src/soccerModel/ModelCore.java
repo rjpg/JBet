@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import org.apache.axis2.jaxws.description.xml.handler.HomeType;
 import org.apache.commons.httpclient.methods.ExpectContinueMethod;
 
+import DataRepository.Utils;
 import GUI.MyChart2D;
 
 
@@ -40,14 +41,14 @@ public class ModelCore {
 	double goalsAVGScale[];
 	
 	// model inputs 
-    double goalLine=2.5;
+    double goalLine=1.5;
     double asianHcap=-0.25;
     
-    double gLineOver=1.90;
-    double gLineUnder=2.02;
+    double gLineOver=0.89;
+    double gLineUnder=1.01;
     
-    double aHcapHome=2.17;
-    double aHcapAway=1.80;
+    double aHcapHome=1.44;
+    double aHcapAway=0.61;
     
     double desAH=0;
     double desGL=0;
@@ -790,10 +791,10 @@ public class ModelCore {
 			//chart.addValue("D", i, sumDraw, Color.GREEN);
 			//chart.addValue("B", i, sumB, Color.BLUE);
 			
-			chart.addValue("1-0", i, 1/oneZero, Color.RED);
-			chart.addValue("2-0", i, 1/twoZero, Color.GREEN);
-			chart.addValue("2-1", i, 1/twoOne, Color.BLUE);
-			chart.addValue("0-0", i, 1/actual, Color.MAGENTA);
+			chart.addValue("1-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
+			chart.addValue("2-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
+			chart.addValue("2-1", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
+			chart.addValue("0-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
 			
 		}	
 		
@@ -821,10 +822,10 @@ public class ModelCore {
 			//chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
 			//chart.addValue("B", i+segments+1, sumB, Color.BLUE);
 			
-			chart.addValue("1-0", i+segments+1, 1/oneZero, Color.RED);
-			chart.addValue("2-0", i+segments+1, 1/twoZero, Color.GREEN);
-			chart.addValue("2-1", i+segments+1, 1/twoOne, Color.BLUE);
-			chart.addValue("0-0", i+segments+1, 1/actual, Color.MAGENTA);
+			chart.addValue("1-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
+			chart.addValue("2-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
+			chart.addValue("2-1", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
+			chart.addValue("0-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
 			
 		
 		}	
@@ -836,6 +837,12 @@ public class ModelCore {
 		
 		
 		
+	}
+	
+	public double limit(double value,double limit)
+	{
+		if(value <=limit ) return value;
+		else return limit;
 	}
 	
 	double sumB=0;
@@ -893,9 +900,9 @@ public class ModelCore {
 		
 		//if(actual<0.05) actual=0.05;
 		
-		System.out.println("A:"+sumA);
-		System.out.println("Draw:"+sumDraw);
-		System.out.println("B:"+sumB);
+		System.out.println("A:"+1/sumA);
+		System.out.println("Draw:"+1/sumDraw);
+		System.out.println("B:"+1/sumB);
 		System.out.println("ACtual:"+(1/actual));
 		
 	}
@@ -1309,6 +1316,7 @@ public class ModelCore {
 	}
 	
 	public static void main(String[] args)  throws Exception {
+		Utils.init();
 		ModelCore mc=new ModelCore();
 		
 	}
