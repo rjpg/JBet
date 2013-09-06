@@ -51,7 +51,7 @@ public class HorseLay3BotAbove6 extends Bot{
 	
 	public boolean useVisualInterface=false;
 	
-	
+	public boolean applyFilter=true;
 	
 	
 	//public int misses=0;
@@ -188,51 +188,21 @@ public class HorseLay3BotAbove6 extends Bot{
 				}
 				
 				
-				
-				if(!olo.isEntryConditions(getMd().getRunners().size(), md.getStart().get(Calendar.HOUR_OF_DAY), HorsesUtils.getTimeRaceInSeconds(getMd().getName()), raceMatchedAmount))
+				if(applyFilter)
 				{
-					tryedToPlace=true;
-					System.out.println("NOT Enter");
-					return;
+					if(!olo.isEntryConditions(getMd().getRunners().size(), md.getStart().get(Calendar.HOUR_OF_DAY), HorsesUtils.getTimeRaceInSeconds(getMd().getName()), raceMatchedAmount))
+					{
+						tryedToPlace=true;
+						System.out.println("NOT Enter");
+						return;
+					}
+					else
+					{
+						tryedToPlace=true;
+						System.out.println("Enter");
+					}
 				}
-				else
-				{
-					tryedToPlace=true;
-					System.out.println("Enter");
-				}
-				/*
-				if(getMd().getRunners().size()<olo.getNumberOffRunnersLow() || getMd().getRunners().size()>olo.getNumberOffRunnersHigh())
-					return;
-				
-				if(md.getStart().get(Calendar.HOUR_OF_DAY)<olo.getTimeHourLow() || md.getStart().get(Calendar.HOUR_OF_DAY)>olo.getTimeHourHigh())
-					return;
-											
-				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<olo.getLenghtInSecondsLow() || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>olo.getLenghtInSecondsHigh())
-					return;
-				                                                //  1128191,72  
-				if(raceMatchedAmount<olo.getLiquidityLow() || raceMatchedAmount>olo.getLiquidityHigh())
-					return;
-				
-				//if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
-				//	return;
-				
-				/*
-				
-				if(getMd().getRunners().size()<2.0 || getMd().getRunners().size()>8.0)
-					return;
-				
-				if(md.getStart().get(Calendar.HOUR_OF_DAY)<13 || md.getStart().get(Calendar.HOUR_OF_DAY)>20.111111111111114)
-					return;
-				
-				if(md.getStart().get(Calendar.DAY_OF_WEEK)<1 || md.getStart().get(Calendar.DAY_OF_WEEK)>7.000000000000001)
-					return;
-				
-				if(HorsesUtils.getTimeRaceInSeconds(getMd().getName())<60 || HorsesUtils.getTimeRaceInSeconds(getMd().getName())>130.0)
-					return;
-				                                                //  1128191,72  
-				if(raceMatchedAmount<1270.53 || raceMatchedAmount>1978889.7433333334)
-					return;
-				*/
+
 				//System.out.println("minutes to start "+getMinutesToStart());
 				for(RunnersData rdAux:getMd().getRunners())
 				{
@@ -262,6 +232,7 @@ public class HorseLay3BotAbove6 extends Bot{
 					getMd().getBetManager().placeBets(bets);
 					writeMsg("Bets were Placed", Color.BLUE);
 					betsPlaced=true;
+					tryedToPlace=true;
 				}
 			}
 		}
@@ -324,9 +295,11 @@ public class HorseLay3BotAbove6 extends Bot{
 				
 				double initialodd=0;
 				
+				double pl=0;
+				
 				if( betMatched==null)
 				{
-					s+="0.00"; 
+					pl=0.00; 
 				}
 				else
 				{
@@ -339,11 +312,20 @@ public class HorseLay3BotAbove6 extends Bot{
 						initialodd=odFound.getOdd();
 					
 					if(win)
-						s+=betMatched.getMatchedAmount();
+						pl=betMatched.getMatchedAmount();
 					else
-						s+=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1);
+						pl=((betMatched.getMatchedAmount()*(betMatched.getOddMached()-1))*-1);
 				}
 				
+				
+				if(!applyFilter)
+					if(pl>0) pl=amount;
+					else if(pl<0)
+						pl=amount*(oddActuation-1)*-1;
+					else
+						pl=0.00;
+						
+				s+=pl;
 				
 				int initialOddint=Utils.oddToIndex(initialodd);
 				

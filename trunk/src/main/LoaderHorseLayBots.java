@@ -233,22 +233,21 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				
 				if(Parameters.horselayBots)
 				{
-					//horseLay3Bot=new HorseLay3Bot(md,3);
-					
-//					HorseLayOptions olo=new HorseLayOptions();
+//					//horseLay3Bot=new HorseLay3Bot(md,3);
+//					
+//					HorseLayOptions olo=null;
 //					for(int i = 2;i<7;i++)
 //					{
 //						for(int x= i+1;x<8;x++)
 //						{
-//							olo.setEntryOdd(i);
-//							olo.setAboveOdd(x);
+//							olo=new HorseLayOptions(false, i, x);
 //							horseLay3BotAbove6=new HorseLay3BotAbove6(md,olo);
 //						}
 //					}
 					
 					Vector<HorseLayOptions> olov=new Vector<HorseLayOptions>();
 					
-					/*HorseLayOptions olo0=new HorseLayOptions(false,2,3);
+					HorseLayOptions olo0=new HorseLayOptions(false,2,3);
 					olo0.setEntryOdd(2);
 					olo0.setAboveOdd(3);
 					olo0.setNumberOffRunnersLow(8);
@@ -276,7 +275,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					
 					olov.add(olo1);
 					
-					HorseLayOptions olo2=new HorseLayOptions(false,3,6);
+					HorseLayOptions olo2=new HorseLayOptions(true,3,6);
 					olo2.setEntryOdd(3);
 					olo2.setAboveOdd(6);
 					olo2.setNumberOffRunnersLow(2);
@@ -289,9 +288,9 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					olo2.setLiquidityHigh(1020312.0133333334);
 					
 					olov.add(olo2);
-					*/
+					
 					HorseLayOptions olo3=new HorseLayOptions(true,4,6);
-					/*olo3.setEntryOdd(4);
+					olo3.setEntryOdd(4);
 					olo3.setAboveOdd(6);
 					olo3.setNumberOffRunnersLow(2);
 					olo3.setNumberOffRunnersHigh(11.0);
@@ -301,23 +300,23 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					olo3.setLenghtInSecondsHigh(133.77777777777777);
 					olo3.setLiquidityLow(46100.2);
 					olo3.setLiquidityHigh(695574.7422222223);
-					*/
-					olov.add(olo3);
-					/*
-					HorseLayOptions olo4=new HorseLayOptions(false,6,7);
-					olo4.setEntryOdd(6);
-					olo4.setAboveOdd(7);
-					olo4.setNumberOffRunnersLow(2);
-					olo4.setNumberOffRunnersHigh(23);
-					olo4.setTimeHourLow(14.777777777777779);
-					olo4.setTimeHourHigh(20.111111111111114);
-					olo4.setLenghtInSecondsLow(60.0);
-					olo4.setLenghtInSecondsHigh(133.77777777777777);
-					olo4.setLiquidityLow(370837.4711111111);
-					olo4.setLiquidityHigh(2319261.097777778);
 					
-					olov.add(olo4);
-					*/
+					olov.add(olo3);
+					
+//					HorseLayOptions olo4=new HorseLayOptions(false,6,7);
+//					olo4.setEntryOdd(6);
+//					olo4.setAboveOdd(7);
+//					olo4.setNumberOffRunnersLow(2);
+//					olo4.setNumberOffRunnersHigh(23);
+//					olo4.setTimeHourLow(14.777777777777779);
+//					olo4.setTimeHourHigh(20.111111111111114);
+//					olo4.setLenghtInSecondsLow(60.0);
+//					olo4.setLenghtInSecondsHigh(133.77777777777777);
+//					olo4.setLiquidityLow(370837.4711111111);
+//					olo4.setLiquidityHigh(2319261.097777778);
+//					
+//					olov.add(olo4);
+					
 					for(HorseLayOptions olo:olov)
 						new HorseLay3BotAbove6(md,olo);
 						
@@ -667,11 +666,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Utils.init();
 		RapidMiner.init();
 		
-		
-		
 		// instanciate model 
 		ModelLoader model = OperatorService.createOperator(ModelLoader.class);
-		File modelFilePath=new File("horseLayModels/model-4.0-6.0.mod");
+		File modelFilePath=new File("horseLayModels/model-3.0-6.0.mod");
 		model.setParameter("model_file", modelFilePath.getAbsolutePath());
 		
 		// instanciate apply model operator
@@ -698,7 +695,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		// add data as datarow
 		// provide example set to apply model operator
 		DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, '.');
-		DataRow testRow = factory.create(new Double []{12.,17.,60.,115651.19}, listOfAttributes.toArray(new Attribute[]{}));
+		DataRow testRow = factory.create(new Double []{15.,16.,88.,811962.52}, listOfAttributes.toArray(new Attribute[]{}));
 		table.addDataRow(testRow);
 		testRow = factory.create(new Double []{10.,16.,248.,235980.29}, listOfAttributes.toArray(new Attribute[]{}));
 		table.addDataRow(testRow);
