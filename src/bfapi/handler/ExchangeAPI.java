@@ -407,6 +407,47 @@ public class ExchangeAPI {
 		return new InflatedCompleteMarketPrices(resp.getCompleteMarketPrices());
 	}
 	
+
+	public static InflatedCompleteMarketPrices getMarketPricesCompressed(Exchange exch, APIContext context, int marketId) throws Exception {
+		// create a request object
+		GetMarketPricesCompressedReq request = new GetMarketPricesCompressedReq();
+		request.setHeader(getHeader(context.getToken()));
+		
+		// Set the parameters
+		request.setMarketId(marketId);
+		
+		// Create the message and attach the request to it.
+		GetMarketPricesCompressed msg = new GetMarketPricesCompressed();
+		msg.setRequest(request);
+		
+		// Send the request to the Betfair Exchange Service.
+		GetMarketPricesCompressedResp resp = null;
+		sem.acquire();
+		try {
+			resp = getStub(exch).getMarketPricesCompressed(msg).getResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		sem.release();
+		context.getUsage().addCall("getCompleteMarketPricesCompressed");
+		
+		if(resp==null)
+		{
+			throw new IllegalArgumentException("Failed to retrieve data: getStub(exch).getCompleteMarketPricesCompressed(msg).getResult() return null");
+		}
+		
+		// Check the response code and throw an exception if the call failed 
+		if (resp.getErrorCode() != GetMarketPricesErrorEnum.OK) {
+			throw new IllegalArgumentException("Failed to retrieve data: "+resp.getErrorCode() + " Minor Error:"+resp.getMinorErrorCode()+ " Header Error:"+resp.getHeader().getErrorCode());
+		}
+		
+		// Transfer the response data back to the API Context
+		setHeaderDataToContext(context, resp.getHeader());
+		
+		return new InflatedCompleteMarketPrices(resp.getCompleteMarketPrices());
+	}
+
+	
 	
 	// Get all matched and unmatched bets on the market
 	public static MUBet[] getMUBets(Exchange exch, APIContext context, int marketId) throws Exception {

@@ -30,8 +30,8 @@ public class HorseLayOptions {
 	double timeHourLow=10;
 	double timeHourHigh=22;
 	
-	double lenghtInSecondsLow=50;
-	double lenghtInSecondsHigh=500;
+	double lenghtInSecondsLow=0;
+	double lenghtInSecondsHigh=1000;
 	
 	double liquidityLow=1000;
 	double liquidityHigh=10000000;

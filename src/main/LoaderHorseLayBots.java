@@ -250,56 +250,61 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					HorseLayOptions olo0=new HorseLayOptions(false,2,3);
 					olo0.setEntryOdd(2);
 					olo0.setAboveOdd(3);
-					olo0.setNumberOffRunnersLow(8);
-					olo0.setNumberOffRunnersHigh(14);
-					olo0.setTimeHourLow(17.444444444444446);
-					olo0.setTimeHourHigh(20.111111111111114);
-					olo0.setLenghtInSecondsLow(60.0);
-					olo0.setLenghtInSecondsHigh(392.0);
-					olo0.setLiquidityLow(46100.2);
-					olo0.setLiquidityHigh(695574.7422222223);
+//					olo0.setNumberOffRunnersLow(8);
+//					olo0.setNumberOffRunnersHigh(14);
+//					olo0.setTimeHourLow(17.444444444444446);
+//					olo0.setTimeHourHigh(20.111111111111114);
+//					olo0.setLenghtInSecondsLow(60.0);
+//					olo0.setLenghtInSecondsHigh(392.0);
+					olo0.setLenghtInSecondsHigh(212.0);
+					
+//					olo0.setLiquidityLow(46100.2);
+//					olo0.setLiquidityHigh(695574.7422222223);
 					
 					olov.add(olo0);
 					
 					HorseLayOptions olo1=new HorseLayOptions(false,2,5);
 					olo1.setEntryOdd(2);
 					olo1.setAboveOdd(5);
-					olo1.setNumberOffRunnersLow(2);
-					olo1.setNumberOffRunnersHigh(8);
-					olo1.setTimeHourLow(15.666666666666668);
-					olo1.setTimeHourHigh(20.111111111111114);
-					olo1.setLenghtInSecondsLow(60.0);
-					olo1.setLenghtInSecondsHigh(133.77777777777777);
-					olo1.setLiquidityLow(46100.2);
-					olo1.setLiquidityHigh(695574.7422222223);
+//					olo1.setNumberOffRunnersLow(2);
+//					olo1.setNumberOffRunnersHigh(8);
+//					olo1.setTimeHourLow(15.666666666666668);
+//					olo1.setTimeHourHigh(20.111111111111114);
+//					olo1.setLenghtInSecondsLow(60.0);
+//					olo1.setLenghtInSecondsHigh(133.77777777777777);
+					olo1.setLenghtInSecondsHigh(212.0);
+//					olo1.setLiquidityLow(46100.2);
+//					olo1.setLiquidityHigh(695574.7422222223);
 					
 					olov.add(olo1);
 					
-					HorseLayOptions olo2=new HorseLayOptions(true,3,6);
+					HorseLayOptions olo2=new HorseLayOptions(false,3,6);
 					olo2.setEntryOdd(3);
 					olo2.setAboveOdd(6);
-					olo2.setNumberOffRunnersLow(2);
-					olo2.setNumberOffRunnersHigh(26.0);
-					olo2.setTimeHourLow(13.0);
-					olo2.setTimeHourHigh(20.111111111111114);
-					olo2.setLenghtInSecondsLow(60.0);
-					olo2.setLenghtInSecondsHigh(133.77777777777777);
-					olo2.setLiquidityLow(370837.4711111111);
-					olo2.setLiquidityHigh(1020312.0133333334);
+//					olo2.setNumberOffRunnersLow(2);
+//					olo2.setNumberOffRunnersHigh(26.0);
+//					olo2.setTimeHourLow(13.0);
+//					olo2.setTimeHourHigh(20.111111111111114);
+//					olo2.setLenghtInSecondsLow(60.0);
+//					olo2.setLenghtInSecondsHigh(133.77777777777777);
+					olo2.setLenghtInSecondsHigh(212.0);
+//					olo2.setLiquidityLow(370837.4711111111);
+//					olo2.setLiquidityHigh(1020312.0133333334);
 					
 					olov.add(olo2);
 					
-					HorseLayOptions olo3=new HorseLayOptions(true,4,6);
+					HorseLayOptions olo3=new HorseLayOptions(false,4,6);
 					olo3.setEntryOdd(4);
 					olo3.setAboveOdd(6);
-					olo3.setNumberOffRunnersLow(2);
-					olo3.setNumberOffRunnersHigh(11.0);
-					olo3.setTimeHourLow(14.777777777777779);
-					olo3.setTimeHourHigh(20.111111111111114);
-					olo3.setLenghtInSecondsLow(60.0);
-					olo3.setLenghtInSecondsHigh(133.77777777777777);
-					olo3.setLiquidityLow(46100.2);
-					olo3.setLiquidityHigh(695574.7422222223);
+//					olo3.setNumberOffRunnersLow(2);
+//					olo3.setNumberOffRunnersHigh(11.0);
+//					olo3.setTimeHourLow(14.777777777777779);
+//					olo3.setTimeHourHigh(20.111111111111114);
+//					olo3.setLenghtInSecondsLow(60.0);
+//					olo3.setLenghtInSecondsHigh(133.77777777777777);
+					olo3.setLenghtInSecondsHigh(212.0);
+//					olo3.setLiquidityLow(46100.2);
+//					olo3.setLiquidityHigh(695574.7422222223);
 					
 					olov.add(olo3);
 					

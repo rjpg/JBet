@@ -301,6 +301,7 @@ public class MarketData {
 			setState(MarketData.ACTIVE);
 
 
+		//ExchangeAPI.getCompleteMarketPrices(selectedExchange,apiContext, selectedMarket.getMarketId());
 
 //		diffaux =start.getTime().getTime()-currentTime.getTime().getTime() ;
 //		if(diffaux<=0 /*|| prices.getInPlayDelay()>0*/)
