@@ -38,7 +38,9 @@ import bfapi.handler.ExchangeAPI;
 import bfapi.handler.ExchangeAPI.Exchange;
 import bots.Bot;
 import demo.util.APIContext;
+import demo.util.Display;
 import demo.util.InflatedCompleteMarketPrices;
+import demo.util.InflatedMarketPrices;
 
 import demo.util.InflatedCompleteMarketPrices.InflatedCompletePrice;
 import demo.util.InflatedCompleteMarketPrices.InflatedCompleteRunner;
@@ -295,13 +297,30 @@ public class MarketData {
 		if (prices == null ) 
 		{
 			System.err.println("No frame captured in :getCompleteMarketPrices : Making copy of data from last frame");
+			
+			if(getState()==MarketData.SUSPENDED)
+			{
+				
+				System.out.println("is suspended try getMarketPrices");
+				InflatedMarketPrices prices2=null;
+				try {
+					
+					prices2=ExchangeAPI.getMarketPrices(selectedExchange,apiContext, selectedMarket.getMarketId());
+					Display.showMarket(selectedExchange, selectedMarket, prices2);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				System.out.println("Prices in suspended : "+prices);
+			}
 			//return;
 		}
 		else
 			setState(MarketData.ACTIVE);
 
 
-		//ExchangeAPI.getCompleteMarketPrices(selectedExchange,apiContext, selectedMarket.getMarketId());
+		
 
 //		diffaux =start.getTime().getTime()-currentTime.getTime().getTime() ;
 //		if(diffaux<=0 /*|| prices.getInPlayDelay()>0*/)
