@@ -1,9 +1,13 @@
 package categories.categories2013;
 
 import java.awt.Color;
+import java.util.Vector;
+
+import org.omg.CORBA.INITIALIZE;
 
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
+import DataRepository.RunnersData;
 import bots.Bot;
 
 public class FillLiquidityFileBot extends Bot{
@@ -11,11 +15,29 @@ public class FillLiquidityFileBot extends Bot{
 	boolean farWritten=false;
 	boolean mediumWritten=false;
 	boolean nearWritten=false;
+
+	
+	Root root=new Root(0);
 	
 	public FillLiquidityFileBot(MarketData md) {
 		super(md, "FillLiquidityFileBot");
+		initialize();
+	}
+	
+	public void initialize()
+	{
+
+		
+		CategoryNode.printIDs(root);
+		//CategoryNode.buildDirectories(root);
+		
+		//Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);
+		
+		//for(CategoryNode cn:cnv)
+		//	System.out.print(cn.getPath()+"\\");
 		
 	}
+	
 	
 	public void newMarket(MarketData md)
 	{
@@ -28,7 +50,21 @@ public class FillLiquidityFileBot extends Bot{
 	{
 		if(!farWritten)
 		{
-			farWritten=true;
+			if(getMinutesToStart()>8 && getMinutesToStart()<10)
+			{
+				for(RunnersData rd:getMd().getRunners())
+				{
+					Vector<CategoryNode> cat=CategoryNode.getAncestorsByRunner(root, rd);
+					if(cat==null)
+						System.out.println(rd.getName()+" has no category");
+					else
+						System.out.println(rd.getName()+" category id :"+CategoryNode.getAncestorsStringPath(cat));
+					
+				}
+				farWritten=true;
+			}
+				
+			
 		}
 		else if (!mediumWritten)
 		{

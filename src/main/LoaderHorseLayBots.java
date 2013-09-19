@@ -37,6 +37,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import categories.categories2013.FillLiquidityFileBot;
+
 import com.rapidminer.RapidMiner;
 import com.rapidminer.example.Attribute;
 import com.rapidminer.example.ExampleSet;
@@ -229,6 +231,11 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					//Bot123 a=new Bot123(md);
 					mmf.setSize(400, 600);
 					mmf.setVisible(true);
+				}
+				
+				if(Parameters.collectHorseLiquidityBot)
+				{
+					new FillLiquidityFileBot(md);
 				}
 				
 				if(Parameters.horselayBots)
@@ -669,7 +676,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 
 	public static void main(String[] args)  throws Exception {
 		Utils.init();
-		RapidMiner.init();
+		/*RapidMiner.init();
 		
 		// instanciate model 
 		ModelLoader model = OperatorService.createOperator(ModelLoader.class);
@@ -720,6 +727,8 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		System.out.println("data RETURN = " +data);
 		System.out.println("DOUBLE RETURN = " +value+" - " + confidence);
 		
+		*/
+		
 		
 		// -------------------- JBet -----------------------
 		Parameters.log=false;  // Log or not to Log when not in replay
@@ -730,7 +739,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
-		Parameters.graphicalInterface=false; 
+		Parameters.graphicalInterface=true; 
 		Parameters.graphicalInterfaceBots=true; 
 		Parameters.amountBot=false;  
 		Parameters.manualBot=false; 
@@ -739,7 +748,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.neuralBot=false;
 		Parameters.neighboursCorrelationBot=false;
 		Parameters.neuralDataBot=false; 
-		Parameters.horselayBots=true; 
+		Parameters.horselayBots=false; 
+		
+		Parameters.collectHorseLiquidityBot=true;
 		
 		Parameters.simulation=true;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call

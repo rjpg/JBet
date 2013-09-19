@@ -113,6 +113,40 @@ public abstract class CategoryNode {
 		return null;
 	}
 	
+	public static Vector<CategoryNode> getAncestorsByRunner(CategoryNode cat,RunnersData rd)
+	{
+	
+		System.out.println("cat path : "+cat.getPath());
+		if(cat.getChilds().size()==0)
+			return cat.getAncestors();
+		
+		
+		for(CategoryNode cn:cat.getChilds())
+		{
+			//System.out.println("cat path : "+cn.getPath()+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
+			if(cn.isRunnerOnThisCategory(rd))
+				return getAncestorsByRunner(cn,rd);
+		}
+			
+		return null;
+	}
+	
+	
+	public static String getAncestorsStringPath(Vector<CategoryNode> cat)
+	{
+		
+		if(cat==null)
+			return null;
+		
+		String ret="";
+		for(CategoryNode cn:cat)
+			ret+=(cn.getPath()+"\\");
+	
+		return ret;
+	}
+	
+	
+	
 	public abstract boolean isRunnerOnThisCategory(RunnersData rd);
 	
 	
