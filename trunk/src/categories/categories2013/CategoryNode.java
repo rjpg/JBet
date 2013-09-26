@@ -58,7 +58,7 @@ public abstract class CategoryNode {
 		{
 			String s="";
 			for(CategoryNode cn:cat.getAncestors())
-				s+="\\"+cn.getPath();
+				s+="/"+cn.getPath();
 			System.out.println(s+" Start ID="+cat.getIdStart()+" End ID="+cat.getIdEnd());
 			
 		}
@@ -76,7 +76,7 @@ public abstract class CategoryNode {
 			{
 				String s="";
 				for(CategoryNode cn:cat.getAncestors())
-					s+="\\"+cn.getPath();
+					s+="/"+cn.getPath();
 				//System.out.println(s+" Start ID="+cat.getIdStart()+" End ID="+cat.getIdEnd());
 				s=s.substring(1);
 				try{ 
@@ -100,12 +100,12 @@ public abstract class CategoryNode {
 	public static Vector<CategoryNode> getAncestorsById(CategoryNode cat,int id)
 	{
 		
-		if(cat.getIdStart()==id /*&& cat.getIdEnd()==id+1*/)
+		if(cat.getIdStart()==id && cat.getIdEnd()==id+1)
 			return cat.getAncestors();
 		
 		for(CategoryNode cn:cat.getChilds())
 		{
-			System.out.println("cat path : "+cn.getPath()+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
+			//System.out.println("cat path : "+cn.getPath()+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
 			if(cn.getIdStart()<=id && cn.getIdEnd()>id)
 				return getAncestorsById(cn,id);
 		}
@@ -116,7 +116,7 @@ public abstract class CategoryNode {
 	public static Vector<CategoryNode> getAncestorsByRunner(CategoryNode cat,RunnersData rd)
 	{
 	
-		System.out.println("cat path : "+cat.getPath());
+		//System.out.println("cat path : "+cat.getPath());
 		if(cat.getChilds().size()==0)
 			return cat.getAncestors();
 		
@@ -139,13 +139,13 @@ public abstract class CategoryNode {
 			return null;
 		
 		String ret="";
+		//if(!cat.isEmpty())
 		for(CategoryNode cn:cat)
-			ret+=(cn.getPath()+"\\");
+			if(!cn.getPath().equals(""))
+			ret+=(cn.getPath()+"/");
 	
 		return ret;
 	}
-	
-	
 	
 	public abstract boolean isRunnerOnThisCategory(RunnersData rd);
 	
@@ -201,10 +201,17 @@ public abstract class CategoryNode {
 		CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
 		
-		Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);
 		
-		for(CategoryNode cn:cnv)
-			System.out.print(cn.getPath()+"\\");
 		
+		for(int i=0;i<648;i++)
+		{
+			System.out.print("id="+i);
+			Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,i);
+			
+			for(CategoryNode cn:cnv)
+				System.out.print(cn.getPath()+"/");
+			
+			System.out.println();
+		}
 	}
 }

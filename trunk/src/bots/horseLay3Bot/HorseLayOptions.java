@@ -121,10 +121,12 @@ public class HorseLayOptions {
 			}
 			double value = data.getExample(0).getValue(data.getAttributes().getPredictedLabel());
 			//double confidence = data.getExample(0).getValue(data.getAttributes().getConfidence("3"));
-			
+			double retrunPredPL=Double.parseDouble(data.getAttributes().getPredictedLabel().getMapping().mapIndex((int)value));
 			//System.out.println("data RETURN = " +data);
 			//System.out.println("DOUBLE RETURN = " +value+" - " + confidence);
-			if(value<2.)
+			
+			System.out.println("PRED : "+numberOffRunners+" , "+ timeHour+" , "+ lenghtInSeconds+ " ,"+ liquidity+" = "+retrunPredPL);
+			if(retrunPredPL>=0)
 				return true;
 			else
 				return false;

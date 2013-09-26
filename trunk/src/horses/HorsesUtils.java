@@ -10,7 +10,8 @@ public class HorsesUtils {
 	{
 		for(int i =0;i<HorsesUtils.raceType.length;i++)
 		{
-			if(type.contains(raceType[i]))
+			String field0=type.split(" ")[0];
+			if(field0.equals(raceType[i]))
 				return timeInSeconds[i];
 		}
 		return -1;

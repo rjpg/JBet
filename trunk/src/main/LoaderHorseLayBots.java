@@ -254,68 +254,67 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					
 					Vector<HorseLayOptions> olov=new Vector<HorseLayOptions>();
 					
-					HorseLayOptions olo0=new HorseLayOptions(false,2,3);
+					HorseLayOptions olo0=new HorseLayOptions(true,2,3);
 					olo0.setEntryOdd(2);
 					olo0.setAboveOdd(3);
-//					olo0.setNumberOffRunnersLow(8);
-//					olo0.setNumberOffRunnersHigh(14);
+					olo0.setNumberOffRunnersLow(8);
+					olo0.setNumberOffRunnersHigh(14);
 //					olo0.setTimeHourLow(17.444444444444446);
 //					olo0.setTimeHourHigh(20.111111111111114);
 //					olo0.setLenghtInSecondsLow(60.0);
 //					olo0.setLenghtInSecondsHigh(392.0);
-					olo0.setLenghtInSecondsHigh(212.0);
+					olo0.setLenghtInSecondsLow(212.0);
 					
 //					olo0.setLiquidityLow(46100.2);
 //					olo0.setLiquidityHigh(695574.7422222223);
 					
-					olov.add(olo0);
+					//olov.add(olo0);
 					
-					HorseLayOptions olo1=new HorseLayOptions(false,2,5);
+					HorseLayOptions olo1=new HorseLayOptions(true,2,5);
 					olo1.setEntryOdd(2);
 					olo1.setAboveOdd(5);
-//					olo1.setNumberOffRunnersLow(2);
-//					olo1.setNumberOffRunnersHigh(8);
+					olo1.setNumberOffRunnersLow(2);
+					olo1.setNumberOffRunnersHigh(8);
 //					olo1.setTimeHourLow(15.666666666666668);
 //					olo1.setTimeHourHigh(20.111111111111114);
 //					olo1.setLenghtInSecondsLow(60.0);
 //					olo1.setLenghtInSecondsHigh(133.77777777777777);
-					olo1.setLenghtInSecondsHigh(212.0);
+					olo1.setLenghtInSecondsLow(212.0);
 //					olo1.setLiquidityLow(46100.2);
 //					olo1.setLiquidityHigh(695574.7422222223);
 					
-					olov.add(olo1);
+					//olov.add(olo1);
 					
-					HorseLayOptions olo2=new HorseLayOptions(false,3,6);
+					HorseLayOptions olo2=new HorseLayOptions(true,3,6);
 					olo2.setEntryOdd(3);
 					olo2.setAboveOdd(6);
-//					olo2.setNumberOffRunnersLow(2);
-//					olo2.setNumberOffRunnersHigh(26.0);
+					olo2.setNumberOffRunnersLow(2);
+					olo2.setNumberOffRunnersHigh(10.0);
 //					olo2.setTimeHourLow(13.0);
 //					olo2.setTimeHourHigh(20.111111111111114);
 //					olo2.setLenghtInSecondsLow(60.0);
 //					olo2.setLenghtInSecondsHigh(133.77777777777777);
-					olo2.setLenghtInSecondsHigh(212.0);
+					olo2.setLenghtInSecondsLow(212.0);
 //					olo2.setLiquidityLow(370837.4711111111);
 //					olo2.setLiquidityHigh(1020312.0133333334);
 					
-					olov.add(olo2);
+					//olov.add(olo2);
 					
-					HorseLayOptions olo3=new HorseLayOptions(false,4,6);
-					olo3.setEntryOdd(4);
-					olo3.setAboveOdd(6);
+					HorseLayOptions olo3=new HorseLayOptions(true,4,6);
+//					olo3.setEntryOdd(4);
+//					olo3.setAboveOdd(6);
 //					olo3.setNumberOffRunnersLow(2);
 //					olo3.setNumberOffRunnersHigh(11.0);
 //					olo3.setTimeHourLow(14.777777777777779);
 //					olo3.setTimeHourHigh(20.111111111111114);
 //					olo3.setLenghtInSecondsLow(60.0);
 //					olo3.setLenghtInSecondsHigh(133.77777777777777);
-					olo3.setLenghtInSecondsHigh(212.0);
 //					olo3.setLiquidityLow(46100.2);
 //					olo3.setLiquidityHigh(695574.7422222223);
 					
 					olov.add(olo3);
 					
-//					HorseLayOptions olo4=new HorseLayOptions(false,6,7);
+					HorseLayOptions olo4=new HorseLayOptions(true,6,7);
 //					olo4.setEntryOdd(6);
 //					olo4.setAboveOdd(7);
 //					olo4.setNumberOffRunnersLow(2);
@@ -327,7 +326,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 //					olo4.setLiquidityLow(370837.4711111111);
 //					olo4.setLiquidityHigh(2319261.097777778);
 //					
-//					olov.add(olo4);
+					//olov.add(olo4);
 					
 					for(HorseLayOptions olo:olov)
 						new HorseLay3BotAbove6(md,olo);
@@ -676,11 +675,11 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 
 	public static void main(String[] args)  throws Exception {
 		Utils.init();
-		/*RapidMiner.init();
+		RapidMiner.init();
 		
 		// instanciate model 
 		ModelLoader model = OperatorService.createOperator(ModelLoader.class);
-		File modelFilePath=new File("horseLayModels/model-3.0-6.0.mod");
+		File modelFilePath=new File("horseLayModels/model-4.0-6.0.mod");
 		model.setParameter("model_file", modelFilePath.getAbsolutePath());
 		
 		// instanciate apply model operator
@@ -707,10 +706,10 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		// add data as datarow
 		// provide example set to apply model operator
 		DataRowFactory factory = new DataRowFactory(DataRowFactory.TYPE_DOUBLE_ARRAY, '.');
-		DataRow testRow = factory.create(new Double []{15.,16.,88.,811962.52}, listOfAttributes.toArray(new Attribute[]{}));
+		DataRow testRow = factory.create(new Double []{9.,14.,74.,376569.55}, listOfAttributes.toArray(new Attribute[]{}));
 		table.addDataRow(testRow);
-		testRow = factory.create(new Double []{10.,16.,248.,235980.29}, listOfAttributes.toArray(new Attribute[]{}));
-		table.addDataRow(testRow);
+		//testRow = factory.create(new Double []{10.,16.,248.,235980.29}, listOfAttributes.toArray(new Attribute[]{}));
+		//table.addDataRow(testRow);
         		
 		ExampleSet exampleset= table.createExampleSet();
         
@@ -724,17 +723,20 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		double value = data.getExample(0).getValue(data.getAttributes().getPredictedLabel());
 		double confidence = data.getExample(0).getValue(data.getAttributes().getConfidence("3"));
 		
-		System.out.println("data RETURN = " +data);
+		System.out.println("data RETURN total = "+data.getAttributes().getPredictedLabel());
+		System.out.println("data RETURN = " +data.getAttributes().getPredictedLabel().getMapping().mapString(value+""));
+		int index=data.getAttributes().getPredictedLabel().getMapping().mapString(value+"");
+		System.out.println("Nominal Value = " +Double.parseDouble(data.getAttributes().getPredictedLabel().getMapping().mapIndex((int)value)));
 		System.out.println("DOUBLE RETURN = " +value+" - " + confidence);
 		
-		*/
+		
 		
 		
 		// -------------------- JBet -----------------------
 		Parameters.log=false;  // Log or not to Log when not in replay
 		Parameters.replay=true; 
 		Parameters.replay_file_list=true; 
-		Parameters.replay_file_list_test=false; 
+		Parameters.replay_file_list_test=true; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
@@ -760,5 +762,6 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		int x=Integer.MAX_VALUE;
 		System.out.println(x);
 		new LoaderHorseLayBots();
+		
 		}
 }
