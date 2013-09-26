@@ -3,7 +3,7 @@ package main;
 public class Parameters {
 	
 	static public boolean log=false;  // Log or not to Log when not in replay
-	static public boolean replay=true; // replay or read from file
+	static public boolean replay=false; // replay or read from file
 	static public boolean replay_file_list=false; // replay or read from file
 	static public boolean replay_file_list_test=false; // replay or read from file
 	
@@ -14,7 +14,7 @@ public class Parameters {
 	
 	static public boolean saveFavorite=false; // replay or read from file
 	
-	static public boolean graphicalInterface=false; // replay or read from file
+	static public boolean graphicalInterface=true; // replay or read from file
 	
 	static public boolean graphicalInterfaceBots=false; // replay or read from file
 	
@@ -33,7 +33,7 @@ public class Parameters {
 	static public boolean baseOfBot=false; // dummy bot for test
 	static public boolean manualPlaceBetBot=false; // for testing BetManager
 	static public boolean horselayBots=false; // for testing BetManager
-	static public boolean collectHorseLiquidityBot=false; // for testing BetManager
+	static public boolean collectHorseLiquidityBot=true; // for testing BetManager
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	

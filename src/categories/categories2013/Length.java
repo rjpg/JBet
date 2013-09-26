@@ -27,6 +27,7 @@ public class Length extends CategoryNode{
 	
 	@Override
 	public boolean isRunnerOnThisCategory(RunnersData rd) {
+		//System.out.println("Lenght time = "+HorsesUtils.getTimeRaceInSeconds(rd.getMarketData().getName())); 
 		if(HorsesUtils.getTimeRaceInSeconds(rd.getMarketData().getName())>=secsStartInterval &&
 				HorsesUtils.getTimeRaceInSeconds(rd.getMarketData().getName())<=secsEndInterval)
 			return true;

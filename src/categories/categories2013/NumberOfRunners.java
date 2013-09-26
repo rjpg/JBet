@@ -21,7 +21,7 @@ public class NumberOfRunners extends CategoryNode{
 	public void initialize()
 	{
 		addChild(new TimePreLive(getAncestors(),10, 5, "farFromBegining"));
-		addChild(new TimePreLive(getAncestors(),6, 2, "mediumFromBegining"));
+		addChild(new TimePreLive(getAncestors(),4, 2, "mediumFromBegining"));
 		addChild(new TimePreLive(getAncestors(),1, 0, "nearFromBegining"));
 	}
 	
