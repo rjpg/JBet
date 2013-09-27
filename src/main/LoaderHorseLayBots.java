@@ -736,13 +736,13 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.log=false;  // Log or not to Log when not in replay
 		Parameters.replay=true; 
 		Parameters.replay_file_list=true; 
-		Parameters.replay_file_list_test=true; 
+		Parameters.replay_file_list_test=false; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
-		Parameters.graphicalInterface=true; 
-		Parameters.graphicalInterfaceBots=true; 
+		Parameters.graphicalInterface=false; 
+		Parameters.graphicalInterfaceBots=false; 
 		Parameters.amountBot=false;  
 		Parameters.manualBot=false; 
 		Parameters.manualPlaceBetBot=false; // manual place bet bot for betManager test
