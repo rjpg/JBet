@@ -71,7 +71,8 @@ public class FillLiquidityFileBot extends Bot{
 				
 			
 		}
-		else if (!mediumWritten)
+		//System.out.println("Minutes to start : "+getMinutesToStart());
+		if (!mediumWritten)
 		{
 			if(getMinutesToStart()>3 && getMinutesToStart()<=4)
 			{
@@ -89,7 +90,9 @@ public class FillLiquidityFileBot extends Bot{
 				}
 				mediumWritten=true;
 			}
-		}else if(!nearWritten)
+		}
+		
+		if(!nearWritten)
 		{
 			if(getMinutesToStart()>=0 && getMinutesToStart()<=1)
 			{
