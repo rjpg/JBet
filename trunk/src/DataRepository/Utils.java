@@ -11,11 +11,11 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.TimeZone;
 import java.util.Vector;
 
 import main.Parameters;
-
 import bfapi.handler.ExchangeAPI;
 import bfapi.handler.GlobalAPI;
 import bfapi.handler.ExchangeAPI.Exchange;
@@ -1259,6 +1259,7 @@ public class Utils {
 				return 0;
 			}
 	
+		
 		return rd.getDataFrames().get(pastFrameCalc).getVolume().get(odd);	
 	
 		
