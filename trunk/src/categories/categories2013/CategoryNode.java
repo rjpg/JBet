@@ -198,12 +198,11 @@ public abstract class CategoryNode {
 	public static void main(String[] args) {
 		Root root=new Root(0);
 		
-		CategoryNode.printIDs(root);
+		//CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
 		
-		
-		
-		for(int i=0;i<648;i++)
+		System.out.println("Cat max ID : "+root.getIdEnd());		
+		/*for(int i=0;i<root.getIdEnd();i++)
 		{
 			System.out.print("id="+i);
 			Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,i);
@@ -212,6 +211,6 @@ public abstract class CategoryNode {
 				System.out.print(cn.getPath()+"/");
 			
 			System.out.println();
-		}
+		}*/
 	}
 }

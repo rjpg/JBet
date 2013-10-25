@@ -10,10 +10,13 @@ public class Liquidity extends CategoryNode{
 	double valueStart;
 	double valueEnd;
 	
-	public Liquidity(Vector<CategoryNode> ancestorsA,double valueStartA,double valueEndA,String path) {
+	boolean active=false;
+	
+	public Liquidity(Vector<CategoryNode> ancestorsA,double valueStartA,double valueEndA,String path,boolean activeA) {
 		super(ancestorsA);
 		valueStart=valueStartA;
 		valueEnd=valueEndA;
+		active=activeA;
 		setPath(path);
 		initialize();
 	}
@@ -25,6 +28,10 @@ public class Liquidity extends CategoryNode{
 
 	@Override
 	public boolean isRunnerOnThisCategory(RunnersData rd) {
+		
+		if(!active)
+			return false;
+		
 		if(Utils.getMatchedAmount(rd, 0)>=valueStart && Utils.getMatchedAmount(rd, 0)<=valueEnd)
 			return true;
 		else

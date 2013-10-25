@@ -1,5 +1,9 @@
 package categories.categories2013;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Vector;
 
 import DataRepository.RunnersData;
@@ -21,10 +25,72 @@ public class OddInterval extends CategoryNode{
 
 	public void initialize()
 	{
+		boolean flagActivate=false;
 		
-		addChild(new Liquidity(getAncestors(),0, 2000, "lowLiquidity"));
-		addChild(new Liquidity(getAncestors(),2000.01, 10000, "mediumLiquidity"));
-		addChild(new Liquidity(getAncestors(),10000.01, Double.MAX_VALUE, "highLiquidity"));
+		Vector<CategoryNode> cat=getAncestors();
+		
+		String fileName=cat.get(0).getPath();;
+		for(int x=1;x<cat.size();x++)
+			fileName+="/"+cat.get(x).getPath();
+		
+		fileName+="/liquitidyIntervalsFile.txt";
+		File f=new File(fileName);
+		
+		if(f.exists()) { 
+		
+			BufferedReader input=getBufferedReader(f);
+			String s=null;
+			
+			int recordsNumber=0;
+			double firstInterval=2000.;
+			double secondInterval=10000.;
+			
+			try {
+				s=input.readLine();
+				recordsNumber=Integer.parseInt(s);
+				s=input.readLine();
+				firstInterval=Double.parseDouble(s);
+				s=input.readLine();
+				secondInterval=Double.parseDouble(s);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(recordsNumber>=500)
+				flagActivate=true;
+			
+			//System.out.println("On "+fileName+" \nNumber of records = "+recordsNumber+"\nFirst Interval = "+firstInterval+"\nSecond Interval = "+secondInterval);
+			if(flagActivate)
+				System.out.println("1");
+			else
+				System.out.println("0");
+			
+			addChild(new Liquidity(getAncestors(),0, firstInterval, "lowLiquidity",flagActivate));
+			addChild(new Liquidity(getAncestors(),firstInterval+0.01, secondInterval, "mediumLiquidity",flagActivate));
+			addChild(new Liquidity(getAncestors(),secondInterval+0.01, Double.MAX_VALUE, "highLiquidity",flagActivate));
+			
+			
+		}else
+		{
+			System.out.println("File does not exists : "+fileName);
+			flagActivate=true;
+		
+			addChild(new Liquidity(getAncestors(),0, 2000, "lowLiquidity",flagActivate));
+			addChild(new Liquidity(getAncestors(),2000.01, 10000, "mediumLiquidity",flagActivate));
+			addChild(new Liquidity(getAncestors(),10000.01, Double.MAX_VALUE, "highLiquidity",flagActivate));
+		
+		}
+	}
+	public static BufferedReader getBufferedReader(File f)
+	{
+		BufferedReader input=null;
+		try {
+			input= new BufferedReader(new FileReader(f));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		return input;
 	}
 
 	@Override
