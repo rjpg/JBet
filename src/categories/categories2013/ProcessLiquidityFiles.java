@@ -169,7 +169,7 @@ public class ProcessLiquidityFiles {
 		
 		OddInterval oddInterval=null;
 		
-		for(int i=0;i<5;i++)
+		for(int i=0;i<648;i++)
 		{
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
 			
