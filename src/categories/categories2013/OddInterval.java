@@ -61,10 +61,10 @@ public class OddInterval extends CategoryNode{
 				flagActivate=true;
 			
 			//System.out.println("On "+fileName+" \nNumber of records = "+recordsNumber+"\nFirst Interval = "+firstInterval+"\nSecond Interval = "+secondInterval);
-			if(flagActivate)
-				System.out.println("1");
-			else
-				System.out.println("0");
+			//if(flagActivate)
+			//	System.out.println("1");
+			//else
+			//	System.out.println("0");
 			
 			addChild(new Liquidity(getAncestors(),0, firstInterval, "lowLiquidity",flagActivate));
 			addChild(new Liquidity(getAncestors(),firstInterval+0.01, secondInterval, "mediumLiquidity",flagActivate));
