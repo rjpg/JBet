@@ -294,6 +294,45 @@ public class Utils {
 	
 	
 	/////////// RUNNER UTILS /////////////
+	public static RunnersData getFavorite(MarketData md)
+	{
+		RunnersData rdLow=md.getRunners().get(0);
+		
+		for(RunnersData rdAux:md.getRunners())
+		{
+			if(Utils.getOddBackFrame(rdAux, 0)<Utils.getOddBackFrame(rdLow, 0))
+					rdLow=rdAux;
+		}
+		
+		return rdLow;
+		
+	}
+	
+	
+	
+	public static RunnersData getNeighbour(RunnersData rd)
+	{
+		MarketData md=rd.getMarketData();
+		double rdOdd=rd.getDataFrames().get(rd.getDataFrames().size()-1).getOddBack();
+		int neighbourOddDiff=Utils.oddToIndex(1000);
+		RunnersData neighbourAux=null;
+	
+		
+		for(RunnersData rdaux:md.getRunners())
+		{
+			  if(rdaux!=rd)
+			  {
+				  double auxOdd=rdaux.getDataFrames().get(rdaux.getDataFrames().size()-1).getOddBack();
+				  int diff=Math.abs(Utils.oddToIndex(rdOdd)-Utils.oddToIndex(auxOdd));
+				  if(diff<neighbourOddDiff)
+				  {
+					  neighbourOddDiff=diff;
+					  neighbourAux=rdaux;
+				  }
+			  }
+		}
+		return neighbourAux;
+	}
 	
 	public static RunnersData getNeighbour(MarketData md,RunnersData rd)
 	{
@@ -355,7 +394,7 @@ public class Utils {
 			  {
 				  double auxOdd=rdaux.getDataFrames().get(rdaux.getDataFrames().size()-1).getOddBack();
 				  int diff=Math.abs(Utils.oddToIndex(rdOdd)-Utils.oddToIndex(auxOdd));
-				  if(diff<neighbourOddDiff && diff>ticksMinDiff)
+				  if(diff<neighbourOddDiff && diff<ticksMinDiff)
 				  {
 					  neighbourOddDiff=diff;
 					  neighbourAux=rdaux;
@@ -386,22 +425,6 @@ public class Utils {
 		return diff;
 	}
 	
-	public static RunnersData getFavorite(MarketData md)
-	{
-		RunnersData rdFavorite=null;
-		double oddMin=1000.00;
-		
-		for(RunnersData rdaux:md.getRunners())
-		{
-
-			  if(rdaux.getDataFrames().get(rdaux.getDataFrames().size()-1).getOddBack()<oddMin)
-			  {
-				  oddMin=rdaux.getDataFrames().get(rdaux.getDataFrames().size()-1).getOddBack();
-				  rdFavorite=rdaux;
-			  }
-		}
-		return rdFavorite;
-	}
 	
 	
 	public static double getMatchedAmountAVG(RunnersData rd,int windowSize,int pastFrame)
