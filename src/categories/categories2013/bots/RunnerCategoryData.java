@@ -1,8 +1,10 @@
 package categories.categories2013.bots;
 
+import java.awt.Color;
 import java.util.Vector;
 
 import DataRepository.RunnersData;
+import DataRepository.Utils;
 import categories.categories2013.CategoryNode;
 
 public class RunnerCategoryData {
@@ -11,8 +13,34 @@ public class RunnerCategoryData {
 	
 	RunnersData rd;
 	
+	RunnersData neighbour;
+	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
 		cat=catA;
+		
+		
+		System.out.println("favorite : "+cat.get(6).getPath());
+		
+		if(cat.get(2).getPath().equals("nofavorite"))
+		{
+			neighbour=Utils.getNeighbour(rd);
+			System.out.println("no favorite : "+neighbour.getName());
+			
+		}
+		else
+		{
+			if(cat.get(6).getPath().equals("lowOdd"))
+				neighbour=Utils.getNeighbour(rd);
+			else
+				neighbour=Utils.getFavorite(rd.getMarketData());
+			
+			System.out.println("has favorite : "+neighbour.getName());
+		}
+		
+		
 	}
+	
+	
+	
 }
