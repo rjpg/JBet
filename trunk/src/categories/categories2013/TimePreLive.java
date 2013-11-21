@@ -21,7 +21,7 @@ public class TimePreLive extends CategoryNode{
 	
 	public void initialize()
 	{
-		addChild(new OddInterval(getAncestors(),1.01,4,"lowOdd"));
+		addChild(new OddInterval(getAncestors(),1.01,4.0,"lowOdd"));
 		addChild(new OddInterval(getAncestors(),4.1,6,"midleOdd"));
 		addChild(new OddInterval(getAncestors(),6.2,12,"highOdd"));
 	}

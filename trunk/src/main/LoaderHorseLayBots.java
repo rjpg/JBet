@@ -38,6 +38,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import categories.categories2013.FillLiquidityFileBot;
+import categories.categories2013.bots.CollectNNRawDataBot;
 
 import com.rapidminer.RapidMiner;
 import com.rapidminer.example.Attribute;
@@ -235,7 +236,8 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 				
 				if(Parameters.collectHorseLiquidityBot)
 				{
-					new FillLiquidityFileBot(md);
+					//new FillLiquidityFileBot(md);
+					new CollectNNRawDataBot(md);
 				}
 				
 				if(Parameters.horselayBots)
@@ -741,7 +743,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
-		Parameters.graphicalInterface=false; 
+		Parameters.graphicalInterface=true; 
 		Parameters.graphicalInterfaceBots=false; 
 		Parameters.amountBot=false;  
 		Parameters.manualBot=false; 
@@ -750,9 +752,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.neuralBot=false;
 		Parameters.neighboursCorrelationBot=false;
 		Parameters.neuralDataBot=false; 
-		Parameters.horselayBots=true; 
+		Parameters.horselayBots=false; 
 		
-		Parameters.collectHorseLiquidityBot=false;
+		Parameters.collectHorseLiquidityBot=true;
 		
 		Parameters.simulation=true;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call

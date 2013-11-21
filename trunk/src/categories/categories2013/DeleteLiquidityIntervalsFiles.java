@@ -26,11 +26,13 @@ public class DeleteLiquidityIntervalsFiles {
 			File file = new File(fileName);
 			if(file.exists()) { 
 				System.out.println("File found in "+fileName);
+				//file.setWritable(true);
 				if(file.delete()){
 	    			System.out.println(file.getName() + " is deleted!");
 	    		}else{
 	    			System.out.println("Delete operation is failed.");
 	    		}
+				System.gc();
 			}
 			else
 			{

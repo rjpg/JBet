@@ -50,23 +50,124 @@ public class CollectNNRawDataBot extends Bot {
 
 	public void update()
 	{
-		
+		updateRunnerCategoryData();
 	}
 	
 	//pathroot\shortLenhgt\favorite\beginingDay\mediumRunners\farFromBegining\lowOdd\highLiquidity\
 	
 	public void reset()
 	{
+		if(rcdv!=null)
+		{
+			rcdv.removeAllElements();
+			rcdv.clear();
+			rcdv=null;
+			rcdv=new Vector<RunnerCategoryData>();
+		}	
+		
+		farActive=false;
+		mediumActive=false;
+		nearActive=false;
 		
 	}
 	
 	public void updateRunnerCategoryData()
 	{
 		int minuteToStart =getMinutesToStart();
-		if(!farActive && (minuteToStart<10 || minuteToStart>5))
+		if(!farActive && (minuteToStart<=10 && minuteToStart>=5))
 		{
+			System.out.println("activating far");
+			
+			farActive=true;
+			if(rcdv!=null)
+			{
+				rcdv.removeAllElements();
+				rcdv.clear();
+				rcdv=null;
+				
+			}	
+			
+			rcdv=new Vector<RunnerCategoryData>();
+			
+			for(RunnersData rd:getMd().getRunners())
+			{
+				Vector<CategoryNode> cat=CategoryNode.getAncestorsByRunner(root, rd);
+				if(cat==null)
+					System.out.println(rd.getName()+" has no category");
+				else
+				{
+					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
+					rcdv.add(new RunnerCategoryData(rd, cat));
+				}
+				
+			}
+			
+		
 			
 		}
+		
+		if(!mediumActive && (minuteToStart<=4 && minuteToStart>=2))
+		{
+			mediumActive=true;
+			
+			System.out.println("activating medium");
+			
+			farActive=true;
+			if(rcdv!=null)
+			{
+				rcdv.removeAllElements();
+				rcdv.clear();
+				rcdv=null;
+				
+			}	
+			
+			rcdv=new Vector<RunnerCategoryData>();
+			
+			for(RunnersData rd:getMd().getRunners())
+			{
+				Vector<CategoryNode> cat=CategoryNode.getAncestorsByRunner(root, rd);
+				if(cat==null)
+					System.out.println(rd.getName()+" has no category");
+				else
+				{
+					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
+					rcdv.add(new RunnerCategoryData(rd, cat));
+				}
+				
+			}
+		}
+		
+		if(!nearActive && (minuteToStart<=1 && minuteToStart>=0))
+		{
+			nearActive=true;
+			
+			System.out.println("activating near");
+			
+			farActive=true;
+			if(rcdv!=null)
+			{
+				rcdv.removeAllElements();
+				rcdv.clear();
+				rcdv=null;
+				
+			}	
+			
+			rcdv=new Vector<RunnerCategoryData>();
+			
+			for(RunnersData rd:getMd().getRunners())
+			{
+				Vector<CategoryNode> cat=CategoryNode.getAncestorsByRunner(root, rd);
+				if(cat==null)
+					System.out.println(rd.getName()+" has no category");
+				else
+				{
+					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
+					rcdv.add(new RunnerCategoryData(rd, cat));
+				}
+				
+			}
+		}
+		
 	}
 	
 	

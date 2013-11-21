@@ -77,36 +77,36 @@ public class ProcessLiquidityFiles {
 				e.printStackTrace();
 			}
 			
-			double precision=(max-min)/100;
+			double precision=(max-min)/1000;
 			Histogram histogram=new Histogram(min, max, precision);
 			for(double d:values)
 				histogram.addValue(d);
 			
-//			JFrame frame=new JFrame();
-//			MyChart2D chart=new MyChart2D();
-//			frame.add(chart);
-//			
-//			double axisx=min;
-//			for(int i=0;i<histogram.getIntervals().length;i++)
-//			{
-//				chart.addValue("histogram", axisx, histogram.getIntervals()[i], Color.BLUE);
-//				axisx+=precision;
-//			}
+			JFrame frame=new JFrame();
+			MyChart2D chart=new MyChart2D();
+			frame.add(chart);
+			
+			double axisx=min;
+			for(int i=0;i<histogram.getIntervals().length;i++)
+			{
+				chart.addValue("histogram", axisx, histogram.getIntervals()[i], Color.BLUE);
+				axisx+=precision;
+			}
 			
 			double firstInterval=histogram.getMinFiltred(100-(100/3));
 			double secondInterval=histogram.getMaxFiltred(100-(100/3));
 			
 			writeIntervals(fileNameOut,lines,firstInterval,secondInterval);
 			
-//			chart.addValue("interval", firstInterval-1, 0, Color.RED);
-//			chart.addValue("interval", firstInterval, 10, Color.RED);
-//			chart.addValue("interval", firstInterval+1, 0, Color.RED);
-//			
-//			chart.addValue("interval", secondInterval-1, 0, Color.RED);
-//			chart.addValue("interval", secondInterval, 10, Color.RED);
-//			chart.addValue("interval", secondInterval+1, 0, Color.RED);
-//	
-//			frame.setVisible(true);
+			chart.addValue("interval", firstInterval-1, 0, Color.RED);
+			chart.addValue("interval", firstInterval, 10, Color.RED);
+			chart.addValue("interval", firstInterval+1, 0, Color.RED);
+			
+			chart.addValue("interval", secondInterval-1, 0, Color.RED);
+			chart.addValue("interval", secondInterval, 10, Color.RED);
+			chart.addValue("interval", secondInterval+1, 0, Color.RED);
+	
+			frame.setVisible(true);
 			
 			return lines;
 			
@@ -170,6 +170,7 @@ public class ProcessLiquidityFiles {
 		OddInterval oddInterval=null;
 		
 		for(int i=0;i<648;i++)
+		//int i=541;
 		{
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
 			
