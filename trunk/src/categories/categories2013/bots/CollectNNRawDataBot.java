@@ -3,11 +3,13 @@ package categories.categories2013.bots;
 import java.awt.Color;
 import java.util.Vector;
 
+import categories.categories2013.CategoriesParameters;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
+import DataRepository.Utils;
 import bots.Bot;
 
 public class CollectNNRawDataBot extends Bot {
@@ -73,8 +75,16 @@ public class CollectNNRawDataBot extends Bot {
 	
 	public void updateRunnerCategoryData()
 	{
+		
+		if(! Utils.isValidWindow(getMd().getRunners().get(0), 120, 0))
+			return;
+		
+		int timeOffSet=0;
+		if(CategoriesParameters.clollect)
+			timeOffSet=1;
+		
 		int minuteToStart =getMinutesToStart();
-		if(!farActive && (minuteToStart<=10 && minuteToStart>=5))
+		if(!farActive && (minuteToStart<=(10 - timeOffSet) && minuteToStart>=(5 - timeOffSet)))
 		{
 			System.out.println("activating far");
 			
@@ -106,7 +116,7 @@ public class CollectNNRawDataBot extends Bot {
 			
 		}
 		
-		if(!mediumActive && (minuteToStart<=4 && minuteToStart>=2))
+		if(!mediumActive && (minuteToStart<=(4 - timeOffSet) && minuteToStart>=(2 - timeOffSet)))
 		{
 			mediumActive=true;
 			
@@ -137,7 +147,7 @@ public class CollectNNRawDataBot extends Bot {
 			}
 		}
 		
-		if(!nearActive && (minuteToStart<=1 && minuteToStart>=0))
+		if(!nearActive && (minuteToStart<=(1 - timeOffSet) && minuteToStart>=(0 - timeOffSet)))
 		{
 			nearActive=true;
 			

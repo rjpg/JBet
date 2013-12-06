@@ -32,10 +32,21 @@ public class Liquidity extends CategoryNode{
 		if(!active)
 			return false;
 		
-		if(Utils.getMatchedAmount(rd, 0)>=valueStart && Utils.getMatchedAmount(rd, 0)<=valueEnd)
-			return true;
+		if(CategoriesParameters.clollect && Utils.isValidWindow(rd, 120, 0))
+		{
+			if(Utils.getMatchedAmount(rd, 120)>=valueStart && Utils.getMatchedAmount(rd, 120)<=valueEnd)
+				return true;
+			else
+				return false;
+		}
 		else
-			return false;
+		{
+			if(Utils.getMatchedAmount(rd, 0)>=valueStart && Utils.getMatchedAmount(rd, 0)<=valueEnd)
+				return true;
+			else
+				return false;
+
+		}
 	}
 
 
