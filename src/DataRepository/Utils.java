@@ -308,7 +308,19 @@ public class Utils {
 		
 	}
 	
-	
+	public static RunnersData getFavorite(MarketData md,int pastFrame)
+	{
+		RunnersData rdLow=md.getRunners().get(0);
+		
+		for(RunnersData rdAux:md.getRunners())
+		{
+			if(Utils.getOddBackFrame(rdAux, pastFrame)<Utils.getOddBackFrame(rdLow, pastFrame))
+					rdLow=rdAux;
+		}
+		
+		return rdLow;
+		
+	}
 	
 	public static RunnersData getNeighbour(RunnersData rd)
 	{
@@ -323,6 +335,32 @@ public class Utils {
 			  if(rdaux!=rd)
 			  {
 				  double auxOdd=rdaux.getDataFrames().get(rdaux.getDataFrames().size()-1).getOddBack();
+				  int diff=Math.abs(Utils.oddToIndex(rdOdd)-Utils.oddToIndex(auxOdd));
+				  if(diff<neighbourOddDiff)
+				  {
+					  neighbourOddDiff=diff;
+					  neighbourAux=rdaux;
+				  }
+			  }
+		}
+		return neighbourAux;
+	}
+	
+	public static RunnersData getNeighbour(RunnersData rd, int pastFrame)
+	{
+		MarketData md=rd.getMarketData();
+		double rdOdd=getOddBackFrame(rd, pastFrame);
+				
+				
+		int neighbourOddDiff=Utils.oddToIndex(1000);
+		RunnersData neighbourAux=null;
+	
+		
+		for(RunnersData rdaux:md.getRunners())
+		{
+			  if(rdaux!=rd)
+			  {
+				  double auxOdd=getOddBackFrame(rdaux, pastFrame);
 				  int diff=Math.abs(Utils.oddToIndex(rdOdd)-Utils.oddToIndex(auxOdd));
 				  if(diff<neighbourOddDiff)
 				  {

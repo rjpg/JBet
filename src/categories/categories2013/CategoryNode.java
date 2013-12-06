@@ -123,11 +123,12 @@ public abstract class CategoryNode {
 		
 		for(CategoryNode cn:cat.getChilds())
 		{
-			//System.out.println("cat path : "+cn.getPath()+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
+			//System.out.println("cat path : "+getAncestorsStringPath(cn.getAncestors())+" Id start : "+cn.getIdStart()+" Id end : "+cn.getIdEnd());
 			if(cn.isRunnerOnThisCategory(rd))
 				return getAncestorsByRunner(cn,rd);
 		}
-			
+		
+		System.out.println("cat path : "+getAncestorsStringPath(cat.getAncestors())+" Id start : "+cat.getIdStart()+" Id end : "+cat.getIdEnd());
 		return null;
 	}
 	

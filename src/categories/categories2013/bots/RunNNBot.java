@@ -3,16 +3,15 @@ package categories.categories2013.bots;
 import java.awt.Color;
 import java.util.Vector;
 
-import categories.categories2013.CategoriesParameters;
-import categories.categories2013.CategoryNode;
-import categories.categories2013.Root;
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
-import DataRepository.Utils;
 import bots.Bot;
+import categories.categories2013.CategoriesParameters;
+import categories.categories2013.CategoryNode;
+import categories.categories2013.Root;
 
-public class CollectNNRawDataBot extends Bot {
+public class RunNNBot extends Bot {
 
 	
 	Root root=null;
@@ -24,15 +23,15 @@ public class CollectNNRawDataBot extends Bot {
 	Vector<RunnerCategoryData> rcdv=null;
 
 	
-	public CollectNNRawDataBot(MarketData md) {
-		super(md, "CollectNNRawData");
+	public RunNNBot(MarketData md) {
+		super(md, "RunNNBot");
 		initialize();
 	}
 
 	public void initialize()
 	{
 	
-		CategoriesParameters.clollect=true;
+		CategoriesParameters.clollect=false;
 		root=new Root(0);
 		CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
@@ -77,8 +76,7 @@ public class CollectNNRawDataBot extends Bot {
 	public void updateRunnerCategoryData()
 	{
 		
-		if(! Utils.isValidWindow(getMd().getRunners().get(0), 90, 0))
-			return;
+		
 		
 		int timeOffSet=0;
 		if(CategoriesParameters.clollect)
@@ -200,5 +198,6 @@ public class CollectNNRawDataBot extends Bot {
 		System.out.println("Bot "+getName()+" Msg :"+s);
 		
 	}
+
 
 }

@@ -29,15 +29,26 @@ public class Liquidity extends CategoryNode{
 	@Override
 	public boolean isRunnerOnThisCategory(RunnersData rd) {
 		
+		//System.out.println(" active : " + active);
 		if(!active)
 			return false;
+		//System.out.println("Matched Amount - "+ rd.getName()+" - "+ Utils.isValidWindow(rd, 120, 0) );
 		
-		if(CategoriesParameters.clollect && Utils.isValidWindow(rd, 120, 0))
+		if(CategoriesParameters.clollect  )
 		{
-			if(Utils.getMatchedAmount(rd, 120)>=valueStart && Utils.getMatchedAmount(rd, 120)<=valueEnd)
+			if(Utils.isValidWindow(rd, 90, 0))
+			{
+			System.out.println("Matched Amount - "+ rd.getName()+" - "+ Utils.getMatchedAmount(rd, 90) );
+			if(Utils.getMatchedAmount(rd, 90)>=valueStart && Utils.getMatchedAmount(rd, 90)<=valueEnd)
 				return true;
 			else
 				return false;
+			}
+			else
+			{
+				System.out.println("No Vald window to get Matched Amount - "+ rd.getName() );
+				return false;
+			}
 		}
 		else
 		{
