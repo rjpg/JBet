@@ -250,9 +250,9 @@ public class InterfaceNextGoal extends JFrame{
 			Display.println("Welcome to After Goal Correct Score Bot");
 			
 			try {
-				this.setUsername(Display.getStringAnswer("Betfair username:"));
+				//this.setUsername(Display.getStringAnswer("Betfair username:"));
 				//username="Kariff";
-				//username="376235";
+				username="birinhos";
 				//username="vedatrade1978";
 				this.setPassword(Display.getStringAnswer("Betfair password ("+username+"):"));
 			} catch (IOException e1) {
@@ -368,7 +368,7 @@ public class InterfaceNextGoal extends JFrame{
 				if(day>9)
 					fixturesToday+=day;
 				else
-					fixturesToday+="0"+day+" "+sdf.format(now.getTime());
+					fixturesToday+="0"+day;//+" ";//+sdf.format(now.getTime());
 				//Calendar.AUGUST
 				
 				fixturesToday+=" "+months[month];

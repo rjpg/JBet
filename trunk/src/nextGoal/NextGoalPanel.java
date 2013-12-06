@@ -4,6 +4,7 @@ import generated.exchange.BFExchangeServiceStub.ArrayOfPlaceBets;
 import generated.exchange.BFExchangeServiceStub.BetCategoryTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetPersistenceTypeEnum;
 import generated.exchange.BFExchangeServiceStub.BetTypeEnum;
+import generated.exchange.BFExchangeServiceStub.GetAccountFundsResp;
 import generated.exchange.BFExchangeServiceStub.MarketStatusEnum;
 import generated.exchange.BFExchangeServiceStub.PlaceBets;
 import generated.exchange.BFExchangeServiceStub.PlaceBetsE;
@@ -37,6 +38,7 @@ import main.Manager;
 import nextGoal.InterfaceNextGoal.MarketThread;
 
 import demo.util.APIContext;
+import demo.util.Display;
 import demo.util.InflatedMarketPrices;
 import demo.util.InflatedMarketPrices.InflatedPrice;
 import demo.util.InflatedMarketPrices.InflatedRunner;
@@ -47,13 +49,12 @@ import DataRepository.Utils;
 
 public class NextGoalPanel extends JPanel {
 
-	public static Double[] stakes={2.00,5.00,7.00,10.00,20.00,50.00,100.00,200.00,500.00,1000.000};
+	public static Double[] stakes={2.00,5.00,7.00,10.00,20.00,30.00,40.00,50.00,100.00,200.00,500.00,1000.000};
 	
 	public Score prev;
 	public Score actual;
 	
-	public Score next;
-	public Score impossible; 
+	 
 	// Interface
 	public JLabel prevScoreLegendLabel = new JLabel("Prev(Lay):",JLabel.RIGHT);
 	public JLabel prevScore = new JLabel("Previous Score:",JLabel.RIGHT);
@@ -65,27 +66,8 @@ public class NextGoalPanel extends JPanel {
 	public JCheckBox prevCheck=new JCheckBox("Process Lay",false);
 	public int prevSelectionId=0;
 	
-	public JLabel simetricScoreLegendLabel = new JLabel("Simetric(Lay):",JLabel.RIGHT);
-	public JLabel simetricScore = new JLabel("Impossible Score:",JLabel.RIGHT);
-	public JLabel simetricScoreLabel=null;
-	public JLabel simetricScoreOddLabel = new JLabel("Odd:",JLabel.RIGHT);
-	public JComboBox<OddObj> simetricScoreComboOdd;
-	public JLabel simetricScoreStakeLabel = new JLabel("Stake:",JLabel.RIGHT);
-	public JComboBox<Double> simetricScoreComboStake;
-	public JCheckBox simetricCheck=new JCheckBox("Process Lay",false);
-	public int simetricSelectionId=0;
 	
-	public JLabel otherScoreLegendLabel = new JLabel("Other team goal (Lay):",JLabel.RIGHT);
-	public JLabel otherScore = new JLabel("Impossible Score:",JLabel.RIGHT);
-	public JLabel otherScoreLabel=null;
-	public JLabel otherScoreOddLabel = new JLabel("Odd:",JLabel.RIGHT);
-	public JComboBox<OddObj> otherScoreComboOdd;
-	public JLabel otherScoreStakeLabel = new JLabel("Stake:",JLabel.RIGHT);
-	public JComboBox<Double> otherScoreComboStake;
-	public JCheckBox otherCheck=new JCheckBox("Process Lay",false);
-	public int otherSelectionId=0;
-	
-	public JLabel actualScoreLegendLabel = new JLabel("Actual(Back):",JLabel.RIGHT);
+	public JLabel actualScoreLegendLabel = new JLabel("Actual(Lays):",JLabel.RIGHT);
 	public JLabel actualScore = new JLabel("Actual Score:",JLabel.RIGHT);
 	public JLabel actualScoreLabel=null;
 	public JLabel actualScoreOddLabel = new JLabel("Odd:",JLabel.RIGHT);
@@ -95,22 +77,13 @@ public class NextGoalPanel extends JPanel {
 	public JCheckBox actualCheck=new JCheckBox("Process Back",false);
 	public int actualSelectionId=0;
 	
-	public JLabel nextScoreLegendLabel = new JLabel("Next(Back):",JLabel.RIGHT);
-	public JLabel nextScore = new JLabel("Next Score:",JLabel.RIGHT);
-	public JLabel nextScoreLabel=null;
-	public JLabel nextScoreOddLabel = new JLabel("Odd:",JLabel.RIGHT);
-	public JComboBox<OddObj> nextScoreComboOdd;
-	public JLabel nextScoreStakeLabel = new JLabel("Stake:",JLabel.RIGHT);
-	public JComboBox<Double> nextScoreComboStake;
-	public JCheckBox nextCheck=new JCheckBox("Process Back",false);
-	public int nextSelectionId=0;
-	
-	
 	
 	public JPanel centralPanel;
 	public JButton process;
 	
 	public String title;
+	
+	public double balance=0.00;
 	
 	// THREAD
 	private MarketThread as;
@@ -145,7 +118,7 @@ public class NextGoalPanel extends JPanel {
 		if(centralPanel==null)
 		{
 			centralPanel=new JPanel();
-			centralPanel.setLayout(new GridLayout(5,7));
+			centralPanel.setLayout(new GridLayout(2,7));
 			
 			prevScoreLabel=new JLabel("",JLabel.CENTER);
 			
@@ -153,30 +126,14 @@ public class NextGoalPanel extends JPanel {
 			actualScoreLabel.setBackground(Color.GREEN);
 			actualScoreLabel.setOpaque(true);
 			
-			nextScoreLabel=new JLabel("",JLabel.CENTER);
-			
-			simetricScoreLabel=new JLabel("",JLabel.CENTER);
-			
-			otherScoreLabel=new JLabel("",JLabel.CENTER);
-			
 			prevScoreComboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
 			prevScoreComboOdd.setMaximumRowCount(30);
 			actualScoreComboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
 			actualScoreComboOdd.setMaximumRowCount(30);
-			nextScoreComboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
-			nextScoreComboOdd.setMaximumRowCount(30);
-			simetricScoreComboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
-			simetricScoreComboOdd.setMaximumRowCount(30);
-			otherScoreComboOdd=new JComboBox<OddObj>(Utils.getLadderOddObj());
-			otherScoreComboOdd.setMaximumRowCount(30);
-			
 			
 			prevScoreComboStake=new JComboBox<Double>(stakes);
 			actualScoreComboStake=new JComboBox<Double>(stakes);
-			nextScoreComboStake=new JComboBox<Double>(stakes);
-			simetricScoreComboStake=new JComboBox<Double>(stakes);
-			otherScoreComboStake=new JComboBox<Double>(stakes);
-			
+
 			centralPanel.add(actualScoreLegendLabel);
 			centralPanel.add(actualScoreLabel);
 			centralPanel.add(actualScoreOddLabel);
@@ -185,14 +142,6 @@ public class NextGoalPanel extends JPanel {
 			centralPanel.add(actualScoreComboStake);
 			centralPanel.add(actualCheck);
 			
-			centralPanel.add(nextScoreLegendLabel);
-			centralPanel.add(nextScoreLabel);
-			centralPanel.add(nextScoreOddLabel);
-			centralPanel.add(nextScoreComboOdd);
-			centralPanel.add(nextScoreStakeLabel);
-			centralPanel.add(nextScoreComboStake);
-			centralPanel.add(nextCheck);
-			
 			centralPanel.add(prevScoreLegendLabel);
 			centralPanel.add(prevScoreLabel);
 			centralPanel.add(prevScoreOddLabel);
@@ -200,25 +149,6 @@ public class NextGoalPanel extends JPanel {
 			centralPanel.add(prevScoreStakeLabel);
 			centralPanel.add(prevScoreComboStake);
 			centralPanel.add(prevCheck);
-			
-			centralPanel.add(simetricScoreLegendLabel);
-			centralPanel.add(simetricScoreLabel);
-			centralPanel.add(simetricScoreOddLabel);		 
-			centralPanel.add(simetricScoreComboOdd);
-			centralPanel.add(simetricScoreStakeLabel);
-			centralPanel.add(simetricScoreComboStake);
-			centralPanel.add(simetricCheck);
-			
-			centralPanel.add(otherScoreLegendLabel);
-			centralPanel.add(otherScoreLabel);
-			centralPanel.add(otherScoreOddLabel);		 
-			centralPanel.add(otherScoreComboOdd);
-			centralPanel.add(otherScoreStakeLabel);
-			centralPanel.add(otherScoreComboStake);
-			centralPanel.add(otherCheck);
-			
-			
-			
 			
 	
 		}
@@ -240,35 +170,23 @@ public class NextGoalPanel extends JPanel {
 					InterfaceNextGoal.msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.BLUE);
 					if(actualCheck.isSelected())
 					{
-						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(actualSelectionId)+" B "+(Double)actualScoreComboStake.getSelectedItem()+" @ "+((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
+						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(actualSelectionId)+" L "+(Double)actualScoreComboStake.getSelectedItem()+" @ "+((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
 						
 					}
-					if(nextCheck.isSelected())
-					{
-						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(nextSelectionId)+" B "+(Double)nextScoreComboStake.getSelectedItem()+" @ "+((OddObj)nextScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
-						
-					}
-					
 					if(prevCheck.isSelected())
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(prevSelectionId)+" L "+(Double)prevScoreComboStake.getSelectedItem()+" @ "+((OddObj)prevScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
 					}
 					
-					if(simetricCheck.isSelected())
-					{
-						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(simetricSelectionId)+" L "+(Double)simetricScoreComboStake.getSelectedItem()+" @ "+((OddObj)simetricScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
-					}
-					
-					if(otherCheck.isSelected())
-					{
-						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(otherSelectionId)+" L "+(Double)otherScoreComboStake.getSelectedItem()+" @ "+((OddObj)otherScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
-					}
 					
 					InterfaceNextGoal.msjf.writeMessageText(" ----------------------------------------------------" , Color.BLUE);
 					
 					if(JOptionPane.showConfirmDialog(null, "Process Bets for "+actual+" result ?")==0)
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Starting the Goal process", Color.BLUE);
+						refreshAccountFunds();
+						
+						System.out.println("balance = "+balance);
 						
 						NextGoalPanel.this.startPolling();
 						
@@ -287,17 +205,6 @@ public class NextGoalPanel extends JPanel {
 	public void setScores(Score prevA,Score actualA)
 	{
 		
-		nextScoreLegendLabel.setEnabled(true);
-		nextScoreLabel.setEnabled(true);
-		nextScoreOddLabel.setEnabled(true); 
-		nextScoreComboOdd.setEnabled(true);
-		nextScoreStakeLabel.setEnabled(true);
-		nextScoreComboStake.setEnabled(true);
-		nextCheck.setSelected(false);
-		nextCheck.setEnabled(true);
-		
-		nextScoreComboOdd.setSelectedItem(Utils.getOddObjByOdd(1000));
-		nextScoreComboOdd.repaint();
 
 		actualScoreLegendLabel.setEnabled(true);
 		actualScoreLabel.setEnabled(true);
@@ -308,26 +215,6 @@ public class NextGoalPanel extends JPanel {
 		actualCheck.setSelected(false);
 		actualCheck.setEnabled(true);
 
-		otherScoreLegendLabel.setEnabled(true);
-		otherScoreLabel.setEnabled(true);
-		otherScoreOddLabel.setEnabled(true); 
-		otherScoreComboOdd.setEnabled(true);
-		otherScoreStakeLabel.setEnabled(true);
-		otherScoreComboStake.setEnabled(true);
-		otherCheck.setSelected(false);
-		otherCheck.setEnabled(true);
-
-		simetricScoreLegendLabel.setEnabled(true);
-		simetricScoreLabel.setEnabled(true);
-		simetricScoreOddLabel.setEnabled(true); 
-		simetricScoreComboOdd.setEnabled(true);
-		simetricScoreStakeLabel.setEnabled(true);
-		simetricScoreComboStake.setEnabled(true);
-		simetricCheck.setSelected(false);
-		simetricCheck.setEnabled(true);
-		
-		simetricScoreComboOdd.setSelectedItem(Utils.getOddObjByOdd(20));
-		simetricScoreComboOdd.repaint();
 	
 		prevScoreLegendLabel.setEnabled(true);
 		prevScoreLabel.setEnabled(true);
@@ -358,120 +245,26 @@ public class NextGoalPanel extends JPanel {
 		
 		
 		
-		Score other;
 		
 		prevScoreLabel.setText(""+prev);
 		actualScoreLabel.setText(""+actual);
 		
-		if(prev.goalA<actual.goalA)
-		{
-			nextScoreLabel.setText(""+actual.getNextScoreA());
-			other=prev.getNextScoreB();
-		}
-		else
-		{
-			nextScoreLabel.setText(""+actual.getNextScoreB());
-			other=prev.getNextScoreA();
-		}
 		
-		simetricScoreLabel.setText(""+actual.getSimetricScore());
-		
-		boolean deactivateSimetric=false;
-		
-		if(actual.goalA==actual.goalB)
-		{
-			deactivateSimetric=true;
-			simetricScoreLegendLabel.setEnabled(false);
-			simetricScoreLabel.setEnabled(false);
-			simetricScoreOddLabel.setEnabled(false); 
-			simetricScoreComboOdd.setEnabled(false);
-			simetricScoreStakeLabel.setEnabled(false);
-			simetricScoreComboStake.setEnabled(false);
-			simetricCheck.setSelected(false);
-			simetricCheck.setEnabled(false);
-		}
-		else
-		{
-			simetricScoreLegendLabel.setEnabled(true);
-			simetricScoreLabel.setEnabled(true);
-			simetricScoreOddLabel.setEnabled(true); 
-			simetricScoreComboOdd.setEnabled(true);
-			simetricScoreStakeLabel.setEnabled(true);
-			simetricScoreComboStake.setEnabled(true);
-			//simetricCheck.setSelected(true);
-			simetricCheck.setEnabled(true);
-		}
-		
-		otherScoreLabel.setText(""+other);
-		if(!deactivateSimetric)
-		{
-			if(other.goalA==actual.getSimetricScore().goalA && other.goalB==actual.getSimetricScore().goalB )
-			{
-				simetricScoreLegendLabel.setEnabled(false);
-				simetricScoreLabel.setEnabled(false);
-				simetricScoreOddLabel.setEnabled(false); 
-				simetricScoreComboOdd.setEnabled(false);
-				simetricScoreStakeLabel.setEnabled(false);
-				simetricScoreComboStake.setEnabled(false);
-				simetricCheck.setSelected(false);
-				simetricCheck.setEnabled(false);
-			}
-			else
-			{
-				simetricScoreLegendLabel.setEnabled(true);
-				simetricScoreLabel.setEnabled(true);
-				simetricScoreOddLabel.setEnabled(true); 
-				simetricScoreComboOdd.setEnabled(true);
-				simetricScoreStakeLabel.setEnabled(true);
-				simetricScoreComboStake.setEnabled(true);
-				//otherCheck.setSelected(true);
-				simetricCheck.setEnabled(true);
-			}
-		}
 		prevSelectionId=0;
-		simetricSelectionId=0;
-		otherSelectionId=0;
 		actualSelectionId=0;
-		nextSelectionId=0;
 		
 		for (Runner mr : InterfaceNextGoal.correctScoreMarket.getRunners().getRunner()) {
 			if (mr.getName().endsWith(prevScoreLabel.getText())) 
 			{
 				prevSelectionId=mr.getSelectionId();
 			}
-			if (mr.getName().endsWith(simetricScoreLabel.getText())) 
-			{
-				simetricSelectionId=mr.getSelectionId();
-			}
-			
-			if (mr.getName().endsWith(otherScoreLabel.getText())) 
-			{
-				otherSelectionId=mr.getSelectionId();
-			}
 			
 			if (mr.getName().endsWith(actualScoreLabel.getText())) 
 			{
 				actualSelectionId=mr.getSelectionId();
 			}
-			
-			if (mr.getName().endsWith(nextScoreLabel.getText())) 
-			{
-				nextSelectionId=mr.getSelectionId();
-			}
-			
 		}
 		
-		if(nextScoreLabel.getText().equals("Any Uncoted"))
-		{
-			nextScoreLegendLabel.setEnabled(false);
-			nextScoreLabel.setEnabled(false);
-			nextScoreOddLabel.setEnabled(false); 
-			nextScoreComboOdd.setEnabled(false);
-			nextScoreStakeLabel.setEnabled(false);
-			nextScoreComboStake.setEnabled(false);
-			nextCheck.setSelected(false);
-			nextCheck.setEnabled(false);
-		}
 		
 		if(actualScoreLabel.getText().equals("Any Uncoted"))
 		{
@@ -483,30 +276,6 @@ public class NextGoalPanel extends JPanel {
 			actualScoreComboStake.setEnabled(false);
 			actualCheck.setSelected(false);
 			actualCheck.setEnabled(false);
-		}
-		
-		if(otherScoreLabel.getText().equals("Any Uncoted"))
-		{
-			otherScoreLegendLabel.setEnabled(false);
-			otherScoreLabel.setEnabled(false);
-			otherScoreOddLabel.setEnabled(false); 
-			otherScoreComboOdd.setEnabled(false);
-			otherScoreStakeLabel.setEnabled(false);
-			otherScoreComboStake.setEnabled(false);
-			otherCheck.setSelected(false);
-			otherCheck.setEnabled(false);
-		}
-		
-		if(simetricScoreLabel.getText().equals("Any Uncoted"))
-		{
-			simetricScoreLegendLabel.setEnabled(false);
-			simetricScoreLabel.setEnabled(false);
-			simetricScoreOddLabel.setEnabled(false); 
-			simetricScoreComboOdd.setEnabled(false);
-			simetricScoreStakeLabel.setEnabled(false);
-			simetricScoreComboStake.setEnabled(false);
-			simetricCheck.setSelected(false);
-			simetricCheck.setEnabled(false);
 		}
 		
 		if(prevScoreLabel.getText().equals("Any Uncoted"))
@@ -560,7 +329,7 @@ public class NextGoalPanel extends JPanel {
 					otherScoreComboOdd.repaint();
 					*/
 					
-					double actualOddShift = Utils.indexToOdd(Utils.oddToIndex(p.getPrice())+5);
+					double actualOddShift = Utils.indexToOdd(Utils.oddToIndex(p.getPrice())-4);
 					actualScoreComboOdd.setSelectedItem(Utils.getOddObjByOdd(actualOddShift));
 					actualScoreComboOdd.repaint();
 					
@@ -638,14 +407,30 @@ public class NextGoalPanel extends JPanel {
 						Vector<PlaceBets> bets=new Vector<PlaceBets>();
 						if(actualCheck.isSelected())
 						{
-							bets.add(createBet(actualSelectionId, ((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd(),(Double)actualScoreComboStake.getSelectedItem(), "B"));
+							double amountSpend=0;
+							
+							double odd=((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd();
+							double stake=(Double)actualScoreComboStake.getSelectedItem();
+							
+							amountSpend+=stake*(odd-1);
+							
+							double max=8000.00;
+							
+							if(max>balance)
+								max=balance;
+							
+							while (odd>=4.0 && amountSpend<max )
+							{
+								bets.add(createBet(actualSelectionId, odd,stake, "L"));
+								amountSpend+=stake*(odd-1);
+								odd=Utils.indexToOdd(Utils.oddToIndex(odd)-2);
+							}
+							
+							
+							
+							
 							//(new HelloRunnable())).start()
 							//(new Thread(new betPlacer(actualSelectionId,((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd(),(Double)actualScoreComboStake.getSelectedItem(),"B"))).start();
-						}
-						if(nextCheck.isSelected())
-						{
-							bets.add(createBet(nextSelectionId,((OddObj)nextScoreComboOdd.getSelectedItem()).getOdd(),(Double)nextScoreComboStake.getSelectedItem(),"B"));
-							//(new Thread(new betPlacer(nextSelectionId,((OddObj)nextScoreComboOdd.getSelectedItem()).getOdd(),(Double)nextScoreComboStake.getSelectedItem(),"B"))).start();
 						}
 						
 						if(prevCheck.isSelected())
@@ -653,22 +438,17 @@ public class NextGoalPanel extends JPanel {
 							bets.add(createBet(prevSelectionId,((OddObj)prevScoreComboOdd.getSelectedItem()).getOdd(),(Double)prevScoreComboStake.getSelectedItem(),"L"));
 							//(new Thread(new betPlacer(prevSelectionId,((OddObj)prevScoreComboOdd.getSelectedItem()).getOdd(),(Double)prevScoreComboStake.getSelectedItem(),"L"))).start();
 						}
-						
-						if(simetricCheck.isSelected())
-						{
-							bets.add(createBet(simetricSelectionId,((OddObj)simetricScoreComboOdd.getSelectedItem()).getOdd(),(Double)simetricScoreComboStake.getSelectedItem(),"L"));
-							//(new Thread(new betPlacer(simetricSelectionId,((OddObj)simetricScoreComboOdd.getSelectedItem()).getOdd(),(Double)simetricScoreComboStake.getSelectedItem(),"L"))).start();
-						}
-						
-						if(otherCheck.isSelected())
-						{
-							bets.add(createBet(otherSelectionId,((OddObj)otherScoreComboOdd.getSelectedItem()).getOdd(),(Double)otherScoreComboStake.getSelectedItem(),"L"));
-							//(new Thread(new betPlacer(otherSelectionId,((OddObj)otherScoreComboOdd.getSelectedItem()).getOdd(),(Double)otherScoreComboStake.getSelectedItem(),"L"))).start();
-						}
+
 						
 						if(bets.size()>0)
 						{
 							InterfaceNextGoal.msjf.writeMessageText("Placing Bets", Color.BLUE);
+							
+							for(PlaceBets pb:bets)
+							{
+								InterfaceNextGoal.msjf.writeMessageText("Placing bet :"+pb.getSelectionId()+"  "+pb.getSize()+" @ "+pb.getPrice()+"  "+pb.getBetType(), Color.ORANGE);
+							}
+							
 							placeBets(bets);
 						}
 						else
@@ -749,6 +529,21 @@ public class NextGoalPanel extends JPanel {
 		return bet;
 	}
 	
+	public int refreshAccountFunds() {
+		GetAccountFundsResp funds=null;
+		try {
+			funds = ExchangeAPI.getAccountFunds(InterfaceNextGoal.selectedExchange,
+					InterfaceNextGoal.apiContext);
+		} catch (Exception e) {
+			Display.showException("*** Failed to Refresh Account Funds", e);
+			return -1;
+		}
+		
+		balance=funds.getAvailBalance();
+		return 0;
+		
+	}
+	
 	public void placeBets(Vector<PlaceBets> betsA) {
 		System.out.println("placing Bets");
 		long id = 0;
@@ -759,7 +554,7 @@ public class NextGoalPanel extends JPanel {
 		int attempts = 0;
 		while (attempts < 3 && betResult == null) {
 			InterfaceNextGoal.msjf.writeMessageText(
-					"ExchangeAPI.placeBets(Back) Attempt :" + attempts,
+					"ExchangeAPI.placeBets Attempt :" + attempts,
 					Color.BLUE);
 			try {
 
