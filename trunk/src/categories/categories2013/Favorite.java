@@ -28,17 +28,42 @@ public class Favorite extends CategoryNode{
 	@Override
 	public boolean isRunnerOnThisCategory(RunnersData rd) {
 		
-		RunnersData rdLow = rd.getMarketData().getRunners().get(0);
-
-		for (RunnersData rdAux : rd.getMarketData().getRunners())
-			if (Utils.getOddBackFrame(rdAux, 0) < Utils.getOddBackFrame(
-					rdLow, 0))
-				rdLow = rdAux;
-		
-		if(Utils.getOddBackFrame(rdLow, 0)>=oddStart && Utils.getOddBackFrame(rdLow, 0)<=oddEnd)
-			return true;
+		if(CategoriesParameters.clollect  )
+		{
+			if(Utils.isValidWindow(rd, 90, 0))
+			{
+				RunnersData rdLow = rd.getMarketData().getRunners().get(0);
+				
+				for (RunnersData rdAux : rd.getMarketData().getRunners())
+					if (Utils.getOddBackFrame(rdAux, 90) < Utils.getOddBackFrame(
+							rdLow, 90))
+						rdLow = rdAux;
+				
+				if(Utils.getOddBackFrame(rdLow, 90)>=oddStart && Utils.getOddBackFrame(rdLow, 90)<=oddEnd)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				System.out.println("No Vald window to get Favorite - "+ rd.getName() );
+				return false;
+			}
+		}
 		else
-			return false;
+		{
+			RunnersData rdLow = rd.getMarketData().getRunners().get(0);
+	
+			for (RunnersData rdAux : rd.getMarketData().getRunners())
+				if (Utils.getOddBackFrame(rdAux, 0) < Utils.getOddBackFrame(
+						rdLow, 0))
+					rdLow = rdAux;
+			
+			if(Utils.getOddBackFrame(rdLow, 0)>=oddStart && Utils.getOddBackFrame(rdLow, 0)<=oddEnd)
+				return true;
+			else
+				return false;
+		}
 	}
 
 

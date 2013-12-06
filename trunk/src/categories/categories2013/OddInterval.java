@@ -60,11 +60,11 @@ public class OddInterval extends CategoryNode{
 			if(recordsNumber>=500)
 				flagActivate=true;
 			
-			//System.out.println("On "+fileName+" \nNumber of records = "+recordsNumber+"\nFirst Interval = "+firstInterval+"\nSecond Interval = "+secondInterval);
-			//if(flagActivate)
-			//	System.out.println("1");
-			//else
-			//	System.out.println("0");
+			System.out.println("On "+fileName+" \nNumber of records = "+recordsNumber+"\nFirst Interval = "+firstInterval+"\nSecond Interval = "+secondInterval);
+			if(flagActivate)
+				System.out.println("1");
+			else
+				System.out.println("0");
 			
 			addChild(new Liquidity(getAncestors(),0, firstInterval, "lowLiquidity",flagActivate));
 			addChild(new Liquidity(getAncestors(),firstInterval+0.01, secondInterval, "mediumLiquidity",flagActivate));
@@ -94,11 +94,33 @@ public class OddInterval extends CategoryNode{
 	}
 
 	@Override
-	public boolean isRunnerOnThisCategory(RunnersData rd) {
-		if(Utils.getOddBackFrame(rd, 0)>=oddStart && Utils.getOddBackFrame(rd, 0)<=oddEnd)
-			return true;
+	public boolean isRunnerOnThisCategory(RunnersData rd) 
+	{
+		//System.out.println("testing odd - "+ rd.getName()+" - "+ Utils.getOddBackFrame(rd, 0)); 
+		
+		if(CategoriesParameters.clollect  )
+		{
+			if(Utils.isValidWindow(rd, 90, 0))
+			{
+				if(Utils.getOddBackFrame(rd, 90)>=oddStart && Utils.getOddBackFrame(rd, 90)<=oddEnd)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				System.out.println("No Vald window to get Favorite - "+ rd.getName() );
+				return false;
+			}
+		}
 		else
-			return false;
+		{
+		
+			if(Utils.getOddBackFrame(rd, 0)>=oddStart && Utils.getOddBackFrame(rd, 0)<=oddEnd)
+				return true;
+			else
+				return false;
+		}
 	}
 
 
