@@ -37,8 +37,12 @@ public class TimePreLive extends CategoryNode{
 		
 		//System.out.println("minute to start "+minuteToStart);
 		
-		if(minuteToStart<=minuteStartInterval &&
-				minuteToStart>=minuteEndInterval)
+		int timeOffSet=0;
+		if(CategoriesParameters.clollect)
+			timeOffSet=1;
+		
+		if(minuteToStart<=(minuteStartInterval - timeOffSet) &&
+				minuteToStart>=(minuteEndInterval - timeOffSet))
 			return true;
 		else
 			return false;
