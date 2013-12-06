@@ -64,7 +64,7 @@ public class LoginEnvironment {
 		return 0;
 	}
 	
-	private int refreshAccountFunds() {
+	public int refreshAccountFunds() {
 		try {
 			funds = ExchangeAPI.getAccountFunds(getSelectedExchange(), getApiContext());
 		} catch (Exception e) {
