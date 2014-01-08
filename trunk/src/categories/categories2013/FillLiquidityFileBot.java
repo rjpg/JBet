@@ -29,6 +29,7 @@ public class FillLiquidityFileBot extends Bot{
 	public void initialize()
 	{
 
+		CategoriesParameters.clollect=false;
 		
 		CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);

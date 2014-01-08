@@ -30,16 +30,16 @@ public class Favorite extends CategoryNode{
 		
 		if(CategoriesParameters.clollect  )
 		{
-			if(Utils.isValidWindow(rd, 90, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
 			{
 				RunnersData rdLow = rd.getMarketData().getRunners().get(0);
 				
 				for (RunnersData rdAux : rd.getMarketData().getRunners())
-					if (Utils.getOddBackFrame(rdAux, 90) < Utils.getOddBackFrame(
-							rdLow, 90))
+					if (Utils.getOddBackFrame(rdAux, CategoriesParameters.framesPrediction) < Utils.getOddBackFrame(
+							rdLow, CategoriesParameters.framesPrediction))
 						rdLow = rdAux;
 				
-				if(Utils.getOddBackFrame(rdLow, 90)>=oddStart && Utils.getOddBackFrame(rdLow, 90)<=oddEnd)
+				if(Utils.getOddBackFrame(rdLow, CategoriesParameters.framesPrediction)>=oddStart && Utils.getOddBackFrame(rdLow, CategoriesParameters.framesPrediction)<=oddEnd)
 					return true;
 				else
 					return false;
