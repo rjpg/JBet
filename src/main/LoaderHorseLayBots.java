@@ -314,7 +314,7 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					olo3.setLiquidityLow(4823.89);
 					olo3.setLiquidityHigh(992794.4733333333);
 					
-					olov.add(olo3);
+					//olov.add(olo3);
 					
 					HorseLayOptions olo4=new HorseLayOptions(false,6,7);
 					olo4.setEntryOdd(6);
@@ -743,7 +743,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
-		Parameters.graphicalInterface=true; 
+		Parameters.graphicalInterface=false; 
 		Parameters.graphicalInterfaceBots=false; 
 		Parameters.amountBot=false;  
 		Parameters.manualBot=false; 

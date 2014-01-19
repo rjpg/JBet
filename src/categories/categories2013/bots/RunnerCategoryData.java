@@ -23,21 +23,28 @@ public class RunnerCategoryData {
 		if(CategoriesParameters.clollect)
 		{
 			System.out.println("favorite : "+cat.get(6).getPath());
-			
-			if(cat.get(2).getPath().equals("nofavorite"))
+			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
 			{
-				neighbour=Utils.getNeighbour(rd,90);
-				System.out.println("no favorite : "+neighbour.getName());
-				
+				if(cat.get(2).getPath().equals("nofavorite"))
+				{
+					neighbour=Utils.getNeighbour(rd,CategoriesParameters.framesPrediction);
+					System.out.println("no favorite : "+neighbour.getName());
+					
+				}
+				else
+				{
+					if(cat.get(6).getPath().equals("lowOdd"))
+						neighbour=Utils.getNeighbour(rd,CategoriesParameters.framesPrediction);
+					else
+						neighbour=Utils.getFavorite(rd.getMarketData(),CategoriesParameters.framesPrediction);
+					
+					System.out.println("has favorite : "+neighbour.getName());
+				}
 			}
 			else
 			{
-				if(cat.get(6).getPath().equals("lowOdd"))
-					neighbour=Utils.getNeighbour(rd,90);
-				else
-					neighbour=Utils.getFavorite(rd.getMarketData(),90);
+				System.out.println("RunnerCategoryData - No Vald window to get neighbour - "+ rd.getName() );
 				
-				System.out.println("has favorite : "+neighbour.getName());
 			}
 		}
 		else

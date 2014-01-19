@@ -32,6 +32,7 @@ public class FillLiquidityFileBot extends Bot{
 		CategoriesParameters.clollect=false;
 		
 		CategoryNode.printIDs(root);
+		
 		//CategoryNode.buildDirectories(root);
 		
 		//Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);

@@ -82,8 +82,10 @@ public class CollectNNRawDataBot extends Bot {
 		
 		int timeOffSet=0;
 		if(CategoriesParameters.clollect)
-			timeOffSet=1;
-		
+		{
+			timeOffSet=CategoriesParameters.minutesPrediction;
+		}
+
 		int minuteToStart =getMinutesToStart();
 		if(!farActive && (minuteToStart<=(10 - timeOffSet) && minuteToStart>=(5 - timeOffSet)))
 		{

@@ -100,9 +100,9 @@ public class OddInterval extends CategoryNode{
 		
 		if(CategoriesParameters.clollect  )
 		{
-			if(Utils.isValidWindow(rd, 90, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
 			{
-				if(Utils.getOddBackFrame(rd, 90)>=oddStart && Utils.getOddBackFrame(rd, 90)<=oddEnd)
+				if(Utils.getOddBackFrame(rd, CategoriesParameters.framesPrediction)>=oddStart && Utils.getOddBackFrame(rd, CategoriesParameters.framesPrediction)<=oddEnd)
 					return true;
 				else
 					return false;
