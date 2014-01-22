@@ -98,11 +98,11 @@ public class OddInterval extends CategoryNode{
 	{
 		//System.out.println("testing odd - "+ rd.getName()+" - "+ Utils.getOddBackFrame(rd, 0)); 
 		
-		if(CategoriesParameters.clollect  )
+		if(CategoriesParameters.COLLECT  )
 		{
-			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.FRAMES_PREDICTION, 0))
 			{
-				if(Utils.getOddBackFrame(rd, CategoriesParameters.framesPrediction)>=oddStart && Utils.getOddBackFrame(rd, CategoriesParameters.framesPrediction)<=oddEnd)
+				if(Utils.getOddBackFrame(rd, CategoriesParameters.FRAMES_PREDICTION)>=oddStart && Utils.getOddBackFrame(rd, CategoriesParameters.FRAMES_PREDICTION)<=oddEnd)
 					return true;
 				else
 					return false;

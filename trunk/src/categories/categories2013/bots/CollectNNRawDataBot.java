@@ -32,7 +32,7 @@ public class CollectNNRawDataBot extends Bot {
 	public void initialize()
 	{
 	
-		CategoriesParameters.clollect=true;
+		CategoriesParameters.COLLECT=true;
 		root=new Root(0);
 		CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
@@ -81,9 +81,9 @@ public class CollectNNRawDataBot extends Bot {
 			return;
 		
 		int timeOffSet=0;
-		if(CategoriesParameters.clollect)
+		if(CategoriesParameters.COLLECT)
 		{
-			timeOffSet=CategoriesParameters.minutesPrediction;
+			timeOffSet=CategoriesParameters.MINUTES_PREDICTION;
 		}
 
 		int minuteToStart =getMinutesToStart();

@@ -1,6 +1,5 @@
 package categories.categories2013.bots;
 
-import java.awt.Color;
 import java.util.Vector;
 
 import DataRepository.RunnersData;
@@ -16,27 +15,29 @@ public class RunnerCategoryData {
 	
 	RunnersData neighbour;
 	
+	
+	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
 		cat=catA;
 		
-		if(CategoriesParameters.clollect)
+		if(CategoriesParameters.COLLECT)
 		{
 			System.out.println("favorite : "+cat.get(6).getPath());
-			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.FRAMES_PREDICTION, 0))
 			{
 				if(cat.get(2).getPath().equals("nofavorite"))
 				{
-					neighbour=Utils.getNeighbour(rd,CategoriesParameters.framesPrediction);
+					neighbour=Utils.getNeighbour(rd,CategoriesParameters.FRAMES_PREDICTION);
 					System.out.println("no favorite : "+neighbour.getName());
 					
 				}
 				else
 				{
 					if(cat.get(6).getPath().equals("lowOdd"))
-						neighbour=Utils.getNeighbour(rd,CategoriesParameters.framesPrediction);
+						neighbour=Utils.getNeighbour(rd,CategoriesParameters.FRAMES_PREDICTION);
 					else
-						neighbour=Utils.getFavorite(rd.getMarketData(),CategoriesParameters.framesPrediction);
+						neighbour=Utils.getFavorite(rd.getMarketData(),CategoriesParameters.FRAMES_PREDICTION);
 					
 					System.out.println("has favorite : "+neighbour.getName());
 				}

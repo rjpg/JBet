@@ -34,12 +34,12 @@ public class Liquidity extends CategoryNode{
 			return false;
 		//System.out.println("Matched Amount - "+ rd.getName()+" - "+ Utils.isValidWindow(rd, 120, 0) );
 		
-		if(CategoriesParameters.clollect)
+		if(CategoriesParameters.COLLECT)
 		{
-			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.FRAMES_PREDICTION, 0))
 			{
 				System.out.println("Matched Amount - "+ rd.getName()+" - "+ Utils.getMatchedAmount(rd, 90) );
-				if(Utils.getMatchedAmount(rd, CategoriesParameters.framesPrediction)>=valueStart && Utils.getMatchedAmount(rd, CategoriesParameters.framesPrediction)<=valueEnd)
+				if(Utils.getMatchedAmount(rd, CategoriesParameters.FRAMES_PREDICTION)>=valueStart && Utils.getMatchedAmount(rd, CategoriesParameters.FRAMES_PREDICTION)<=valueEnd)
 					return true;
 				else
 					return false;

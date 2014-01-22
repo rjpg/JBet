@@ -30,6 +30,7 @@ public class DeleteLiquidityFiles {
 	    		}else{
 	    			System.out.println("Delete operation is failed.");
 	    		}
+				System.gc();
 			}
 			else
 			{

@@ -29,7 +29,7 @@ public class FillLiquidityFileBot extends Bot{
 	public void initialize()
 	{
 
-		CategoriesParameters.clollect=false;
+		CategoriesParameters.COLLECT=false;
 		
 		CategoryNode.printIDs(root);
 		
