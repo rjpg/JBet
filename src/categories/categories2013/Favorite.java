@@ -28,18 +28,18 @@ public class Favorite extends CategoryNode{
 	@Override
 	public boolean isRunnerOnThisCategory(RunnersData rd) {
 		
-		if(CategoriesParameters.clollect  )
+		if(CategoriesParameters.COLLECT  )
 		{
-			if(Utils.isValidWindow(rd, CategoriesParameters.framesPrediction, 0))
+			if(Utils.isValidWindow(rd, CategoriesParameters.FRAMES_PREDICTION, 0))
 			{
 				RunnersData rdLow = rd.getMarketData().getRunners().get(0);
 				
 				for (RunnersData rdAux : rd.getMarketData().getRunners())
-					if (Utils.getOddBackFrame(rdAux, CategoriesParameters.framesPrediction) < Utils.getOddBackFrame(
-							rdLow, CategoriesParameters.framesPrediction))
+					if (Utils.getOddBackFrame(rdAux, CategoriesParameters.FRAMES_PREDICTION) < Utils.getOddBackFrame(
+							rdLow, CategoriesParameters.FRAMES_PREDICTION))
 						rdLow = rdAux;
 				
-				if(Utils.getOddBackFrame(rdLow, CategoriesParameters.framesPrediction)>=oddStart && Utils.getOddBackFrame(rdLow, CategoriesParameters.framesPrediction)<=oddEnd)
+				if(Utils.getOddBackFrame(rdLow, CategoriesParameters.FRAMES_PREDICTION)>=oddStart && Utils.getOddBackFrame(rdLow, CategoriesParameters.FRAMES_PREDICTION)<=oddEnd)
 					return true;
 				else
 					return false;

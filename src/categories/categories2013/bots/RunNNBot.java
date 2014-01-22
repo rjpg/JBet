@@ -31,7 +31,7 @@ public class RunNNBot extends Bot {
 	public void initialize()
 	{
 	
-		CategoriesParameters.clollect=false;
+		CategoriesParameters.COLLECT=false;
 		root=new Root(0);
 		CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
@@ -79,7 +79,7 @@ public class RunNNBot extends Bot {
 		
 		
 		int timeOffSet=0;
-		if(CategoriesParameters.clollect)
+		if(CategoriesParameters.COLLECT)
 			timeOffSet=1;
 		
 		int minuteToStart =getMinutesToStart();
