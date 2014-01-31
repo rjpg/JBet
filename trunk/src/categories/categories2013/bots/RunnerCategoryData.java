@@ -15,7 +15,7 @@ public class RunnerCategoryData {
 	
 	RunnersData neighbour;
 	
-	
+	int axisSize=3;
 	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
@@ -68,6 +68,19 @@ public class RunnerCategoryData {
 				System.out.println("has favorite : "+neighbour.getName());
 			}
 			
+		}
+		
+		if(cat.get(6).getPath().equals("lowOdd"))
+		{
+			axisSize=4;
+		}
+		if(cat.get(6).getPath().equals("midleOdd"))
+		{
+			axisSize=3;
+		}
+		if(cat.get(6).getPath().equals("highOdd"))
+		{
+			axisSize=2;
 		}
 	}
 	
