@@ -743,7 +743,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
 		Parameters.saveFavorite=false; 
-		Parameters.graphicalInterface=false; 
+		Parameters.graphicalInterface=true; 
 		Parameters.graphicalInterfaceBots=false; 
 		Parameters.amountBot=false;  
 		Parameters.manualBot=false; 

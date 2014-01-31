@@ -54,6 +54,14 @@ public class CollectNNRawDataBot extends Bot {
 	public void update()
 	{
 		updateRunnerCategoryData();
+		
+		RunnersData rd=getMd().getRunners().get(2);
+		if(Utils.isValidWindow(rd, 2, 0))
+		{
+			System.out.println("For Lay :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))+1)  ));
+			System.out.println("For Back :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.getOddBackFrame(rd, 0)));
+		}
+			
 	}
 	
 	//pathroot\shortLenhgt\favorite\beginingDay\mediumRunners\farFromBegining\lowOdd\highLiquidity\
