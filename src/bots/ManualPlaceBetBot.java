@@ -303,8 +303,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 							swingPanel.getBackLayBetData(),
 							swingPanel.isKeepIP());
 					
-				/*	SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
-					
+					SwingOptions so=new SwingOptions(betOpen, ManualPlaceBetBot.this);
 					
 					so.setWaitFramesOpen(swingPanel.getTimeOpen());
 					so.setWaitFramesNormal(swingPanel.getTimeClose());
@@ -336,9 +335,9 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 					*/
 					
-					//Swing swing=new Swing(so);
-					//swings.add(swing);
-					
+					Swing swing=new Swing(so);
+					swings.add(swing);
+					/*
 					TrailingStopOptions tso=new TrailingStopOptions(betOpen, ManualPlaceBetBot.this);
 					
 					
@@ -359,7 +358,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 					tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
 					
 					TrailingStop trailing=new TrailingStop(tso);
-					
+					*/
 				
 					
 				}
@@ -438,11 +437,11 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 
 	@Override
 	public void MarketChange(MarketData md, int marketEventType) {
-		
+		System.out.println("efrwf");
 //		
 		if( marketEventType==MarketChangeListener.MarketNew)
 		{
-			//System.out.println("Market NEW");
+			System.out.println("Market NEW");
 			setMd(md);
 			betPanel.reset(getMd());
 			betPanel2.reset(getMd());
@@ -452,7 +451,9 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 		else if( marketEventType==MarketChangeListener.MarketUpdate)
 		{
 			
-			writeMsg("WOM :"+Utils.getWomFrame(md.getRunners().get(0), 3, false, 0),Color.BLUE);
+			//writeMsg("WOM :"+Utils.getWomFrame(md.getRunners().get(0), 3, false, 0),Color.BLUE);
+			System.out.println("Market update");
+			
 			//writeMsg("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0)+ "  Minutes to start : "+getMinutesToStart(), Color.BLUE);
 			//System.out.println("Market :"+md.getName()+" "+md.getEventName()+" ");
 			if(bet!=null)
@@ -466,6 +467,7 @@ public class ManualPlaceBetBot extends Bot implements TradeMechanismListener{
 			if(bet2!=null)
 				if(BetUtils.isBetFinalState(bet2.getState()))
 					bet2=null;
+			
 		}
 		
 	}
