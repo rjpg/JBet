@@ -12,7 +12,7 @@ public class DataWindowsSizes {
 	public static double MIDLE_ODD_MINUTES=2.5;
 	public static double LOW_ODD_MINUTES=2.0;
 	
-	public static double EXP_FACTOR=2.0;
+	public static double EXP_FACTOR=1.5;
 	
 	public static int SEGMENTS=10;
 	
@@ -115,7 +115,7 @@ public class DataWindowsSizes {
 		
 		DataWindowsSizes.init();
 		
-		Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root, 8);
+		Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root, 12);
 		int [][] windows=DataWindowsSizes.getWindowsByCategory(cat);
 		System.out.println("Category id (start):"+cat.get(cat.size()-1).getIdStart()+" : "+CategoryNode.getAncestorsStringPath(cat));
 		
