@@ -106,7 +106,7 @@ public class MarketData {
 
 	//----- Internal Data ------
 	public Vector<RunnersData> runners=new Vector<RunnersData>();
-	public Vector<BetData> bets=new Vector<BetData>();	
+	//public Vector<BetData> bets=new Vector<BetData>();	
 
 
 	public List<MarketChangeListener> listeners= Collections.synchronizedList(new Vector<MarketChangeListener>());;
@@ -150,6 +150,7 @@ public class MarketData {
 		{
 			name=selectedMarket.getName();
 			id=selectedMarket.getMarketId();
+			System.err.println("Market ID :"+id);
 			start=selectedMarket.getMarketTime();
 			String slist[]=selectedMarket.getMenuPath().split("\\\\");
 
