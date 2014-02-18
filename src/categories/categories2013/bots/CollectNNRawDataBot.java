@@ -56,8 +56,19 @@ public class CollectNNRawDataBot extends Bot {
 		updateRunnerCategoryData();
 		
 		RunnersData rd=getMd().getRunners().get(2);
-		if(Utils.isValidWindow(rd, 2, 0))
+		if(Utils.isValidWindow(rd, 9, 0))
 		{
+//			UtilsCollectData.getAmountOfferVariationBackDepthWindow(rd, 1, 9,4);
+//			System.out.println("AVG Back : "+UtilsCollectData.getAmountOfferVariationAVGBackDepthWindow(rd, 0, 9,4));
+//			UtilsCollectData.getAmountOfferVariationLayDepthWindow(rd, 1, 9,4);
+//			System.out.println("AVG Lay : "+UtilsCollectData.getAmountOfferVariationAVGLayDepthWindow(rd, 0, 9,4));
+
+//			System.out.println("Volume Variation Lay :"+UtilsCollectData.getAmountMatchedVariationFrame(rd, 0, Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0)))  ));
+
+//			System.out.println("Volume Variation depth : "+UtilsCollectData.getAmountMatchedVariationAxisFrame(rd,0,4));
+			
+			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,0,9,4));
+			
 //			System.out.println("For Lay :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))+1)  ));
 //			System.out.println("For Back :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.getOddBackFrame(rd, 0)));
 //			
