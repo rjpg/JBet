@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import bets.BetData;
@@ -167,7 +168,7 @@ public class NextGoalPanel extends JPanel {
 					System.out.println("Processing :"+actual);
 					ing.stopPolling();
 					InterfaceNextGoal.msjf.writeMessageText(" ----------------------------------------------------" , Color.BLUE);
-					InterfaceNextGoal.msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.BLUE);
+					//InterfaceNextGoal.msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.BLUE);
 					if(actualCheck.isSelected())
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(actualSelectionId)+" L "+(Double)actualScoreComboStake.getSelectedItem()+" @ "+((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
@@ -181,8 +182,16 @@ public class NextGoalPanel extends JPanel {
 					
 					InterfaceNextGoal.msjf.writeMessageText(" ----------------------------------------------------" , Color.BLUE);
 					
-					if(JOptionPane.showConfirmDialog(null, "Process Bets for "+actual+" result ?")==0)
-					{
+					JTextField tf = new JTextField(15);
+					tf.setForeground(Color.BLACK);
+					tf.setBackground(Color.GREEN);
+					tf.setHorizontalAlignment(JTextField.CENTER);
+					tf.setText(((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd()+"");
+	                tf.setFont(tf.getFont().deriveFont(75f));
+					
+	                //////////////////////branca////////////////////
+					/*if(JOptionPane.showConfirmDialog(ing, tf,"Process Bets for "+actual+" result ?", JOptionPane.OK_CANCEL_OPTION)==0)
+					{*/ /////////////////////branca
 						InterfaceNextGoal.msjf.writeMessageText("Starting the Goal process", Color.BLUE);
 						refreshAccountFunds();
 						
@@ -190,11 +199,11 @@ public class NextGoalPanel extends JPanel {
 						
 						NextGoalPanel.this.startPolling();
 						
-					}
+					/*}  ////////////////////branca
 					else
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Cancelling the Goal process", Color.GREEN);
-					}
+					}*/
 				}
 			});
 		}
@@ -329,7 +338,7 @@ public class NextGoalPanel extends JPanel {
 					otherScoreComboOdd.repaint();
 					*/
 					
-					double actualOddShift = Utils.indexToOdd(Utils.oddToIndex(p.getPrice())-4);
+					double actualOddShift = Utils.indexToOdd(Utils.oddToIndex(p.getPrice())-5);
 					actualScoreComboOdd.setSelectedItem(Utils.getOddObjByOdd(actualOddShift));
 					actualScoreComboOdd.repaint();
 					
@@ -386,7 +395,7 @@ public class NextGoalPanel extends JPanel {
 			runThread = Thread.currentThread();
 			stopRequested = false;
 			
-			while (!stopRequested) {
+			//while (!stopRequested) {            //// branca
 				System.out.println("pooling");
 				InflatedMarketPrices prices = null;
 
@@ -449,6 +458,13 @@ public class NextGoalPanel extends JPanel {
 								InterfaceNextGoal.msjf.writeMessageText("Placing bet :"+pb.getSelectionId()+"  "+pb.getSize()+" @ "+pb.getPrice()+"  "+pb.getBetType(), Color.ORANGE);
 							}
 							
+							///////////////////////branca////////////////////
+							try {
+								Thread.sleep(updateInterval);
+							} catch (Exception e) {
+								
+							}
+							////////////////////////branca//////////////////
 							placeBets(bets);
 						}
 						else
@@ -469,7 +485,12 @@ public class NextGoalPanel extends JPanel {
 				} catch (Exception e) {
 					// e.printStackTrace();
 				}
-			}
+				
+				////////////////branca ////////////////
+				stopPolling(); // retirar ...para o branca
+				/////////////////branca
+				
+			//}        ///////branca
 		}
 
 		public void stopRequest() {
