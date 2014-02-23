@@ -460,7 +460,7 @@ public class NextGoalPanel extends JPanel {
 							
 							///////////////////////branca////////////////////
 							try {
-								Thread.sleep(updateInterval);
+								Thread.sleep(400);
 							} catch (Exception e) {
 								
 							}
