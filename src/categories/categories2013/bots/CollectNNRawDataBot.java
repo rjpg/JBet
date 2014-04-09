@@ -55,8 +55,8 @@ public class CollectNNRawDataBot extends Bot {
 	{
 		updateRunnerCategoryData();
 		
-		RunnersData rd=getMd().getRunners().get(2);
-		if(Utils.isValidWindow(rd, 9, 0))
+		RunnersData rd=getMd().getRunners().get(10);
+		if(Utils.isValidWindow(rd, 27, 0))
 		{
 //			UtilsCollectData.getAmountOfferVariationBackDepthWindow(rd, 1, 9,4);
 //			System.out.println("AVG Back : "+UtilsCollectData.getAmountOfferVariationAVGBackDepthWindow(rd, 0, 9,4));
@@ -68,6 +68,8 @@ public class CollectNNRawDataBot extends Bot {
 //			System.out.println("Volume Variation depth : "+UtilsCollectData.getAmountMatchedVariationAxisFrame(rd,0,4));
 			
 			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,0,9,4));
+			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,9,18,4));
+			System.out.println("");
 			
 //			System.out.println("For Lay :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))+1)  ));
 //			System.out.println("For Back :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.getOddBackFrame(rd, 0)));
@@ -75,7 +77,13 @@ public class CollectNNRawDataBot extends Bot {
 //			System.out.println("For Back depth:"+UtilsCollectData.getAmountOfferVariationBackDepthFrame(rd,0,2));
 //			System.out.println("For Lay depth:"+UtilsCollectData.getAmountOfferVariationLayDepthFrame(rd,0,2));
 		}
-			
+		
+		if(rcdv!=null)
+			for(RunnerCategoryData rcd:rcdv)
+			{
+				System.out.println("Odd Variation on last 80 frames is :"+rcd.generateNNOutput()+" for "+rcd.getRd().getName());
+			}
+				
 	}
 	
 	//pathroot\shortLenhgt\favorite\beginingDay\mediumRunners\farFromBegining\lowOdd\highLiquidity\
