@@ -113,6 +113,18 @@ public class ClosePosition extends TradeMechanism implements MarketChangeListene
 		
 		md=betCloseInfoA.getRd().getMarketData();
 		
+		if(md==null)
+		{
+			setState(TradeMechanism.OPEN);
+			this.setI_STATE(I_END);
+			ended=true;
+			informListenersEnd();
+			return;		
+		}
+		else
+			md.addTradingMechanismTrading(this);
+		
+		
 		md.addTradingMechanismTrading(this);
 		
 		initialize();

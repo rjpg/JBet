@@ -17,6 +17,8 @@ public class RunnerCategoryData {
 	
 	int axisSize=3;
 	
+	
+	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
 		cat=catA;
@@ -83,6 +85,66 @@ public class RunnerCategoryData {
 			axisSize=2;
 		}
 	}
+	
+	
+	public double generateNNOutput()
+	{
+		if(CategoriesParameters.COLLECT==false)
+		{
+			return 0;
+		}
+		
+		
+		int ret= Utils.getOddLayTickVariation(rd, CategoriesParameters.FRAMES_PREDICTION-10, 0);
+		
+		return (double)ret;
+	}
+	
+	public double[] generateNNInputs()
+	{
+		int timeFramesOffset=0;
+		if(CategoriesParameters.COLLECT==true)
+		{
+			timeFramesOffset=CategoriesParameters.FRAMES_PREDICTION;
+		}
+		
+		// 7 frames de interpolação cada imput  (está em DataWindowsSizes)
+		
+		// evolução da odd do proprio 
+		// evolução da odd do vizinho (ou favorito)
+		// evolução da oferta correspondida 
+		// evolução dos backs disponiveis  
+		// evolução dos lays disponiveis 
+		
+		// 7 x 5 = 35 inputs 
+		return null;
+	}
+	
+	public double[] generateNNTrainSample()
+	{
+		if(CategoriesParameters.COLLECT==false)
+		{
+			return null;
+		}
+		// generateNNInputs() + output
+		
+		return null;
+	}
+	
+	public Vector<CategoryNode> getCat() {
+		return cat;
+	}
+
+
+	public RunnersData getRd() {
+		return rd;
+	}
+
+	public RunnersData getNeighbour() {
+		return neighbour;
+	}
+
+
 	
 	
 	
