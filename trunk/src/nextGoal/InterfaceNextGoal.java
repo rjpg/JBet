@@ -251,8 +251,8 @@ public class InterfaceNextGoal extends JFrame{
 			
 			try {
 				//this.setUsername(Display.getStringAnswer("Betfair username:"));
-				username="Kariff";
-				//username="birinhos";
+				//username="Kariff";
+				username="birinhos";
 				//username="vedatrade1978";
 				this.setPassword(Display.getStringAnswer("Betfair password ("+username+"):"));
 			} catch (IOException e1) {

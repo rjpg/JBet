@@ -168,7 +168,7 @@ public class NextGoalPanel extends JPanel {
 					System.out.println("Processing :"+actual);
 					ing.stopPolling();
 					InterfaceNextGoal.msjf.writeMessageText(" ----------------------------------------------------" , Color.BLUE);
-					//InterfaceNextGoal.msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.BLUE);
+					InterfaceNextGoal.msjf.writeMessageText("if you press yes, when the market becames active, the following will be placed:", Color.BLUE);
 					if(actualCheck.isSelected())
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Bet: "+NextGoalPanel.this.getRunnerNameById(actualSelectionId)+" L "+(Double)actualScoreComboStake.getSelectedItem()+" @ "+((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd() , Color.BLUE);
@@ -189,9 +189,9 @@ public class NextGoalPanel extends JPanel {
 					tf.setText(((OddObj)actualScoreComboOdd.getSelectedItem()).getOdd()+"");
 	                tf.setFont(tf.getFont().deriveFont(75f));
 					
-	                //////////////////////branca////////////////////
-					/*if(JOptionPane.showConfirmDialog(ing, tf,"Process Bets for "+actual+" result ?", JOptionPane.OK_CANCEL_OPTION)==0)
-					{*/ /////////////////////branca
+	                
+					if(JOptionPane.showConfirmDialog(ing, tf,"Process Bets for "+actual+" result ?", JOptionPane.OK_CANCEL_OPTION)==0)
+					{
 						InterfaceNextGoal.msjf.writeMessageText("Starting the Goal process", Color.BLUE);
 						refreshAccountFunds();
 						
@@ -199,11 +199,11 @@ public class NextGoalPanel extends JPanel {
 						
 						NextGoalPanel.this.startPolling();
 						
-					/*}  ////////////////////branca
+					}  
 					else
 					{
 						InterfaceNextGoal.msjf.writeMessageText("Cancelling the Goal process", Color.GREEN);
-					}*/
+					}
 				}
 			});
 		}
@@ -395,7 +395,7 @@ public class NextGoalPanel extends JPanel {
 			runThread = Thread.currentThread();
 			stopRequested = false;
 			
-			//while (!stopRequested) {            //// branca
+			while (!stopRequested) {            
 				System.out.println("pooling");
 				InflatedMarketPrices prices = null;
 
@@ -430,8 +430,11 @@ public class NextGoalPanel extends JPanel {
 							
 							while (odd>=4.0 && amountSpend<max )
 							{
-								bets.add(createBet(actualSelectionId, odd,stake, "L"));
-								amountSpend+=stake*(odd-1);
+								if(odd<25)
+								{
+									bets.add(createBet(actualSelectionId, odd,stake, "L"));
+									amountSpend+=stake*(odd-1);
+								}
 								odd=Utils.indexToOdd(Utils.oddToIndex(odd)-2);
 							}
 							
@@ -458,13 +461,7 @@ public class NextGoalPanel extends JPanel {
 								InterfaceNextGoal.msjf.writeMessageText("Placing bet :"+pb.getSelectionId()+"  "+pb.getSize()+" @ "+pb.getPrice()+"  "+pb.getBetType(), Color.ORANGE);
 							}
 							
-							///////////////////////branca////////////////////
-							try {
-								Thread.sleep(400);
-							} catch (Exception e) {
-								
-							}
-							////////////////////////branca//////////////////
+							
 							placeBets(bets);
 						}
 						else
@@ -486,11 +483,9 @@ public class NextGoalPanel extends JPanel {
 					// e.printStackTrace();
 				}
 				
-				////////////////branca ////////////////
-				stopPolling(); // retirar ...para o branca
-				/////////////////branca
 				
-			//}        ///////branca
+				
+			}     
 		}
 
 		public void stopRequest() {
