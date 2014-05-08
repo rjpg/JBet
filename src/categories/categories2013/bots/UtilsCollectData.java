@@ -53,10 +53,10 @@ public class UtilsCollectData {
 		double ret=0;
 		for (int i=0;i<size;i++)
 		{
-			System.out.println("varitaion frame Back "+(pastFrame+i)+" = "+getAmountOfferVariationBackDepthFrame(rd,pastFrame+i,depth));
+			//System.out.println("varitaion frame Back "+(pastFrame+i)+" = "+getAmountOfferVariationBackDepthFrame(rd,pastFrame+i,depth));
 			ret+=getAmountOfferVariationBackDepthFrame(rd,pastFrame+i,depth);
 		}
-		System.out.println("Total Back= "+ret);
+		//System.out.println("Total Back= "+ret);
 		return ret;
 	}
 	
@@ -65,11 +65,11 @@ public class UtilsCollectData {
 		double ret=0;
 		for (int i=0;i<size;i++)
 		{
-			System.out.println("varitaion frame Lay "+(pastFrame+i)+" = "+getAmountOfferVariationLayDepthFrame(rd,pastFrame+i,depth));
+			//System.out.println("varitaion frame Lay "+(pastFrame+i)+" = "+getAmountOfferVariationLayDepthFrame(rd,pastFrame+i,depth));
 			ret+=getAmountOfferVariationLayDepthFrame(rd,pastFrame+i,depth);
 		}
 		
-		System.out.println("Total Lay= "+ret);	
+		//System.out.println("Total Lay= "+ret);	
 		return ret;
 	}
 	
@@ -146,11 +146,12 @@ public class UtilsCollectData {
 		double ret=0;
 		for (int i=0;i<size;i++)
 		{
-			System.out.println("varitaion frame volume "+(pastFrame+i)+" = "+getAmountMatchedVariationAxisFrame(rd,pastFrame+i,depth));
+			//System.out.println("varitaion frame volume "+(pastFrame+i)+" = "+getAmountMatchedVariationAxisFrame(rd,pastFrame+i,depth));
 			ret+=getAmountMatchedVariationAxisFrame(rd,pastFrame+i,depth);
 		}
 		
-		System.out.println("Total Volume var= "+ret);	
+		//System.out.println("Total Volume var= "+ret);	
+		//System.out.println("AVG Volume var= "+ret/size);	
 		return ret;
 	}
 	
@@ -162,5 +163,33 @@ public class UtilsCollectData {
 			return getAmountMatchedVariationAxisWindow(rd,pastFrame,size,depth);
 	}	
 	
+	public static int getOddLayTickVariation(RunnersData rd, int pastFrame,int windowSize)
+	{
+		
+		System.out.println("Variation ["+pastFrame+"]["+windowSize+"]="+(Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1)))+ " Odd["+pastFrame+"]="+Utils.getOddLayFrame(rd,pastFrame)+" Odd["+(windowSize+pastFrame-1)+"]="+Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		return Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
 	
+	}
+	
+	public static double getOddLayTickVariationIntegral(RunnersData rd,int pastFrame, int windowSize)
+	{
+		
+		double indexRef=0;
+		for(int i=pastFrame+windowSize;i<windowSize+windowSize+pastFrame;i++)
+		{
+			indexRef+=Utils.oddToIndex(Utils.getOddLayFrame(rd, i));
+			//System.out.println("Odd Lay "+Utils.getOddLayFrame(rd, i)+" index "+Utils.oddToIndex(Utils.getOddLayFrame(rd, i))+" on frame "+i);
+		}
+		indexRef/=windowSize;
+		//System.out.println("Index Ref "+ indexRef);
+		
+		double ret=0;
+		for(int i=pastFrame;i<windowSize+pastFrame;i++)
+		{
+			ret-=(indexRef-(double)Utils.oddToIndex(Utils.getOddLayFrame(rd,i)));
+		}
+		//System.out.println("Variation ["+pastFrame+"]["+windowSize+"]="+(Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1)))+ " Odd["+pastFrame+"]="+Utils.getOddLayFrame(rd,pastFrame)+" Odd["+(windowSize+pastFrame-1)+"]="+Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		//return Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		return ret;
+	}
 }

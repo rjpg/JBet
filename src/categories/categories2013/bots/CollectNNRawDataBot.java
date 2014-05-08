@@ -31,7 +31,7 @@ public class CollectNNRawDataBot extends Bot {
 
 	public void initialize()
 	{
-	
+		DataWindowsSizes.init();
 		CategoriesParameters.COLLECT=true;
 		root=new Root(0);
 		CategoryNode.printIDs(root);
@@ -51,12 +51,50 @@ public class CollectNNRawDataBot extends Bot {
 		
 	}
 
+	//int framesMinute=0;
+	//int minute=0;
 	public void update()
 	{
+		/*int minuteAux=getMinutesToStart();
+		
+		if(minuteAux!=minute)
+		{
+			System.out.println("Frames minute : "+framesMinute);
+			minute=minuteAux;
+			framesMinute=0;
+		}
+		else
+			framesMinute++;
+		*/
+		
+		
 		updateRunnerCategoryData();
 		
-		RunnersData rd=getMd().getRunners().get(10);
-		if(Utils.isValidWindow(rd, 27, 0))
+		if(rcdv!=null && rcdv.size()>0)
+		{
+			RunnerCategoryData rcd=rcdv.get(0);
+			//for(RunnerCategoryData rcd:rcdv)
+			{
+				System.out.println("Runner "+rcd.getRd().getName()+" inputs:");
+				Vector<Double> inputs=rcd.generateNNInputs();
+				if(inputs!=null)
+				{
+					//for(int i=0;i<270;i++)
+					//	System.out.print(Utils.getOddLayFrame(rcd.getRd(), i)+"("+i+") ");
+					//System.out.println();
+					for(Double v:inputs)
+					{
+						System.out.print(v+" ");
+					}
+				}
+				else
+					System.out.print("No inputs generated");
+				System.out.println("");
+			}
+		}
+		
+	//	RunnersData rd=getMd().getRunners().get(10);
+	//	if(Utils.isValidWindow(rd, 27, 0))
 		{
 //			UtilsCollectData.getAmountOfferVariationBackDepthWindow(rd, 1, 9,4);
 //			System.out.println("AVG Back : "+UtilsCollectData.getAmountOfferVariationAVGBackDepthWindow(rd, 0, 9,4));
@@ -67,9 +105,9 @@ public class CollectNNRawDataBot extends Bot {
 
 //			System.out.println("Volume Variation depth : "+UtilsCollectData.getAmountMatchedVariationAxisFrame(rd,0,4));
 			
-			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,0,9,4));
-			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,9,18,4));
-			System.out.println("");
+//			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,0,9,4));
+//			System.out.println("Volume Variation depth AVG window : "+UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd,9,18,4));
+//			System.out.println("");
 			
 //			System.out.println("For Lay :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.indexToOdd(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))+1)  ));
 //			System.out.println("For Back :"+UtilsCollectData.getAmountOfferVariationOddFrame(rd, 0, Utils.getOddBackFrame(rd, 0)));
@@ -78,11 +116,11 @@ public class CollectNNRawDataBot extends Bot {
 //			System.out.println("For Lay depth:"+UtilsCollectData.getAmountOfferVariationLayDepthFrame(rd,0,2));
 		}
 		
-		if(rcdv!=null)
-			for(RunnerCategoryData rcd:rcdv)
-			{
-				System.out.println("Odd Variation on last 80 frames is :"+rcd.generateNNOutput()+" for "+rcd.getRd().getName());
-			}
+//		if(rcdv!=null)
+//			for(RunnerCategoryData rcd:rcdv)
+//			{
+//				System.out.println("Odd Variation on last 80 frames is :"+rcd.generateNNOutput()+" for "+rcd.getRd().getName());
+//			}
 				
 	}
 	
@@ -107,7 +145,7 @@ public class CollectNNRawDataBot extends Bot {
 	public void updateRunnerCategoryData()
 	{
 		
-		if(! Utils.isValidWindow(getMd().getRunners().get(0), 90, 0))
+		if(! Utils.isValidWindow(getMd().getRunners().get(0), CategoriesParameters.FRAMES_PREDICTION+2, 0))
 			return;
 		
 		int timeOffSet=0;

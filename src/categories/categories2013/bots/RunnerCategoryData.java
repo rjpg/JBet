@@ -100,14 +100,20 @@ public class RunnerCategoryData {
 		return (double)ret;
 	}
 	
-	public double[] generateNNInputs()
+	public Vector<Double> generateNNInputs()
 	{
+		Vector<Double> ret=new Vector<Double>();
 		int timeFramesOffset=0;
 		if(CategoriesParameters.COLLECT==true)
 		{
 			timeFramesOffset=CategoriesParameters.FRAMES_PREDICTION;
 		}
+		int timeDataWindows[][]=DataWindowsSizes.getWindowsByCategory(getCat());
 		
+		if(!Utils.isValidWindow(rd,  timeDataWindows[DataWindowsSizes.SEGMENTS-1][1]*2, timeDataWindows[DataWindowsSizes.SEGMENTS-1][0]+timeFramesOffset))
+		{
+			return null;
+		}
 		// 7 frames de interpolação cada imput  (está em DataWindowsSizes)
 		
 		// evolução da odd do proprio 
@@ -117,7 +123,34 @@ public class RunnerCategoryData {
 		// evolução dos lays disponiveis 
 		
 		// 7 x 5 = 35 inputs 
-		return null;
+		
+		
+		for(int i=0;i<DataWindowsSizes.SEGMENTS;i++)
+		{
+			ret.add((double)UtilsCollectData.getOddLayTickVariationIntegral(rd, timeDataWindows[i][0]+timeFramesOffset, timeDataWindows[i][1]));
+		}
+		
+		for(int i=0;i<DataWindowsSizes.SEGMENTS;i++)
+		{
+			ret.add((double)UtilsCollectData.getOddLayTickVariationIntegral(neighbour, timeDataWindows[i][0]+timeFramesOffset, timeDataWindows[i][1]));
+		}
+		
+		for(int i=0;i<DataWindowsSizes.SEGMENTS;i++)
+		{
+			ret.add(UtilsCollectData.getAmountOfferVariationAVGBackDepthWindow(rd, timeDataWindows[i][0]+timeFramesOffset, timeDataWindows[i][1],axisSize));
+		}
+		
+		for(int i=0;i<DataWindowsSizes.SEGMENTS;i++)
+		{
+			ret.add(UtilsCollectData.getAmountOfferVariationAVGLayDepthWindow(rd, timeDataWindows[i][0]+timeFramesOffset, timeDataWindows[i][1],axisSize));
+		}
+		
+		for(int i=0;i<DataWindowsSizes.SEGMENTS;i++)
+		{
+			ret.add(UtilsCollectData.getAmountMatchedVariationAVGAxisWindow(rd, timeDataWindows[i][0]+timeFramesOffset, timeDataWindows[i][1],axisSize));
+		}
+		
+		return ret;
 	}
 	
 	public double[] generateNNTrainSample()

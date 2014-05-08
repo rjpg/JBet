@@ -39,7 +39,7 @@ public class DataWindowsSizes {
 			int size=indexB-indexA;
 						
 			LOW_ODD_WINDOWS[i-1][0]=indexA;
-			LOW_ODD_WINDOWS[i-1][1]=size;
+			LOW_ODD_WINDOWS[i-1][1]=size+1;
 		}
 		
 		totalSizeFrames=(int) (MIDLE_ODD_MINUTES*CategoriesParameters.FRAMES_PER_MINUTE);
@@ -54,7 +54,7 @@ public class DataWindowsSizes {
 			int size=indexB-indexA;
 						
 			MIDLE_ODD_WINDOWS[i-1][0]=indexA;
-			MIDLE_ODD_WINDOWS[i-1][1]=size;
+			MIDLE_ODD_WINDOWS[i-1][1]=size+1;
 		}
 		
 		totalSizeFrames=(int) (HIGH_ODD_MINUTES*CategoriesParameters.FRAMES_PER_MINUTE);
@@ -69,7 +69,7 @@ public class DataWindowsSizes {
 			int size=indexB-indexA;
 						
 			HIGH_ODD_WINDOWS[i-1][0]=indexA;
-			HIGH_ODD_WINDOWS[i-1][1]=size;
+			HIGH_ODD_WINDOWS[i-1][1]=size+1;
 		}
 	
 		/*
@@ -115,7 +115,7 @@ public class DataWindowsSizes {
 		
 		DataWindowsSizes.init();
 		
-		Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root, 10);
+		Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root, 15);
 		int [][] windows=DataWindowsSizes.getWindowsByCategory(cat);
 		System.out.println("Category id (start):"+cat.get(cat.size()-1).getIdStart()+" : "+CategoryNode.getAncestorsStringPath(cat));
 		
