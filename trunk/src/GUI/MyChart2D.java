@@ -42,6 +42,8 @@ public class MyChart2D extends Chart2D {
 		
 		//setXRangeTimeNowTo (startTime.getTimeInMillis());
 		
+		
+		
 	}
 	
 	public MyChart2D(Calendar endA)
@@ -55,6 +57,7 @@ public class MyChart2D extends Chart2D {
 		this.setScaleX(true);
 		
 		endTime=endA;
+		
 	}
 	
 	

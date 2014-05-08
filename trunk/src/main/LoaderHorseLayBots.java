@@ -759,7 +759,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.simulation=true;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
 		Parameters.WOM_DIST_CENTER=5;
-		Parameters.CHART_FRAMES=90;
+		Parameters.CHART_FRAMES=270;
 		Parameters.ODD_FAVORITE=2.00;
 		int x=Integer.MAX_VALUE;
 		System.out.println(x);
