@@ -677,7 +677,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 
 	public static void main(String[] args)  throws Exception {
 		Utils.init();
-		RapidMiner.init();
+		/*RapidMiner.init();
 		
 		// instanciate model 
 		ModelLoader model = OperatorService.createOperator(ModelLoader.class);
@@ -733,7 +733,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		
 		
 		
-		
+		*/
 		// -------------------- JBet -----------------------
 		Parameters.log=false;  // Log or not to Log when not in replay
 		Parameters.replay=true; 
