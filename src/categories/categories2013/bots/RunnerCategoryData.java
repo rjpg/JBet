@@ -87,6 +87,7 @@ public class RunnerCategoryData {
 	}
 	
 	
+	
 	public double generateNNOutput()
 	{
 		if(CategoriesParameters.COLLECT==false)
@@ -94,10 +95,11 @@ public class RunnerCategoryData {
 			return 0;
 		}
 		
+		double past=Utils.getOddBackAVG(rd, 10, CategoriesParameters.FRAMES_PREDICTION-10);
+		double present=Utils.getOddBackAVG(rd, 0, 10);
 		
-		int ret= Utils.getOddLayTickVariation(rd, CategoriesParameters.FRAMES_PREDICTION-10, 0);
+		return Utils.oddToIndex(Utils.nearValidOdd(present))-Utils.oddToIndex(Utils.nearValidOdd(past));
 		
-		return (double)ret;
 	}
 	
 	public Vector<Double> generateNNInputs()

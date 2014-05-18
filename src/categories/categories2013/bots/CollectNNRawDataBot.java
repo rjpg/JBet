@@ -90,6 +90,8 @@ public class CollectNNRawDataBot extends Bot {
 				else
 					System.out.print("No inputs generated");
 				System.out.println("");
+				
+				System.out.println("output : " + rcd.generateNNOutput());
 			}
 		}
 		
