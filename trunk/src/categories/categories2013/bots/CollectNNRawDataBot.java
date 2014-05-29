@@ -1,6 +1,13 @@
 package categories.categories2013.bots;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import categories.categories2013.CategoriesParameters;
@@ -14,6 +21,8 @@ import bots.Bot;
 
 public class CollectNNRawDataBot extends Bot {
 
+	// y m d - m=0 January
+	public static Calendar UNTIL_DATE= new GregorianCalendar(2013,2,1);
 	
 	Root root=null;
 	
@@ -22,8 +31,13 @@ public class CollectNNRawDataBot extends Bot {
 	boolean nearActive=false;
 	
 	Vector<RunnerCategoryData> rcdv=null;
-
 	
+	String fileName="NNRawData.csv";
+	
+	Vector<CollectSamplesInfo> csiv=null;
+	
+	
+		
 	public CollectNNRawDataBot(MarketData md) {
 		super(md, "CollectNNRawData");
 		initialize();
@@ -35,6 +49,25 @@ public class CollectNNRawDataBot extends Bot {
 		CategoriesParameters.COLLECT=true;
 		root=new Root(0);
 		CategoryNode.printIDs(root);
+		
+		csiv=new Vector<CollectSamplesInfo>();
+		for(int i=0;i<root.getIdEnd();i++)
+		{
+			CollectSamplesInfo csi=new CollectSamplesInfo();
+			csi.setCategoryId(i);
+			csiv.add(csi);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		//CategoryNode.buildDirectories(root);
 		
 		//Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);
@@ -48,6 +81,87 @@ public class CollectNNRawDataBot extends Bot {
 	{
 	
 		setMd(md);
+		
+	}
+	
+	public void writeNNRawDataIntoFile(RunnerCategoryData rcd)
+	{
+		Vector<Double> inputs=rcd.generateNNInputs();
+		if(inputs==null)
+			return;
+		
+		int id=rcd.getCat().get(rcd.getCat().size()-1).getIdStart();
+		CollectSamplesInfo csi=csiv.get(id);
+		
+		if(getMd().getStart().before(UNTIL_DATE))
+		{
+			//System.out.println("testing");
+			if(csi.getSamplesCollected()>DataWindowsSizes.COLLECT_EXAMPLES)
+				return ;
+		}
+//		else
+//			System.out.println("Less Date wrtite");
+//		
+		
+//		else
+//			System.out.println("ok collect "+ csi.getSamplesCollected()+" < "+DataWindowsSizes.COLLECT_EXAMPLES);
+		
+//		if(csi.getCategoryId()==id)
+//			System.out.println("csi OK");
+//		else
+//			System.out.println("csi NOT OK");
+//		
+//		System.out.println("Category Id "+csi.getCategoryId()+" samples collected "+csi.getSamplesCollected()+ " last Market Collected Date " + csi.getLastSampleEventDate());
+		
+		double output=rcd.generateNNOutput();
+		inputs.add(output);
+		
+		String filePath=CategoryNode.getAncestorsStringPath(rcd.getCat())+fileName;
+		//System.out.println("Runner "+rcd.getRd().getName()+" line to file:" +filePath);
+		
+		String line="";
+		for(Double v:inputs)
+		{
+			line+=(v+" ");
+		}
+		//System.out.println(line);
+		
+		BufferedWriter out=null;
+		
+		try {
+			out = new BufferedWriter(new FileWriter(filePath, true));
+			} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Error Open "+filePath+" for writing");
+			}
+		
+		if(out==null)
+		{
+			System.err.println("could not open "+filePath);
+			return;
+		}
+		
+		try {
+			out.write(line);
+			//System.out.println("writeen "+ filePath);
+			out.newLine();
+			out.flush();
+		} catch (IOException e) {
+			System.out.println(filePath+":Error wrtting data to log file");
+			e.printStackTrace();
+		}
+		
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		csi.setAnotherSample( getMd().getStart().get(Calendar.DAY_OF_MONTH)+"-"+(getMd().getStart().get(Calendar.MONTH)+1)+"-"+getMd().getStart().get(Calendar.YEAR));
+		
 		
 	}
 
@@ -72,26 +186,10 @@ public class CollectNNRawDataBot extends Bot {
 		
 		if(rcdv!=null && rcdv.size()>0)
 		{
-			RunnerCategoryData rcd=rcdv.get(0);
-			//for(RunnerCategoryData rcd:rcdv)
-			{
-				System.out.println("Runner "+rcd.getRd().getName()+" inputs:");
-				Vector<Double> inputs=rcd.generateNNInputs();
-				if(inputs!=null)
-				{
-					//for(int i=0;i<270;i++)
-					//	System.out.print(Utils.getOddLayFrame(rcd.getRd(), i)+"("+i+") ");
-					//System.out.println();
-					for(Double v:inputs)
-					{
-						System.out.print(v+" ");
-					}
-				}
-				else
-					System.out.print("No inputs generated");
-				System.out.println("");
-				
-				System.out.println("output : " + rcd.generateNNOutput());
+			//RunnerCategoryData rcd=rcdv.get(0);
+			for(RunnerCategoryData rcd:rcdv)
+			{	
+				writeNNRawDataIntoFile(rcd);
 			}
 		}
 		
@@ -271,6 +369,11 @@ public class CollectNNRawDataBot extends Bot {
 	public void writeMsg(String s, Color c) {
 		System.out.println("Bot "+getName()+" Msg :"+s);
 		
+	}
+	
+	public Vector<CollectSamplesInfo> getCollectSamplesInfo()
+	{
+		return csiv;
 	}
 
 }
