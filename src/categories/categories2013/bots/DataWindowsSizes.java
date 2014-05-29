@@ -16,6 +16,24 @@ public class DataWindowsSizes {
 	
 	public static int SEGMENTS=7;
 	
+	public static int TIME_SERIES=5;
+	
+	
+	// NN Constants
+	public static int MIDLE_LAYER_NEURONS=45;
+	
+	public static int INPUT_NEURONS=SEGMENTS*TIME_SERIES;
+	
+	public static int TOTAL_NEURONS=INPUT_NEURONS+MIDLE_LAYER_NEURONS+1;
+	
+	public static int TOTAL_CONECTIONS=(INPUT_NEURONS*MIDLE_LAYER_NEURONS)+MIDLE_LAYER_NEURONS;
+	
+	public static int REQUIRED_EXAMPLES=10*TOTAL_CONECTIONS;
+	
+	public static int COLLECT_EXAMPLES=(int)(1.5*REQUIRED_EXAMPLES);
+	
+	
+	// Time Windows 
 	public static int HIGH_ODD_WINDOWS[][]=new int[SEGMENTS][2];
 	public static int MIDLE_ODD_WINDOWS[][]=new int[SEGMENTS][2];
 	public static int LOW_ODD_WINDOWS[][]=new int[SEGMENTS][2];
@@ -123,5 +141,19 @@ public class DataWindowsSizes {
 		{		
 			System.out.println("window ["+i+"]=["+windows[i][0]+","+windows[i][1]+"]");
 		}
+		
+		System.out.println("MIDLE_LAYER_NEURONS : "+MIDLE_LAYER_NEURONS);;
+		
+		System.out.println("INPUT_NEURONS : "+INPUT_NEURONS);
+		
+		System.out.println("TOTAL_NEURONS : "+ TOTAL_NEURONS);
+		
+		System.out.println("TOTAL_CONECTIONS : "+TOTAL_CONECTIONS);
+		
+		System.out.println("REQUIRED_EXAMPLES : "+REQUIRED_EXAMPLES);
+		
+		System.out.println("COLLECT_EXAMPLES : "+COLLECT_EXAMPLES);
+		
+		
 	}
 }
