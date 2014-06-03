@@ -65,6 +65,37 @@ public class ProcessNNRawData {
 		return ret;
 	}
 	
+	
+	public static Vector<double[]> removeToCollectExamples(Vector<double[]> examples)
+	{
+		
+		Vector<double[]> ret=new Vector<double[]>();
+		int size=examples.size();
+		
+		
+		
+		if(size<=DataWindowsSizes.COLLECT_EXAMPLES)
+		{
+			for(int i=0;i<examples.size();i++)
+				ret.add(examples.get(i));
+			return ret;
+		}
+			
+		
+		double step=(double)size/(double)DataWindowsSizes.COLLECT_EXAMPLES;
+		double doubleIndex=0;
+		for(int i =0;i<DataWindowsSizes.COLLECT_EXAMPLES;i++)
+		{
+			ret.add(examples.get((int)doubleIndex));
+			doubleIndex+=step;
+			
+		}
+		
+		return ret;
+		
+		
+	}
+	
 	public static void main(String[] args) {
 			
 			Root root=new Root(0);
@@ -72,7 +103,8 @@ public class ProcessNNRawData {
 			CategoryNode.printIDs(root);
 			//CategoryNode.buildDirectories(root);
 			
-			for(int i=0;i<648;i++)
+			int i=203;
+			//for(int i=0;i<648;i++)
 			{
 				Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
 				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawData.csv";
@@ -85,6 +117,9 @@ public class ProcessNNRawData {
 					System.out.println("Loading "+fileName);
 					Vector<double[]> examples =loadFileIntoMemory(fileName);
 					System.out.println("Number of examples : "+examples.size() );
+					
+					Vector<double[]> collectExamples =removeToCollectExamples(examples);
+					System.out.println("Removed - Number of examples : "+collectExamples.size() );
 					
 					System.gc();
 				}
