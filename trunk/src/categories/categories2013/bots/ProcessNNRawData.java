@@ -96,6 +96,11 @@ public class ProcessNNRawData {
 		
 	}
 	
+	public static Vector<double[]> normalize(Vector<double[]> examples)
+	{
+		return null;
+	}
+	
 	public static void main(String[] args) {
 			
 			Root root=new Root(0);
