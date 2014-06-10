@@ -26,7 +26,7 @@ public class Histogram {
 		
 		norma=((max-min));
 		
-		System.out.println("Size:"+(size+1));
+		//System.out.println("Size:"+(size+1));
 	}
 	
 	public void addValue(double v)
