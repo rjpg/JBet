@@ -226,8 +226,8 @@ public class ProcessNNRawData {
 				
 			}
 			
+			/*JFrame f=showHistogramChart(histogram, points,""+i);
 			
-			/*
 			try {
 				Display.getStringAnswer("pause - input : "+i);
 			} catch (IOException e) {
