@@ -259,46 +259,46 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					Vector<HorseLayOptions> olov=new Vector<HorseLayOptions>();
 					
 					HorseLayOptions olo0=new HorseLayOptions(false,2,3);
-					olo0.setEntryOdd(2);
-					olo0.setAboveOdd(3);
-					olo0.setNumberOffRunnersLow(8);
-					olo0.setNumberOffRunnersHigh(14);
-					olo0.setTimeHourLow(18.333333333333336);
-					olo0.setTimeHourHigh(20.111111111111114);
-					olo0.setLenghtInSecondsLow(60.0);
-					olo0.setLenghtInSecondsHigh(360.22);
-					olo0.setLiquidityLow(38616.54999999999);
-					olo0.setLiquidityHigh(689754.1255555556);
+//					olo0.setEntryOdd(2);
+//					olo0.setAboveOdd(3);
+//					olo0.setNumberOffRunnersLow(8);
+//					olo0.setNumberOffRunnersHigh(14);
+//					olo0.setTimeHourLow(18.333333333333336);
+//					olo0.setTimeHourHigh(20.111111111111114);
+//					olo0.setLenghtInSecondsLow(60.0);
+//					olo0.setLenghtInSecondsHigh(360.22);
+//					olo0.setLiquidityLow(38616.54999999999);
+//					olo0.setLiquidityHigh(689754.1255555556);
 					
-					//olov.add(olo0);
+					olov.add(olo0);
 					
 					HorseLayOptions olo1=new HorseLayOptions(false,2,5);
-					olo1.setEntryOdd(2);
-					olo1.setAboveOdd(5);
-					olo1.setNumberOffRunnersLow(5);
-					olo1.setNumberOffRunnersHigh(8);
-					olo1.setTimeHourLow(16.555555555555557);
-					olo1.setTimeHourHigh(19.222222222222225);
-					olo1.setLenghtInSecondsLow(60.0);
-					olo1.setLenghtInSecondsHigh(231.55555555555554);
-					olo1.setLiquidityLow(38616.54999999999);
-					olo1.setLiquidityHigh(689754.1255555556);
+//					olo1.setEntryOdd(2);
+//					olo1.setAboveOdd(5);
+//					olo1.setNumberOffRunnersLow(5);
+//					olo1.setNumberOffRunnersHigh(8);
+//					olo1.setTimeHourLow(16.555555555555557);
+//					olo1.setTimeHourHigh(19.222222222222225);
+//					olo1.setLenghtInSecondsLow(60.0);
+//					olo1.setLenghtInSecondsHigh(231.55555555555554);
+//					olo1.setLiquidityLow(38616.54999999999);
+//					olo1.setLiquidityHigh(689754.1255555556);
 					
-					//olov.add(olo1);
+					olov.add(olo1);
 					
 					HorseLayOptions olo2=new HorseLayOptions(false,3,6);
-					olo2.setEntryOdd(3);
-					olo2.setAboveOdd(6);
-					olo2.setNumberOffRunnersLow(2);
-					olo2.setNumberOffRunnersHigh(11.0);
-					olo2.setTimeHourLow(16.555555555555557 );
-					olo2.setTimeHourHigh(20.111111111111114);
-					olo2.setLenghtInSecondsLow(60.0);
-					olo2.setLenghtInSecondsHigh( 274.44444444444446);
-					olo2.setLiquidityLow(38616.54999999999);
-					olo2.setLiquidityHigh(1015322.9133333333);
+//					olo2.setEntryOdd(3);
+//					olo2.setAboveOdd(6);
+//					olo2.setNumberOffRunnersLow(2);
+//					olo2.setNumberOffRunnersHigh(11.0);
+//					olo2.setTimeHourLow(16.555555555555557 );
+//					olo2.setTimeHourHigh(20.111111111111114);
+//					olo2.setLenghtInSecondsLow(60.0);
+//					olo2.setLenghtInSecondsHigh( 274.44444444444446);
+//					olo2.setLiquidityLow(38616.54999999999);
+//					olo2.setLiquidityHigh(1015322.9133333333);
 					
-					//olov.add(olo2);
+					olov.add(olo2);
 					
 					// 4 - 6
 					//Mins :2.0 15.0 60.0 4823.89
@@ -307,30 +307,30 @@ public class LoaderHorseLayBots implements MarketChangeListener,MarketProviderLi
 					HorseLayOptions olo3=new HorseLayOptions(false,4,6);
 //					olo3.setEntryOdd(4);
 //					olo3.setAboveOdd(6);
-					olo3.setNumberOffRunnersLow(2.0);
-					olo3.setNumberOffRunnersHigh(29.0);
-					olo3.setTimeHourLow(15.0);
-					olo3.setTimeHourHigh( 21.0);
-					olo3.setLenghtInSecondsLow(60.0);
-					olo3.setLenghtInSecondsHigh( 102.88888888888889);
-					olo3.setLiquidityLow(4823.89);
-					olo3.setLiquidityHigh(992794.4733333333);
+//					olo3.setNumberOffRunnersLow(2.0);
+//					olo3.setNumberOffRunnersHigh(29.0);
+//					olo3.setTimeHourLow(15.0);
+//					olo3.setTimeHourHigh( 21.0);
+//					olo3.setLenghtInSecondsLow(60.0);
+//					olo3.setLenghtInSecondsHigh( 102.88888888888889);
+//					olo3.setLiquidityLow(4823.89);
+//					olo3.setLiquidityHigh(992794.4733333333);
 					
-					//olov.add(olo3);
+					olov.add(olo3);
 					
 					HorseLayOptions olo4=new HorseLayOptions(false,6,7);
-					olo4.setEntryOdd(6);
-					olo4.setAboveOdd(7);
-					olo4.setNumberOffRunnersLow(2);
-					olo4.setNumberOffRunnersHigh(23);
-					olo4.setTimeHourLow(14.777777777777779);
-					olo4.setTimeHourHigh(20.111111111111114);
-					olo4.setLenghtInSecondsLow(60.0);
-					olo4.setLenghtInSecondsHigh(231.55555555555554);
-					olo4.setLiquidityLow(364185.3377777778);
-					olo4.setLiquidityHigh(1992029.2766666666);
+//					olo4.setEntryOdd(6);
+//					olo4.setAboveOdd(7);
+//					olo4.setNumberOffRunnersLow(2);
+//					olo4.setNumberOffRunnersHigh(23);
+//					olo4.setTimeHourLow(14.777777777777779);
+//					olo4.setTimeHourHigh(20.111111111111114);
+//					olo4.setLenghtInSecondsLow(60.0);
+//					olo4.setLenghtInSecondsHigh(231.55555555555554);
+//					olo4.setLiquidityLow(364185.3377777778);
+//					olo4.setLiquidityHigh(1992029.2766666666);
 					
-					//olov.add(olo4);
+					olov.add(olo4);
 					
 					for(HorseLayOptions olo:olov)
 						new HorseLay3BotAbove6(md,olo);
@@ -747,7 +747,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.log=false;  // Log or not to Log when not in replay
 		Parameters.replay=true; 
 		Parameters.replay_file_list=true; 
-		Parameters.replay_file_list_test=false; 
+		Parameters.replay_file_list_test=true; 
 		Parameters.jump_to_the_next_race=false; //not go inplay ? 
 		Parameters.REALISTIC_TIME_REPLAY=false;
 		Parameters.PAUSE_BETWEEN_RACES_REPLAY=false;
@@ -761,9 +761,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.neuralBot=false;
 		Parameters.neighboursCorrelationBot=false;
 		Parameters.neuralDataBot=false; 
-		Parameters.horselayBots=false; 
+		Parameters.horselayBots=true; 
 		
-		Parameters.collectHorseLiquidityBot=true;
+		Parameters.collectHorseLiquidityBot=false;
 		
 		Parameters.simulation=true;
 		//Parameters.matchedStepsSimulation = 1; // in simulation part of matched amount in each call
