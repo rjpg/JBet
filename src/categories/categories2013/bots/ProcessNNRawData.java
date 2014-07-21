@@ -11,8 +11,12 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
+import org.encog.ml.data.specific.CSVNeuralDataSet;
+import org.encog.util.simple.EncogUtility;
+
 import DataRepository.Utils;
 import GUI.MyChart2D;
+import categories.categories2011.CategoriesManager;
 import categories.categories2011.Histogram;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
@@ -420,8 +424,9 @@ public class ProcessNNRawData {
 			String lineExample="";
 			for(double value:ex)
 			{
-				lineExample+=value+" ";
+				lineExample+=value+",";
 			}
+			lineExample = lineExample.substring(0, lineExample.length() - 1);
 			//lineExample+="\n";
 			
 			
@@ -444,6 +449,21 @@ public class ProcessNNRawData {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void writeEncogFile(Vector<CategoryNode> cat)
+	{
+		String encogFileName=CategoryNode.getAncestorsStringPath(cat)+"nn-train-data.egb";
+		String normalFileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+		
+		deleteFile(encogFileName);
+		
+		System.out.println("Writing binary Encog training to "+encogFileName);
+		File normalizaedCVSFile=new File(normalFileName);
+		File targetEGBFile=new File(encogFileName);
+		CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), DataWindowsSizes.INPUT_NEURONS, 1, false);
+		EncogUtility.saveEGB(targetEGBFile, csvnds);
+		System.out.println("Write Complete.");
+	}
 
 	public static void main(String[] args) {
 			
@@ -455,6 +475,8 @@ public class ProcessNNRawData {
 			int i=203;
 			//for(int i=0;i<648;i++)
 			{
+				System.out.println("-----------------------------------------------------");
+				System.out.println("--- Processing Category "+i+" ---");
 				Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
 				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawData.csv";
 				
@@ -481,6 +503,7 @@ public class ProcessNNRawData {
 					
 					System.gc();
 					
+					writeEncogFile(cat);
 					
 				}
 				else
