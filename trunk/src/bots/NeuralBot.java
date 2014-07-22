@@ -18,15 +18,17 @@ import org.encog.app.analyst.EncogAnalyst;
 import org.encog.app.analyst.script.normalize.AnalystField;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.MLDataPair;
+import org.encog.ml.data.basic.BasicMLData;
+import org.encog.ml.data.basic.BasicMLDataPair;
+import org.encog.neural.data.NeuralData;
+import org.encog.neural.data.basic.BasicNeuralData;
 import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 
 import bets.BetData;
-
 import statistics.Statistics;
-
 import categories.categories2011.CategoriesManager;
 import categories.categories2011.Category;
-
 import main.Parameters;
 import correctscore.MessageJFrame;
 import DataRepository.MarketChangeListener;
@@ -509,7 +511,12 @@ public class NeuralBot extends Bot implements TradeMechanismListener{
 		double[] out =new double[1];
 		//System.out.println("Number of values to compute:"+inputValues.length+"  input count:"+network.getInputCount());
 		
-		network.compute(inputValues,out);
+		
+		NeuralData in=new BasicNeuralData(inputValues);
+		NeuralData output = network.compute(in);
+		out=output.getData();
+		
+		
 		//System.out.println(out[0]);
 		//System.out.println(analyst.getScript().getNormalize().getNormalizedFields().get(cat.getNumberInputValues()).getName());
 		return analyst.getScript().getNormalize().getNormalizedFields().get(cat.getNumberInputValues()).deNormalize(out[0]);
