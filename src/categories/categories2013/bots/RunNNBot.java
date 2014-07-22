@@ -53,6 +53,8 @@ public class RunNNBot extends Bot {
 	public void update()
 	{
 		updateRunnerCategoryData();
+		
+		
 	}
 	
 	//pathroot\shortLenhgt\favorite\beginingDay\mediumRunners\farFromBegining\lowOdd\highLiquidity\
