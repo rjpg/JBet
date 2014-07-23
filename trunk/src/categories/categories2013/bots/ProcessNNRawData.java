@@ -472,8 +472,8 @@ public class ProcessNNRawData {
 			CategoryNode.printIDs(root);
 			//CategoryNode.buildDirectories(root);
 			
-			int i=203;
-			//for(int i=0;i<648;i++)
+			//int i=203;
+			for(int i=0;i<648;i++)
 			{
 				System.out.println("-----------------------------------------------------");
 				System.out.println("--- Processing Category "+i+" ---");
