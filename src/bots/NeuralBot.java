@@ -512,8 +512,8 @@ public class NeuralBot extends Bot implements TradeMechanismListener{
 		//System.out.println("Number of values to compute:"+inputValues.length+"  input count:"+network.getInputCount());
 		
 		
-		NeuralData in=new BasicNeuralData(inputValues);
-		NeuralData output = network.compute(in);
+		NeuralData in=(NeuralData) new BasicNeuralData(inputValues);
+		NeuralData output = (NeuralData) network.compute(in);
 		out=output.getData();
 		
 		

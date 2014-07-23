@@ -77,7 +77,6 @@
 	<classpathentry kind="lib" path="lib/rapidMinner/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/rapidMinner/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/rapidMinner/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/rapidMinner/encog.jar"/>
 	<classpathentry kind="lib" path="lib/rapidMinner/groovy-all-1.7.7.jar"/>
 	<classpathentry kind="lib" path="lib/rapidMinner/itextpdf-5.3.3.jar"/>
 	<classpathentry kind="lib" path="lib/rapidMinner/ivy-2.2.0.jar"/>
