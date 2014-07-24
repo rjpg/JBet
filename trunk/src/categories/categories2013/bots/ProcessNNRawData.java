@@ -14,13 +14,10 @@ import javax.swing.JFrame;
 import org.encog.ml.data.specific.CSVNeuralDataSet;
 import org.encog.util.simple.EncogUtility;
 
-import DataRepository.Utils;
 import GUI.MyChart2D;
-import categories.categories2011.CategoriesManager;
 import categories.categories2011.Histogram;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
-import demo.util.Display;
 
 public class ProcessNNRawData {
 	

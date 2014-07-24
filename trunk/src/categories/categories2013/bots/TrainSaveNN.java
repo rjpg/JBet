@@ -1,12 +1,14 @@
 package categories.categories2013.bots;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Vector;
 
 import org.encog.ml.data.MLDataSet;
 import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.propagation.TrainingContinuation;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
+import org.encog.persist.EncogDirectoryPersistence;
 import org.encog.util.simple.EncogUtility;
 
 import categories.categories2013.CategoryNode;
@@ -14,16 +16,46 @@ import categories.categories2013.Root;
 
 public class TrainSaveNN {
 
+	public static boolean trainToA=false;  //15%
+	public static boolean trainToB=false;  //12%
+	public static boolean trainToC=false;  //10%
+	public static boolean trainToD=false;  //8%
+	public static boolean trainToE=false;  //5%
+	public static boolean trainToF=false;  //8h
 	
 	public static void main(String[] args) {
 		
+		if(args.length<1)
+			System.out.println("Missing argument (category ID)");
+		for(int i = 1; i < args.length; i++) {
+            System.out.println(args[i]);
+		}
+		
+		int i=-1;
+		
+		i=Integer.parseInt(args[0]);
+		
+		if(i<0 || i>647)
+			System.out.println("invalid category ID : "+i);
+		
+		
 		Root root=new Root(0);
 		
-		int i=203;
-		int usedCores=2;
+		//i=203;
+		int usedCores=4;
 		
 		Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
 		String fileName=CategoryNode.getAncestorsStringPath(cat)+"nn-train-data.egb";
+		
+		String fileSaveA=CategoryNode.getAncestorsStringPath(cat)+"nn-A.eg";
+		String fileSaveB=CategoryNode.getAncestorsStringPath(cat)+"nn-B.eg";
+		String fileSaveC=CategoryNode.getAncestorsStringPath(cat)+"nn-C.eg";
+		String fileSaveD=CategoryNode.getAncestorsStringPath(cat)+"nn-D.eg";
+		String fileSaveE=CategoryNode.getAncestorsStringPath(cat)+"nn-E.eg";
+		String fileSaveF=CategoryNode.getAncestorsStringPath(cat)+"nn-F.eg";
+		
+		
+		
 		System.out.println("-----------------------------------------------------");
 		System.out.println("--- Processing Category "+i+" : "+CategoryNode.getAncestorsStringPath(cat)+" ---");
 		
@@ -45,17 +77,91 @@ public class TrainSaveNN {
 //			network.reset();
 			
 			final ResilientPropagation train = new ResilientPropagation(network, trainingSet);
-            train.setThreadCount(2);
+            train.setThreadCount(usedCores);
             
+            
+
+            Calendar now=Calendar.getInstance();
+            
+            Calendar untilTime=Calendar.getInstance();
+            
+            untilTime.add(Calendar.MINUTE, 10);
+
+            double error=2;
 			int epoch = 1;
 
 			do {
 				train.iteration();
-				System.out.println("Epoch #" + epoch + " Error:" + train.getError());
+				
+				error=train.getError();
+				
+				if(error<0.15 && !trainToA)
+				{
+					TrainingContinuation tc=train.pause();
+					train.finishTraining();
+					System.out.println("saving NN A");
+					EncogDirectoryPersistence.saveObject(new File(fileSaveA), network);
+					trainToA=true;
+					train.resume(tc);
+				}
+				
+				if(error<0.12 && !trainToB)
+				{
+					TrainingContinuation tc=train.pause();
+					train.finishTraining();
+					System.out.println("saving NN B");
+					EncogDirectoryPersistence.saveObject(new File(fileSaveB), network);
+					trainToB=true;
+					train.resume(tc);
+				}
+				
+				if(error<0.10 && !trainToC)
+				{
+					TrainingContinuation tc=train.pause();
+					train.finishTraining();
+					System.out.println("saving NN C");
+					EncogDirectoryPersistence.saveObject(new File(fileSaveC), network);
+					trainToC=true;
+					train.resume(tc);
+				}
+				
+				if(error<0.08 && !trainToD)
+				{
+					TrainingContinuation tc=train.pause();
+					train.finishTraining();
+					System.out.println("saving NN D");
+					EncogDirectoryPersistence.saveObject(new File(fileSaveD), network);
+					trainToD=true;
+					train.resume(tc);
+				}
+				
+				if(error<0.05 && !trainToE)
+				{
+					TrainingContinuation tc=train.pause();
+					train.finishTraining();
+					System.out.println("saving NN E");
+					EncogDirectoryPersistence.saveObject(new File(fileSaveE), network);
+					trainToE=true;
+					train.resume(tc);
+				}
+							
+				if(epoch % 100 == 0)
+				{
+					System.out.println("Epoch #" + epoch + " Error:" + train.getError());
+				    now=Calendar.getInstance();
+				}
 				epoch++;
-			} while(train.getError() > 0.01);
+				
+			} while(!now.after(untilTime) );
 			train.finishTraining();
 
+			System.out.println("saving NN F");
+			EncogDirectoryPersistence.saveObject(new File(fileSaveF), network);
+			trainToF=true;
+			
+			Vector<double[]> lastErrorTable=new Vector<double[]>();
+			lastErrorTable.add(new double[]{error,(double)epoch});
+			ProcessNNRawData.writeTalbleFile(lastErrorTable, cat, "last-error.txt");
 			
 		}
 		else
@@ -64,7 +170,9 @@ public class TrainSaveNN {
 		}
 		
 	
-
+		System.out.println("END TRAN for category : "+i);
+		
+		System.exit(0);
 		
 	}
 }
