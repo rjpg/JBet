@@ -1,11 +1,19 @@
 package categories.categories2013.bots;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Vector;
+
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.persist.EncogDirectoryPersistence;
 
 import DataRepository.RunnersData;
 import DataRepository.Utils;
 import categories.categories2013.CategoriesParameters;
 import categories.categories2013.CategoryNode;
+import categories.categories2013.Liquidity;
 
 public class RunnerCategoryData {
 
@@ -16,6 +24,21 @@ public class RunnerCategoryData {
 	RunnersData neighbour;
 	
 	int axisSize=3;
+	
+	// execute Model data
+	public static int PREDICT_NO_DATA_ERROR=-1;
+	public static int PREDICT_COLLECT_ERROR=-2;
+	public static int PREDICT_NO_MODEL_ERROR=-3;
+	
+	public static int PREDICT_ZERO=0;
+	public static int PREDICT_WEEAK_UP=1;
+	public static int PREDICT_WEEAK_DOWN=2;
+	public static int PREDICT_STRONG_UP=3;
+	public static int PREDICT_STRONG_DOWN=4;
+	
+	public static String SUFIX_MODEL="F";
+	double[][] minmax=null;
+	BasicNetwork network=null;
 	
 	
 	
@@ -84,9 +107,107 @@ public class RunnerCategoryData {
 		{
 			axisSize=2;
 		}
+		
+		loadExecutionModelData();
 	}
 	
+	public static BufferedReader getBufferedReader(File f)
+	{
+		BufferedReader input=null;
+		try {
+			input= new BufferedReader(new FileReader(f));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		return input;
+	}
 	
+	public int loadMinMaxValues()
+	{
+		
+		String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNMinMax.csv";
+		File f=new File(fileName);
+		
+		if(f.exists()) { 
+		
+			BufferedReader input=getBufferedReader(f);
+			String s=null;
+			
+			 minmax=new double[DataWindowsSizes.INPUT_NEURONS+2][2];
+			
+			
+			try {
+				for(int i=0;i<DataWindowsSizes.INPUT_NEURONS+2;i++)
+				{
+					s=input.readLine();
+					String sa[]=s.split(" ");
+					minmax[i][0]=Double.parseDouble(sa[0]);
+					minmax[i][1]=Double.parseDouble(sa[1]);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				input.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}else
+		{
+			System.out.println("File does not exists : "+fileName);
+			return -1;
+		}
+		return 0;
+	}
+	
+	public int loadNN()
+	{
+		String fileName=CategoryNode.getAncestorsStringPath(cat)+"nn-"+RunnerCategoryData.SUFIX_MODEL+".eg";
+		File networkFile=new File(fileName);
+		
+		if(networkFile.exists()) { 
+			network=(BasicNetwork) EncogDirectoryPersistence.loadObject(networkFile);
+		}
+		else
+		{
+			System.out.println("File does not exists : "+fileName);
+			return -1;
+		}
+		return 0;
+	}
+	
+	public void loadExecutionModelData()
+	{
+		String catPath=CategoryNode.getAncestorsStringPath(cat);
+		if(CategoriesParameters.COLLECT)
+		{
+			System.out.println("Loading model execution data for : "+catPath);
+			System.out.println("Loading normalization data for : "+catPath);
+			if(loadMinMaxValues()==-1)
+			{
+				System.out.println("Error Loading normalization data for : "+catPath);
+				return;
+			}
+			System.out.println("Loading NN for : "+catPath);
+			if(loadNN()==-1)
+			{
+				System.out.println("Error NN for : "+catPath);
+				return;
+			}
+			System.out.println("Loading model complete for : "+catPath);
+			
+		}
+		else
+		{
+			System.out.println("Not Loading model execution data : Running in Collect Data Mode");
+		}
+	}
 	
 	public double generateNNOutput()
 	{
