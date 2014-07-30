@@ -81,11 +81,11 @@ public class TrainSaveNN {
             
             
 
-            Calendar now=Calendar.getInstance();
+    //        Calendar now=Calendar.getInstance();
             
-            Calendar untilTime=Calendar.getInstance();
+    //        Calendar untilTime=Calendar.getInstance();
             
-            untilTime.add(Calendar.MINUTE, 10);
+    //        untilTime.add(Calendar.HOUR, 6);
 
             double error=2;
 			int epoch = 1;
@@ -95,73 +95,79 @@ public class TrainSaveNN {
 				
 				error=train.getError();
 				
-				if(error<0.15 && !trainToA)
+				if(epoch>50000 && !trainToA)
 				{
 					TrainingContinuation tc=train.pause();
 					train.finishTraining();
-					System.out.println("saving NN A");
+					System.out.println("saving NN A ERROR : "+error);
+					
 					EncogDirectoryPersistence.saveObject(new File(fileSaveA), network);
 					trainToA=true;
 					train.resume(tc);
 				}
 				
-				if(error<0.12 && !trainToB)
+				if(epoch>100000 && !trainToB)
 				{
 					TrainingContinuation tc=train.pause();
 					train.finishTraining();
-					System.out.println("saving NN B");
+					System.out.println("saving NN B ERROR : "+error);
 					EncogDirectoryPersistence.saveObject(new File(fileSaveB), network);
 					trainToB=true;
 					train.resume(tc);
 				}
 				
-				if(error<0.10 && !trainToC)
+				if(epoch>150000 && !trainToC)
 				{
 					TrainingContinuation tc=train.pause();
 					train.finishTraining();
-					System.out.println("saving NN C");
+					System.out.println("saving NN C ERROR : "+error);
 					EncogDirectoryPersistence.saveObject(new File(fileSaveC), network);
 					trainToC=true;
 					train.resume(tc);
 				}
 				
-				if(error<0.08 && !trainToD)
-				{
-					TrainingContinuation tc=train.pause();
-					train.finishTraining();
-					System.out.println("saving NN D");
-					EncogDirectoryPersistence.saveObject(new File(fileSaveD), network);
-					trainToD=true;
-					train.resume(tc);
-				}
-				
-				if(error<0.05 && !trainToE)
-				{
-					TrainingContinuation tc=train.pause();
-					train.finishTraining();
-					System.out.println("saving NN E");
-					EncogDirectoryPersistence.saveObject(new File(fileSaveE), network);
-					trainToE=true;
-					train.resume(tc);
-				}
-							
-				if(epoch % 100 == 0)
-				{
-					System.out.println("Epoch #" + epoch + " Error:" + train.getError());
-				    now=Calendar.getInstance();
-				}
+//				if(error<0.08 && !trainToD)
+//				{
+//					TrainingContinuation tc=train.pause();
+//					train.finishTraining();
+//					System.out.println("saving NN D");
+//					EncogDirectoryPersistence.saveObject(new File(fileSaveD), network);
+//					trainToD=true;
+//					train.resume(tc);
+//				}
+//				
+//				if(error<0.05 && !trainToE)
+//				{
+//					TrainingContinuation tc=train.pause();
+//					train.finishTraining();
+//					System.out.println("saving NN E");
+//					EncogDirectoryPersistence.saveObject(new File(fileSaveE), network);
+//					trainToE=true;
+//					train.resume(tc);
+//				}
+//							
+		//		if(epoch % 100 == 0)
+		//		{
+		//			System.out.println("Epoch #" + epoch + " Error:" + train.getError());
+		//		    now=Calendar.getInstance();
+		//		}
 				epoch++;
-				
-			} while(!now.after(untilTime) );
+				          
+			} while(epoch<200000 );
 			train.finishTraining();
 
-			System.out.println("saving NN F");
+//	A		50 000
+//	B		100 000
+//	C		150 000
+//	D		200 000
+			
+			System.out.println("saving NN F ERROR : "+error);
 			EncogDirectoryPersistence.saveObject(new File(fileSaveF), network);
 			trainToF=true;
 			
 			Vector<double[]> lastErrorTable=new Vector<double[]>();
 			lastErrorTable.add(new double[]{error,(double)epoch});
-			ProcessNNRawData.writeTalbleFile(lastErrorTable, cat, "last-error.txt");
+			//ProcessNNRawData.writeTalbleFile(lastErrorTable, cat, "last-error.txt");
 			
 		}
 		else

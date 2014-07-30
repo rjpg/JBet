@@ -56,6 +56,12 @@ public class OddInterval extends CategoryNode{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			try {
+				input.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			if(recordsNumber>=500)
 				flagActivate=true;
