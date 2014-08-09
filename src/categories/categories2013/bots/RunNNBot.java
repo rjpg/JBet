@@ -25,6 +25,7 @@ public class RunNNBot extends Bot {
 	
 	public RunNNBot(MarketData md) {
 		super(md, "RunNNBot");
+		
 		initialize();
 	}
 
@@ -32,8 +33,10 @@ public class RunNNBot extends Bot {
 	{
 	
 		CategoriesParameters.COLLECT=false;
+		//System.out.println("############################################ : "+CategoriesParameters.COLLECT);
 		root=new Root(0);
 		CategoryNode.printIDs(root);
+		System.out.println("############################################ : "+CategoriesParameters.COLLECT);
 		//CategoryNode.buildDirectories(root);
 		
 		//Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,500);

@@ -34,6 +34,7 @@ public class Parameters {
 	static public boolean manualPlaceBetBot=false; // for testing BetManager
 	static public boolean horselayBots=false; // for testing BetManager
 	static public boolean collectHorseLiquidityBot=true; // for testing BetManager
+	static public boolean runNN2013Bot=false; // for testing BetManager
 	
 	static public boolean dutchingBot=false;  // dutching bookmaking
 	
