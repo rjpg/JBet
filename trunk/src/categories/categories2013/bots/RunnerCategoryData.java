@@ -109,6 +109,7 @@ public class RunnerCategoryData {
 		}
 		
 		loadExecutionModelData();
+	
 	}
 	
 	public static BufferedReader getBufferedReader(File f)
@@ -185,7 +186,7 @@ public class RunnerCategoryData {
 	public void loadExecutionModelData()
 	{
 		String catPath=CategoryNode.getAncestorsStringPath(cat);
-		if(CategoriesParameters.COLLECT)
+		if(!CategoriesParameters.COLLECT)
 		{
 			System.out.println("Loading model execution data for : "+catPath);
 			System.out.println("Loading normalization data for : "+catPath);
@@ -201,6 +202,10 @@ public class RunnerCategoryData {
 				return;
 			}
 			System.out.println("Loading model complete for : "+catPath);
+			for(int i=0;i<minmax.length;i++)
+			{
+				System.out.println("minmax["+i+"][0]="+minmax[i][0]+"     minmax["+i+"][1]="+minmax[i][1]    );
+			}
 			
 		}
 		else
@@ -217,7 +222,7 @@ public class RunnerCategoryData {
 		}
 		
 		double past=Utils.getOddBackAVG(rd, 10, CategoriesParameters.FRAMES_PREDICTION-10);
-		double present=Utils.getOddBackAVG(rd, 0, 10);
+		double present=Utils.getOddBackAVG(rd, 10, 0);
 		
 		return Utils.oddToIndex(Utils.nearValidOdd(present))-Utils.oddToIndex(Utils.nearValidOdd(past));
 		
