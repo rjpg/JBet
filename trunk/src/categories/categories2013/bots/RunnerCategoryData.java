@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.encog.ml.data.MLData;
+import org.encog.neural.data.NeuralData;
+import org.encog.neural.data.basic.BasicNeuralData;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.persist.EncogDirectoryPersistence;
 
@@ -40,7 +43,8 @@ public class RunnerCategoryData {
 	double[][] minmax=null;
 	BasicNetwork network=null;
 	
-	
+	public Vector<Double> votes=new Vector<Double>();
+	public static int NUMBER_OF_VOTES=10;
 	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
@@ -202,16 +206,136 @@ public class RunnerCategoryData {
 				return;
 			}
 			System.out.println("Loading model complete for : "+catPath);
-			for(int i=0;i<minmax.length;i++)
-			{
-				System.out.println("minmax["+i+"][0]="+minmax[i][0]+"     minmax["+i+"][1]="+minmax[i][1]    );
-			}
+//			for(int i=0;i<minmax.length;i++)
+//			{
+//				System.out.println("minmax["+i+"][0]="+minmax[i][0]+"     minmax["+i+"][1]="+minmax[i][1]    );
+//			}
 			
 		}
 		else
 		{
 			System.out.println("Not Loading model execution data : Running in Collect Data Mode");
 		}
+	}
+	
+	public int predict()
+	{
+		if(CategoriesParameters.COLLECT)
+			return PREDICT_COLLECT_ERROR;
+		if(network== null || minmax == null)
+			return PREDICT_NO_MODEL_ERROR;
+		Vector<Double> rawInputs=generateNNInputs();
+		if(rawInputs==null)
+			return PREDICT_NO_DATA_ERROR;
+		
+		
+		
+		Double rawExample[]=rawInputs.toArray(new Double[]{});
+		double normalExample[]=new double[DataWindowsSizes.INPUT_NEURONS];
+		for(int i=0;i<DataWindowsSizes.INPUT_NEURONS;i++)
+		{		
+			normalExample[i]=ProcessNNRawData.normalizeValue(rawExample[i], minmax[i][0], minmax[i][1]);
+			//System.out.println("Normalize["+i+"]="+rawInputs.get(i)+" with ("+minmax[i][0]+","+minmax[i][1]+") = "+normalExample[i]);
+		}
+		
+		double[] out =new double[1];
+		//System.out.println("Number of values to compute:"+inputValues.length+"  input count:"+network.getInputCount());
+			
+		MLData pair=new BasicNeuralData(normalExample);
+		
+		MLData output = network.compute(pair);
+		out=output.getData();
+				
+		System.out.println("predict Value : "+out[0]+" in Ticks : "+deNormalizeOutput(out[0],minmax[DataWindowsSizes.INPUT_NEURONS][1]));
+		double value = deNormalizeOutput(out[0],minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		
+		double min=minmax[DataWindowsSizes.INPUT_NEURONS+1][0];
+		double max=minmax[DataWindowsSizes.INPUT_NEURONS+1][1];
+		
+		int ret=0;
+		if(value>-min && value<min)
+			ret=PREDICT_ZERO;
+		else if(value>=min && value<=max)
+			ret=PREDICT_WEEAK_UP;
+		else if(value>max)
+			ret=PREDICT_STRONG_UP;
+		else if(value>=-max && value<=-min)
+			ret=PREDICT_WEEAK_DOWN;
+		else if(value<-max)
+			ret=PREDICT_STRONG_DOWN;
+	
+		votes.add(value);
+		
+		if(votes.size()>NUMBER_OF_VOTES)
+		{
+			votes.remove(0);
+		}
+		
+		System.out.println("min : "+min+" max : "+max+"  predict : "+ret+" vector votes :"+votes);
+		
+		return ret;
+	}
+	
+	public double [] getOuputIntervals()
+	{
+		return minmax[DataWindowsSizes.INPUT_NEURONS+1];
+	}
+	
+	public void executePredictions()
+	{
+		if(votes.size()<NUMBER_OF_VOTES)
+			return;
+		
+		double avgVotes=0;
+		for(double x:votes)
+		{
+			avgVotes+=x;
+		}
+		
+		avgVotes=avgVotes/(double)votes.size();
+		
+		int value=(int)(avgVotes+0.5);
+		
+		double min=minmax[DataWindowsSizes.INPUT_NEURONS+1][0];
+		double max=minmax[DataWindowsSizes.INPUT_NEURONS+1][1];
+		
+		System.out.println("runner : "+rd.getName()+"min : "+min+" max : "+max+"  predict : "+value);
+		if(value>=min && value<=max)
+			swingUp();
+		else if(value>max)
+			trailUp();
+		else if(value>=-max && value<=-min)
+			swingDown();
+		else if(value<-max)
+			trailDown();
+		
+	}
+	
+	public void swingUp()
+	{
+		
+	}
+	
+	public void swingDown()
+	{
+		
+	}
+	
+	public void trailUp()
+	{
+		
+	}
+	
+	public void trailDown()
+	{
+		
+	}
+	
+	// min max are simetric so whe only need max
+	public double deNormalizeOutput(double value,double max)
+	{
+		return value*max;    
+	
 	}
 	
 	public double generateNNOutput()
@@ -240,6 +364,7 @@ public class RunnerCategoryData {
 		
 		if(!Utils.isValidWindow(rd,  timeDataWindows[DataWindowsSizes.SEGMENTS-1][1]*2, timeDataWindows[DataWindowsSizes.SEGMENTS-1][0]+timeFramesOffset))
 		{
+			//System.out.println("Not Valid window");
 			return null;
 		}
 		// 7 frames de interpolação cada imput  (está em DataWindowsSizes)
