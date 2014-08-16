@@ -31,7 +31,7 @@ public class RunNNBot extends Bot {
 
 	public void initialize()
 	{
-	
+		DataWindowsSizes.init();
 		CategoriesParameters.COLLECT=false;
 		//System.out.println("############################################ : "+CategoriesParameters.COLLECT);
 		root=new Root(0);
@@ -53,12 +53,44 @@ public class RunNNBot extends Bot {
 		
 	}
 
+	int predict=0;
+	int execute=0;
 	public void update()
 	{
+		if(getMinutesToStart()==0) return;
+		
 		updateRunnerCategoryData();
 		
-		
+		if(rcdv!=null && rcdv.size()>0)
+		{
+			predict++;
+			execute++;
+			//RunnerCategoryData rcd=rcdv.get(0);
+			for(RunnerCategoryData rcd:rcdv)
+			{	
+					
+				if(predict==2)
+				{
+					int result=rcd.predict();
+					System.out.println("result for "+rcd.getRd().getName()+" : "+result);
+				}		
+						
+				if(execute==30)
+					rcd.executePredictions();
+						
+			}
+				
+			if(execute==30)
+				execute=0;
+			if(predict==2)
+				predict=0;
+				
+				
+		}
 	}
+		
+		
+	
 	
 	//pathroot\shortLenhgt\favorite\beginingDay\mediumRunners\farFromBegining\lowOdd\highLiquidity\
 	
