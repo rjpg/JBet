@@ -69,7 +69,7 @@ public class TrainSaveNN {
 			
 			System.out.println("Preparing NN");
 			
-			BasicNetwork network = EncogUtility.simpleFeedForward(DataWindowsSizes.INPUT_NEURONS, DataWindowsSizes.MIDLE_LAYER_NEURONS, 0, 1, true);
+			BasicNetwork network = EncogUtility.simpleFeedForward(DataWindowsSizes.INPUT_NEURONS, DataWindowsSizes.MIDLE_LAYER_NEURONS, DataWindowsSizes.MIDLE_LAYER_NEURONS/2, 1, true);
 //			network.addLayer(new BasicLayer(DataWindowsSizes.INPUT_NEURONS));
 //			network.addLayer(new BasicLayer(DataWindowsSizes.MIDLE_LAYER_NEURONS));
 //			network.addLayer(new BasicLayer(1));

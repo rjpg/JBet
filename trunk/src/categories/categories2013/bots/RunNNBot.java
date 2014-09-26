@@ -22,6 +22,7 @@ public class RunNNBot extends Bot {
 	
 	Vector<RunnerCategoryData> rcdv=null;
 
+	ProcessStats pc=new ProcessStats();
 	
 	public RunNNBot(MarketData md) {
 		super(md, "RunNNBot");
@@ -53,6 +54,12 @@ public class RunNNBot extends Bot {
 		
 	}
 
+	public boolean isProfitableCat()
+	{
+		
+		return true;
+	}
+	
 	int predict=0;
 	int execute=0;
 	public void update()
@@ -68,21 +75,24 @@ public class RunNNBot extends Bot {
 			//RunnerCategoryData rcd=rcdv.get(0);
 			for(RunnerCategoryData rcd:rcdv)
 			{	
-					
-				if(predict==2)
+				//Vector<CategoryNode> cat= rcd.getCat();
+				//int idcat=cat.get(6).getIdStart();
+				//if(pc.isProfitableCat(idcat))
 				{
-					int result=rcd.predict();
-					System.out.println("result for "+rcd.getRd().getName()+" : "+result);
-				}		
-						
-				if(execute==30)
-					rcd.executePredictions();
-						
+					if(predict==1)
+					{
+						int result=rcd.predict();
+						System.out.println("result for "+rcd.getRd().getName()+" : "+result);
+					}		
+							
+					if(execute==30)
+						rcd.executePredictions();
+							
+				}
 			}
-				
 			if(execute==30)
 				execute=0;
-			if(predict==2)
+			if(predict==1)
 				predict=0;
 				
 				

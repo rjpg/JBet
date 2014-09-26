@@ -1,8 +1,11 @@
 package categories.categories2013.bots;
 
+import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -11,14 +14,23 @@ import org.encog.neural.data.NeuralData;
 import org.encog.neural.data.basic.BasicNeuralData;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.persist.EncogDirectoryPersistence;
+import org.junit.experimental.categories.Categories;
 
+import bets.BetData;
+import TradeMechanisms.TradeMechanism;
+import TradeMechanisms.TradeMechanismListener;
+import TradeMechanisms.swing.Swing;
+import TradeMechanisms.swing.SwingOptions;
+import TradeMechanisms.trailingStop.TrailingStop;
+import TradeMechanisms.trailingStop.TrailingStopOptions;
 import DataRepository.RunnersData;
 import DataRepository.Utils;
+import categories.categories2011.CategoriesManager;
 import categories.categories2013.CategoriesParameters;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Liquidity;
 
-public class RunnerCategoryData {
+public class RunnerCategoryData implements TradeMechanismListener{
 
 	Vector<CategoryNode> cat=null;
 	
@@ -44,7 +56,9 @@ public class RunnerCategoryData {
 	BasicNetwork network=null;
 	
 	public Vector<Double> votes=new Vector<Double>();
-	public static int NUMBER_OF_VOTES=10;
+	public static int NUMBER_OF_VOTES=30;
+	
+	public static boolean TRADE_AT_BEST_PRICE=true;
 	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
@@ -313,22 +327,155 @@ public class RunnerCategoryData {
 	
 	public void swingUp()
 	{
+		double entryOdd=0;
+		if(TRADE_AT_BEST_PRICE)
+			entryOdd=Utils.getOddBackFrame(rd, 0);
+		else
+			entryOdd=Utils.getOddLayFrame(rd, 0);
+			
 		
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		
+		BetData betOpen=new BetData(rd,
+				3.00,
+				entryOdd,
+				BetData.LAY,
+				false);
+		
+		SwingOptions so=new SwingOptions(betOpen, this);
+		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
+		so.setWaitFramesNormal(80);   //2.25- 3 minutes
+		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
+		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]+2);
+		so.setForceCloseOnStopLoss(false);
+		so.setInsistOpen(false);
+		so.setGoOnfrontInBestPrice(false);
+		so.setUseStopProfifInBestPrice(true);
+		so.setPercentageOpen(0.80);   // if 80% is open go to close  
+		so.setDelayBetweenOpenClose(-1);
+		so.setDelayIgnoreStopLoss(-1);
+		so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+		
+			
+		Swing swing=new Swing(so);
+		System.out.println("Swing Started - going to state EXECUTING_SWING");	
+	
 	}
 	
 	public void swingDown()
 	{
+		double entryOdd=0;
+		if(TRADE_AT_BEST_PRICE)
+			entryOdd=Utils.getOddLayFrame(rd, 0);
+		else
+			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		
+		BetData betOpen=new BetData(rd,
+				3.00,
+				entryOdd,
+				BetData.BACK,
+				false);
+		
+		
+		
+		SwingOptions so=new SwingOptions(betOpen, this);
+		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
+		so.setWaitFramesNormal(80);   //2.25- 3 minutes
+		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
+		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]+2);
+		so.setForceCloseOnStopLoss(false);
+		so.setInsistOpen(false);
+		so.setGoOnfrontInBestPrice(false);
+		so.setUseStopProfifInBestPrice(true);
+		so.setPercentageOpen(0.80);   // if 80% is open go to close  
+		so.setDelayBetweenOpenClose(-1);
+		so.setDelayIgnoreStopLoss(-1);
+		so.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+		
+			
+		Swing swing=new Swing(so);
+		System.out.println("Swing Started - going to state EXECUTING_SWING");	
 	}
 	
 	public void trailUp()
 	{
+		double entryOdd=0;
+		if(TRADE_AT_BEST_PRICE)
+			entryOdd=Utils.getOddBackFrame(rd, 0);
+		else
+			entryOdd=Utils.getOddLayFrame(rd, 0);
 		
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		
+		BetData betOpen=new BetData(rd,
+				3.00,
+				entryOdd,
+				BetData.LAY,
+				false);
+		
+		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
+		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
+		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
+		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+2);
+		tso.setForceCloseOnStopLoss(false);
+		tso.setInsistOpen(false);
+		tso.setGoOnfrontInBestPrice(false);
+		tso.setUseStopProfifInBestPrice(true);
+		tso.setPercentageOpen(0.80);   // if 80% is open go to close  
+		tso.setDelayBetweenOpenClose(-1);
+		tso.setDelayIgnoreStopLoss(-1);
+		tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+		
+		tso.setMovingAverageSamples(0);
+		tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
+			
+		TrailingStop trailingStop=new TrailingStop(tso);
+		System.out.println("TrailingStop Started - going to state EXECUTING_SWING");	
+
 	}
 	
 	public void trailDown()
 	{
+		double entryOdd=0;
+		if(TRADE_AT_BEST_PRICE)
+			entryOdd=Utils.getOddLayFrame(rd, 0);
+		else
+			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		
+		BetData betOpen=new BetData(rd,
+				3.00,
+				entryOdd,
+				BetData.BACK,
+				false);
+		
+		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
+		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
+		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
+		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+2);
+		tso.setForceCloseOnStopLoss(false);
+		tso.setInsistOpen(false);
+		tso.setGoOnfrontInBestPrice(false);
+		tso.setUseStopProfifInBestPrice(true);
+		tso.setPercentageOpen(0.80);   // if 80% is open go to close  
+		tso.setDelayBetweenOpenClose(-1);
+		tso.setDelayIgnoreStopLoss(-1);
+		tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
+		
+		tso.setMovingAverageSamples(0);
+		tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
+			
+		TrailingStop trailingStop=new TrailingStop(tso);
+		System.out.println("TrailingStop Started - going to state EXECUTING_SWING");	
 	}
 	
 	// min max are simetric so whe only need max
@@ -430,7 +577,68 @@ public class RunnerCategoryData {
 		return neighbour;
 	}
 
+	@Override
+	public void tradeMechanismChangeState(TradeMechanism tm, int state) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void tradeMechanismEnded(TradeMechanism tm, int state) {
+		writeResultsToFile(tm);
+		
+	}
+
+	@Override
+	public void tradeMechanismMsg(TradeMechanism tm, String msg, Color color) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void writeResultsToFile(TradeMechanism tm)
+	{
+		String line=cat.get(6).getIdStart()+" "+tm.getEndPL()+" ";
+		if(tm instanceof Swing)
+			line+="1 ";
+		else
+			line+="2 ";
+		
+		
+		String fileName="stats.txt";
+		
+		System.out.println("writing to file : "+fileName);
+		
+		BufferedWriter out=null;
+			
+		try {
+			out = new BufferedWriter(new FileWriter(fileName, true));
+			} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Error Open "+fileName+" for writing");
+			}
+		if(out==null)
+		{
+			System.err.println("could not open "+fileName);
+			return;
+		}
+		
+		try {
+			out.write(line);
+			out.newLine();
+			out.flush();
+		} catch (IOException e) {
+			System.out.println(fileName+":Error wrtting data to log file");
+			e.printStackTrace();
+		}
+		
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	
 	
