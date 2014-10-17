@@ -242,6 +242,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		if(rawInputs==null)
 			return PREDICT_NO_DATA_ERROR;
 		
+		if(!cat.get(5).getPath().equals("nearFromBegining"))
+		{
+			return PREDICT_NO_DATA_ERROR;
+		}
+		
 		
 		
 		Double rawExample[]=rawInputs.toArray(new Double[]{});
@@ -315,11 +320,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		System.out.println("runner : "+rd.getName()+"min : "+min+" max : "+max+"  predict : "+value);
 		if(value>=min && value<=max)
-			swingUp();
+			trailUp();//swingUp();
 		else if(value>max)
 			trailUp();
 		else if(value>=-max && value<=-min)
-			swingDown();
+			trailDown();//swingDown();
 		else if(value<-max)
 			trailDown();
 		
@@ -334,7 +339,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 			
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*-1*/);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -371,7 +376,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*+1*/);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -409,7 +414,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*-1*/);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -448,7 +453,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*+1*/);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
