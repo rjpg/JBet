@@ -41,23 +41,23 @@ public class ModelCore {
 	double goalsAVGScale[];
 	
 	// model inputs 
-    double goalLine=1.5;
-    double asianHcap=-0.25;
+    double goalLine=2.5;
+    double asianHcap=-1.25;
     
-    double gLineOver=0.89;
-    double gLineUnder=1.01;
+    double gLineOver=2.00;
+    double gLineUnder=2.00;
     
-    double aHcapHome=1.44;
-    double aHcapAway=0.61;
+    double aHcapHome=3.24;
+    double aHcapAway=0.31;
     
-    double desAH=0;
-    double desGL=0;
+    double desAH=2;
+    double desGL=2;
 
 
 	
 	//
-	double initExpectedGoalsA=0;
-	double initExpectedGoalsB=0;
+	double initExpectedGoalsA=1;
+	double initExpectedGoalsB=1;
 	
 	
 	//------------------------ time
@@ -787,14 +787,19 @@ public class ModelCore {
 			
 			printMatchOdds();
 			
-			//chart.addValue("A", i, sumA, Color.RED);
-			//chart.addValue("D", i, sumDraw, Color.GREEN);
-			//chart.addValue("B", i, sumB, Color.BLUE);
+//			chart.addValue("A", i, sumA, Color.RED);
+//			chart.addValue("D", i, sumDraw, Color.GREEN);
+//			chart.addValue("B", i, sumB, Color.BLUE);
+//			
+			chart.addValue("A", i, Utils.nearValidOdd(limit(1/sumA,10.)) , Color.RED);
+			chart.addValue("D", i, Utils.nearValidOdd(limit(1/sumDraw,10.)), Color.GREEN);
+			chart.addValue("B", i, Utils.nearValidOdd(limit(1/sumB,10.)), Color.BLUE);
 			
-			chart.addValue("1-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
-			chart.addValue("2-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
-			chart.addValue("2-1", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
-			chart.addValue("0-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
+			
+			//chart.addValue("1-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
+			//chart.addValue("2-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
+			//chart.addValue("2-1", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
+			//chart.addValue("0-0", i,  Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
 			
 		}	
 		
@@ -818,14 +823,14 @@ public class ModelCore {
 				System.out.println("Score "+ge.getA()+" "+ge.getB());
 			
 			printMatchOdds();
-			//chart.addValue("A", i+segments+1, sumA, Color.RED);
-			//chart.addValue("D", i+segments+1, sumDraw, Color.GREEN);
-			//chart.addValue("B", i+segments+1, sumB, Color.BLUE);
+			chart.addValue("A", i+segments+1, Utils.nearValidOdd(limit(1/sumA,10.)) , Color.RED);
+			chart.addValue("D", i+segments+1, Utils.nearValidOdd(limit(1/sumDraw,10.)), Color.GREEN);
+			chart.addValue("B", i+segments+1, Utils.nearValidOdd(limit(1/sumB,10.)), Color.BLUE);
 			
-			chart.addValue("1-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
-			chart.addValue("2-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
-			chart.addValue("2-1", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
-			chart.addValue("0-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
+			//chart.addValue("1-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/oneZero,100.))), Color.RED);
+			//chart.addValue("2-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoZero,100.))), Color.GREEN);
+			//chart.addValue("2-1", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/twoOne,100.))), Color.BLUE);
+			//chart.addValue("0-0", i+segments+1, Utils.oddToIndex(Utils.nearValidOdd(limit(1/actual,100.))), Color.MAGENTA);
 			
 		
 		}	
