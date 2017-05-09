@@ -85,12 +85,12 @@ public class RunNNBot extends Bot {
 						System.out.println("result for "+rcd.getRd().getName()+" : "+result);
 					}		
 							
-					if(execute==30)
+					if(execute==60)
 						rcd.executePredictions();
 							
 				}
 			}
-			if(execute==30)
+			if(execute==60)
 				execute=0;
 			if(predict==1)
 				predict=0;

@@ -24,7 +24,7 @@ public class ModelCore {
 	double table[][];
 	double totalTable=0;
 	
-	double drawFactor=1;
+	double drawFactor=0.80;
 	
 	//Handicap
 	double hcapHome[];
@@ -41,7 +41,7 @@ public class ModelCore {
 	double goalsAVGScale[];
 	
 	// model inputs 
-    double goalLine=2.5;
+    double goalLine=2.0;
     double asianHcap=-1.25;
     
     double gLineOver=2.00;
@@ -101,7 +101,7 @@ public class ModelCore {
 		
 		System.out.println("Supremacy :"+supremacy);
 		
-		//goalsVector.add(new GoalEvent(70, true, 1, 0));
+		goalsVector.add(new GoalEvent(70, true, 1, 0));
 		
 		//goalsVector.add(new GoalEvent(95, true, 2, 0));
 		

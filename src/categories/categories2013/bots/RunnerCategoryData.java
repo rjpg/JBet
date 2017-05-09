@@ -51,14 +51,17 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	public static int PREDICT_STRONG_UP=3;
 	public static int PREDICT_STRONG_DOWN=4;
 	
-	public static String SUFIX_MODEL="F";
+	public static String SUFIX_MODEL="C";
 	double[][] minmax=null;
 	BasicNetwork network=null;
 	
 	public Vector<Double> votes=new Vector<Double>();
-	public static int NUMBER_OF_VOTES=30;
+	public static int NUMBER_OF_VOTES=60;
 	
-	public static boolean TRADE_AT_BEST_PRICE=true;
+	public static boolean TRADE_AT_BEST_PRICE=false;
+	
+	public Vector<TradeMechanism> tmUp=new Vector<TradeMechanism>();
+	public Vector<TradeMechanism> tmDown=new Vector<TradeMechanism>();
 	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
@@ -242,7 +245,9 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		if(rawInputs==null)
 			return PREDICT_NO_DATA_ERROR;
 		
-		if(!cat.get(5).getPath().equals("nearFromBegining"))
+		
+		// force not use far (hack) - use only last 5 min.
+		if(cat.get(5).getPath().equals("farFromBegining"))
 		{
 			return PREDICT_NO_DATA_ERROR;
 		}
@@ -277,11 +282,17 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else if(value>=min && value<=max)
 			ret=PREDICT_WEEAK_UP;
 		else if(value>max)
+		{
 			ret=PREDICT_STRONG_UP;
+			//forceCloseTMDown();
+		}
 		else if(value>=-max && value<=-min)
 			ret=PREDICT_WEEAK_DOWN;
 		else if(value<-max)
+		{
+			//forceCloseTMUp();
 			ret=PREDICT_STRONG_DOWN;
+		}
 	
 		votes.add(value);
 		
@@ -289,6 +300,22 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		{
 			votes.remove(0);
 		}
+		
+		double avgVotes=0;
+		for(double x:votes)
+		{
+			avgVotes+=x;
+		}
+		
+		avgVotes=avgVotes/(double)votes.size();
+		
+		if(avgVotes>=max)
+			forceCloseTMDown();
+		if(avgVotes<=-max)
+			forceCloseTMUp();
+		
+		
+		
 		
 		System.out.println("min : "+min+" max : "+max+"  predict : "+ret+" vector votes :"+votes);
 		
@@ -302,6 +329,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	
 	public void executePredictions()
 	{
+		
 		if(votes.size()<NUMBER_OF_VOTES)
 			return;
 		
@@ -318,20 +346,32 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		double min=minmax[DataWindowsSizes.INPUT_NEURONS+1][0];
 		double max=minmax[DataWindowsSizes.INPUT_NEURONS+1][1];
 		
-		System.out.println("runner : "+rd.getName()+"min : "+min+" max : "+max+"  predict : "+value);
+		System.out.println("runner : "+rd.getName()+" min : "+min+" max : "+max+"  predict : "+value);
+		
 		if(value>=min && value<=max)
-			trailUp();//swingUp();
+			//trailUp();//
+			swingUp();
+			
 		else if(value>max)
 			trailUp();
+			//swingUp();
 		else if(value>=-max && value<=-min)
-			trailDown();//swingDown();
+			//trailDown();//
+			swingDown();
+			
 		else if(value<-max)
 			trailDown();
+			//swingDown();
+			  
+			 
+			 
 		
 	}
 	
 	public void swingUp()
 	{
+		//forceCloseTMDown();
+		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
 			entryOdd=Utils.getOddBackFrame(rd, 0);
@@ -339,7 +379,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 			
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*-1*/);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -351,8 +391,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
 		so.setWaitFramesNormal(80);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
-		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]+2);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+4);
+		so.setTicksLoss(1/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]/*+2*/);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
 		so.setGoOnfrontInBestPrice(false);
@@ -364,19 +404,27 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 			
 		Swing swing=new Swing(so);
+		tmUp.add(swing);
+		
+		System.err.println("Executing Prediction Swing UP "+rd.getName() );
+		rd.getMarketData().pause=true;
+		
 		System.out.println("Swing Started - going to state EXECUTING_SWING");	
 	
 	}
 	
 	public void swingDown()
 	{
+		
+		//forceCloseTMUp();
+		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*+1*/);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -390,8 +438,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
 		so.setWaitFramesNormal(80);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
-		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]+2);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+4);
+		so.setTicksLoss(1/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]/*+2*/);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
 		so.setGoOnfrontInBestPrice(false);
@@ -403,18 +451,26 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 			
 		Swing swing=new Swing(so);
+		tmDown.add(swing);
+		
+		System.err.println("Executing Prediction Swing DOWN "+rd.getName() );
+		rd.getMarketData().pause=true;
+		
+		
 		System.out.println("Swing Started - going to state EXECUTING_SWING");	
 	}
 	
 	public void trailUp()
 	{
+		//forceCloseTMDown();
+		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*-1*/);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -426,8 +482,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
 		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
-		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+2);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]+4);
+		tso.setTicksLoss(2/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]/*+2*/);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);
@@ -437,23 +493,34 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tso.setDelayIgnoreStopLoss(-1);
 		tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 		
-		tso.setMovingAverageSamples(0);
+		tso.setMovingAverageSamples(2);
 		tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
 			
 		TrailingStop trailingStop=new TrailingStop(tso);
-		System.out.println("TrailingStop Started - going to state EXECUTING_SWING");	
+		tmUp.add(trailingStop);
+		
+		System.err.println("Executing Prediction Trail UP "+rd.getName() );
+		rd.getMarketData().pause=true;
+		
+		
+		System.out.println("TrailingStop Started - going to state EXECUTING_TRAIL");
+		
+		
 
 	}
 	
 	public void trailDown()
 	{
+		
+		//forceCloseTMUp();
+		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)/*+1*/);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -465,8 +532,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
 		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
-		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+2);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]+4);
+		tso.setTicksLoss(2/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]/*+2*/);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);
@@ -476,11 +543,17 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tso.setDelayIgnoreStopLoss(-1);
 		tso.setUpdateInterval(TradeMechanism.SYNC_MARKET_DATA_UPDATE);
 		
-		tso.setMovingAverageSamples(0);
+		tso.setMovingAverageSamples(2);
 		tso.setReference(TrailingStopOptions.REF_BEST_PRICE);
 			
 		TrailingStop trailingStop=new TrailingStop(tso);
-		System.out.println("TrailingStop Started - going to state EXECUTING_SWING");	
+		tmDown.add(trailingStop);
+		
+		System.err.println("Executing Prediction trail DOWN "+rd.getName() );
+		rd.getMarketData().pause=true;
+		
+		
+		System.out.println("TrailingStop Started - going to state EXECUTING_TRAIL");	
 	}
 	
 	// min max are simetric so whe only need max
@@ -558,16 +631,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		return ret;
 	}
 	
-	public double[] generateNNTrainSample()
-	{
-		if(CategoriesParameters.COLLECT==false)
-		{
-			return null;
-		}
-		// generateNNInputs() + output
-		
-		return null;
-	}
+	
 	
 	public Vector<CategoryNode> getCat() {
 		return cat;
@@ -604,11 +668,18 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	{
 		String line=cat.get(6).getIdStart()+" "+tm.getEndPL()+" ";
 		if(tm instanceof Swing)
+		{
 			line+="1 ";
+			
+		}
 		else
+		{
 			line+="2 ";
+		}
 		
-		
+		line+=tm.getStatisticsValues().split(" ")[10]+" ";
+		//System.out.println(tm.getStatisticsFields());
+	
 		String fileName="stats.txt";
 		
 		System.out.println("writing to file : "+fileName);
@@ -643,6 +714,27 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void forceCloseTMUp()
+	{
+		System.err.println("########################## UP #################");
+		for(TradeMechanism tm:tmUp)
+		{
+			if(!tm.isEnded())
+				tm.forceClose();
+		}
+	}
+	
+	public void forceCloseTMDown()
+	{
+		
+		System.err.println("########################## DOWN #################");
+		for(TradeMechanism tm:tmDown)
+		{
+			if(!tm.isEnded())
+				tm.forceClose();
+		}
 	}
 	
 	

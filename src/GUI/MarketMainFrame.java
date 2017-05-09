@@ -15,8 +15,6 @@ import javax.swing.JPanel;
 
 import bets.BetData;
 
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
-
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;

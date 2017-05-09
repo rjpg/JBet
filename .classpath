@@ -120,5 +120,10 @@
 	<classpathentry kind="lib" path="lib/rapidMinner/xstream.jar"/>
 	<classpathentry kind="lib" path="lib/JNativeHook/JNativeHook.jar"/>
 	<classpathentry kind="lib" path="lib/encog/encog-core-3.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/dl4j/original-nd4j-examples-0.8-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/dl4j/nd4j-examples-0.8-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/tensorflow/libtensorflow-1.1.0-rc1.jar"/>
+	<classpathentry kind="lib" path="lib/dl4j/dl4j-examples-0.8-SNAPSHOT-bin.jar"/>
+	<classpathentry kind="lib" path="lib/tensorflow/proto-1.1.0-rc2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

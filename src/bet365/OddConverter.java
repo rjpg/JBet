@@ -6,11 +6,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+
 
 import DataRepository.Utils;
 import GUI.MessagePanel;
@@ -159,8 +161,8 @@ public class OddConverter {
 		}
 	}
 	
-	public static void main(String[] args) {
-		Utils.init();
-		new OddConverter(3);
-	}
+
 }
+
+	
+
