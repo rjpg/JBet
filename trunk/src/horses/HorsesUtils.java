@@ -8,6 +8,7 @@ public class HorsesUtils {
 	
 	public static int getTimeRaceInSeconds(String type)
 	{
+		
 		for(int i =0;i<HorsesUtils.raceType.length;i++)
 		{
 			String field0=type.split(" ")[0];

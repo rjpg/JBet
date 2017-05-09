@@ -202,16 +202,23 @@ public abstract class CategoryNode {
 		//CategoryNode.printIDs(root);
 		//CategoryNode.buildDirectories(root);
 		
-		System.out.println("Cat max ID : "+root.getIdEnd());		
-		/*for(int i=0;i<root.getIdEnd();i++)
+		System.out.println("Cat max ID : "+root.getIdEnd());	
+		//root.getAncestorsById(cat, id)
+		int nCatActive=0;
+		for(int i=0;i<root.getIdEnd();i++)
 		{
 			System.out.print("id="+i);
 			Vector<CategoryNode> cnv=CategoryNode.getAncestorsById(root,i);
 			
+			if(((Liquidity)cnv.get(7)).active==true)
+				nCatActive++;
 			for(CategoryNode cn:cnv)
+			{
 				System.out.print(cn.getPath()+"/");
-			
+				
+			}
 			System.out.println();
-		}*/
+		}
+		System.out.println("active Cats : "+nCatActive);
 	}
 }
