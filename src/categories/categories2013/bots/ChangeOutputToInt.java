@@ -8,6 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
+import categories.categories2013.CategoryNode;
+import categories.categories2013.Root;
+
 public class ChangeOutputToInt {
 
 	
@@ -24,12 +27,12 @@ public class ChangeOutputToInt {
 	}
 
 	
-	public static Vector<double[]> loadFileIntoMemory(String fileName)
+	public static Vector<double[]> loadFileIntoMemory(File file)
 	{
 		
 		Vector<double[]> ret=new Vector<double[]>();
 		
-		File ff=new File(fileName);
+		File ff=file;
 		BufferedReader inputFile=getBufferedReader(ff);
 		
 		if(inputFile == null)
@@ -57,7 +60,7 @@ public class ChangeOutputToInt {
 			return null;
 		}
 
-		System.out.println("END OF FILE : "+ fileName );
+		System.out.println("END OF FILE : "+ file.getPath() );
 		try {
 			inputFile.close();
 		} catch (IOException e) {
@@ -88,6 +91,18 @@ public class ChangeOutputToInt {
 	public static void writeTalbleFile(Vector<double[]> examples,String fileNameA)
 	{
 		String fileName=fileNameA;
+		
+		
+		File file = new File(fileName);
+		if(file.exists()) { 
+			System.out.println("File found in "+fileName);
+			if(file.delete()){
+    			System.out.println(file.getName() + " is deleted!");
+    		}else{
+    			System.out.println("Delete operation is failed.");
+    		}
+			System.gc();
+		}
 		
 		System.out.println("Writting data to file - "+fileName);
 		
@@ -145,8 +160,32 @@ public class ChangeOutputToInt {
 
 	
 	public static void main(String[] args) {
-		Vector<double[]> rawData=loadFileIntoMemory("NNNormalizeData.csv");
-		writeTalbleFile(rawData,"NNNormalizeData-out.csv");
+		
+		Root root=new Root(0);
+		
+		int i=607;
+		//for(int i=0;i<648;i++)
+		{
+			
+			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
+			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+			
+			
+			
+			File file = new File(fileName);
+			if(file.exists()) {
+				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath());
+				
+				Vector<double[]> rawData=loadFileIntoMemory(file);
+				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNormalizeData-out.csv");
+				
+				//rawData=null;
+			}
+		}
+		
+		
+		
+		
 		
 	}
 	
