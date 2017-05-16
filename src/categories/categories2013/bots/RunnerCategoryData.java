@@ -15,6 +15,9 @@ import org.encog.neural.data.basic.BasicNeuralData;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.persist.EncogDirectoryPersistence;
 import org.junit.experimental.categories.Categories;
+import org.tensorflow.SavedModelBundle;
+import org.tensorflow.Session;
+import org.tensorflow.Tensor;
 
 import bets.BetData;
 import TradeMechanisms.TradeMechanism;
@@ -45,20 +48,31 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	public static int PREDICT_COLLECT_ERROR=-2;
 	public static int PREDICT_NO_MODEL_ERROR=-3;
 	
-	public static int PREDICT_ZERO=0;
-	public static int PREDICT_WEEAK_UP=1;
-	public static int PREDICT_WEEAK_DOWN=2;
-	public static int PREDICT_STRONG_UP=3;
-	public static int PREDICT_STRONG_DOWN=4;
+	public static int PREDICT_STRONG_DOWN=0;
+	public static int PREDICT_WEEAK_DOWN=1;
+	public static int PREDICT_ZERO=2;
+	public static int PREDICT_STRONG_UP=4;
+	public static int PREDICT_WEEAK_UP=3;
 	
+	double[][] minmax=null; // For Normalizations and Denormalizations 
+	
+	// use TF or ENCOG ?
+	public static boolean useTensorFlow=true;  
+		
+	// for Encog Models 
 	public static String SUFIX_MODEL="C";
-	double[][] minmax=null;
 	BasicNetwork network=null;
 	
-	public Vector<Double> votes=new Vector<Double>();
+	// for TensorFlow Models
+	SavedModelBundle bundle=null; //SavedModelBundle.load("tfModels/dnn/ModelSave","serve");
+	Session TFsession = null; //bundle.session();
+	
+	
+	public Vector<Double> votesEncog=new Vector<Double>();
+	public Vector<Integer> votesTF=new Vector<Integer>();
 	public static int NUMBER_OF_VOTES=60;
 	
-	public static boolean TRADE_AT_BEST_PRICE=false;
+	public static boolean TRADE_AT_BEST_PRICE=true;
 	
 	public Vector<TradeMechanism> tmUp=new Vector<TradeMechanism>();
 	public Vector<TradeMechanism> tmDown=new Vector<TradeMechanism>();
@@ -190,16 +204,42 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	
 	public int loadNN()
 	{
-		String fileName=CategoryNode.getAncestorsStringPath(cat)+"nn-"+RunnerCategoryData.SUFIX_MODEL+".eg";
-		File networkFile=new File(fileName);
 		
-		if(networkFile.exists()) { 
-			network=(BasicNetwork) EncogDirectoryPersistence.loadObject(networkFile);
+		if(useTensorFlow)
+		{
+			String catPath= CategoryNode.getAncestorsStringPath(cat)+"ModelSaveFinal/";
+			File[] directories = new File(catPath).listFiles(File::isDirectory);
+			for (int i=0;i<directories.length;i++)
+			{
+				System.out.println(" #################### MODEL DIRS ############### \n"+directories[i].getPath());
+				catPath=directories[i].getPath();
+			}
+			
+			//catPath+="/saved_model.pbtxt";
+			bundle= SavedModelBundle.load(catPath,"serve");
+			TFsession = bundle.session();
+			//File file = new File("/path/to/directory");
+		/*	String[] directories = file.list(new FilenameFilter() {
+			  @Override
+			  public boolean accept(File current, String name) {
+			    return new File(current, name).isDirectory();
+			  }
+			});
+			System.out.println(Arrays.toString(directories));*/
 		}
 		else
 		{
-			System.out.println("File does not exists : "+fileName);
-			return -1;
+			String fileName=CategoryNode.getAncestorsStringPath(cat)+"nn-"+RunnerCategoryData.SUFIX_MODEL+".eg";
+			File networkFile=new File(fileName);
+			
+			if(networkFile.exists()) { 
+				network=(BasicNetwork) EncogDirectoryPersistence.loadObject(networkFile);
+			}
+			else
+			{
+				System.out.println("File does not exists : "+fileName);
+				return -1;
+			}
 		}
 		return 0;
 	}
@@ -235,25 +275,15 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		}
 	}
 	
-	public int predict()
+	
+	public int predictEncog(Vector<Double> rawInputs)
 	{
-		if(CategoriesParameters.COLLECT)
-			return PREDICT_COLLECT_ERROR;
-		if(network== null || minmax == null)
+		
+		if(network== null)
 			return PREDICT_NO_MODEL_ERROR;
-		Vector<Double> rawInputs=generateNNInputs();
-		if(rawInputs==null)
-			return PREDICT_NO_DATA_ERROR;
 		
-		
-		// force not use far (hack) - use only last 5 min.
-		if(cat.get(5).getPath().equals("farFromBegining"))
-		{
-			return PREDICT_NO_DATA_ERROR;
-		}
-		
-		
-		
+		int ret=RunnerCategoryData.PREDICT_ZERO;
+
 		Double rawExample[]=rawInputs.toArray(new Double[]{});
 		double normalExample[]=new double[DataWindowsSizes.INPUT_NEURONS];
 		for(int i=0;i<DataWindowsSizes.INPUT_NEURONS;i++)
@@ -276,7 +306,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		double min=minmax[DataWindowsSizes.INPUT_NEURONS+1][0];
 		double max=minmax[DataWindowsSizes.INPUT_NEURONS+1][1];
 		
-		int ret=0;
+	
 		if(value>-min && value<min)
 			ret=PREDICT_ZERO;
 		else if(value>=min && value<=max)
@@ -294,32 +324,113 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			ret=PREDICT_STRONG_DOWN;
 		}
 	
-		votes.add(value);
+		votesEncog.add(value);
 		
-		if(votes.size()>NUMBER_OF_VOTES)
+		if(votesEncog.size()>NUMBER_OF_VOTES)
 		{
-			votes.remove(0);
+			votesEncog.remove(0);
 		}
 		
 		double avgVotes=0;
-		for(double x:votes)
+		for(double x:votesEncog)
 		{
 			avgVotes+=x;
 		}
 		
-		avgVotes=avgVotes/(double)votes.size();
+		avgVotes=avgVotes/(double)votesEncog.size();
 		
 		if(avgVotes>=max)
 			forceCloseTMDown();
 		if(avgVotes<=-max)
 			forceCloseTMUp();
+	
 		
-		
-		
-		
-		System.out.println("min : "+min+" max : "+max+"  predict : "+ret+" vector votes :"+votes);
-		
+		System.out.println("min : "+min+" max : "+max+"  predict : "+ret+" vector votes :"+votesEncog);
+	
 		return ret;
+	}
+	
+	public int predictTensorFlow(Vector<Double> rawInputs)
+	{
+		if(TFsession == null)
+			return PREDICT_NO_MODEL_ERROR;
+		
+					
+		Double rawExample[]=rawInputs.toArray(new Double[]{});
+		double normalExample[]=new double[DataWindowsSizes.INPUT_NEURONS];
+		for(int i=0;i<DataWindowsSizes.INPUT_NEURONS;i++)
+		{		
+			normalExample[i]=ProcessNNRawData.normalizeValue(rawExample[i], minmax[i][0], minmax[i][1]);
+			//System.out.println("Normalize["+i+"]="+rawInputs.get(i)+" with ("+minmax[i][0]+","+minmax[i][1]+") = "+normalExample[i]);
+		}
+		
+		float [] inputfloat=new float[normalExample.length];
+		for(int i=0;i<inputfloat.length;i++)
+		{		
+			inputfloat[i]=(float) normalExample[i];
+		}
+		
+		float[][] data= new float[1][35];
+		data[0]=inputfloat;
+		Tensor inputTensor=Tensor.create(data);
+		
+		Tensor result = TFsession.runner()
+				.feed("dnn/input_from_feature_columns/input_from_feature_columns/concat", inputTensor)
+				//.feed("input_example_tensor", inputTensor)
+	            //.fetch("tensorflow/serving/classify")
+	            .fetch("dnn/multi_class_head/predictions/probabilities")
+				//.fetch("dnn/zero_fraction_3/Cast")
+	            .run().get(0);
+		
+		 float[][] m = new float[1][5];
+         float[][] vector = result.copyTo(m);
+         float maxVal = 0;
+         int inc = 0;
+         int predict = -1;
+         for(float val : vector[0]) 
+         {
+        	// System.out.println(val+"  ");
+        	 if(val > maxVal) {
+        		 predict = inc;
+        		 maxVal = val;
+        	 }
+        	 inc++;
+         }
+         
+         votesTF.add(predict);
+ 		
+		 if(votesTF.size()>NUMBER_OF_VOTES)
+		 {
+			votesTF.remove(0);
+		 }
+         
+		
+		return predict;
+	}
+	
+	public int predict()
+	{
+		if(CategoriesParameters.COLLECT)
+			return PREDICT_COLLECT_ERROR;
+		if(minmax == null)
+			return PREDICT_NO_MODEL_ERROR;
+		Vector<Double> rawInputs=generateNNInputs();
+		if(rawInputs==null)
+			return PREDICT_NO_DATA_ERROR;
+		
+		
+		// force not use far (hack) - use only last 5 min.
+		//if(cat.get(5).getPath().equals("farFromBegining"))
+		//{
+		//	return PREDICT_NO_DATA_ERROR;
+		//}
+		//System.out.println("cheguri aqui ");
+		if(useTensorFlow)
+			return predictTensorFlow(rawInputs);
+		else
+			return predictEncog(rawInputs);
+			
+
 	}
 	
 	public double [] getOuputIntervals()
@@ -327,19 +438,18 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		return minmax[DataWindowsSizes.INPUT_NEURONS+1];
 	}
 	
-	public void executePredictions()
+	public void executePredictionsEncog()
 	{
-		
-		if(votes.size()<NUMBER_OF_VOTES)
+		if(votesEncog.size()<NUMBER_OF_VOTES)
 			return;
 		
 		double avgVotes=0;
-		for(double x:votes)
+		for(double x:votesEncog)
 		{
 			avgVotes+=x;
 		}
 		
-		avgVotes=avgVotes/(double)votes.size();
+		avgVotes=avgVotes/(double)votesEncog.size();
 		
 		int value=(int)(avgVotes+0.5);
 		
@@ -362,8 +472,61 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else if(value<-max)
 			trailDown();
 			//swingDown();
-			  
 			 
+	}
+	
+	public void executePredictionsTensorFlow()
+	{
+		if(votesTF.size()<NUMBER_OF_VOTES)
+			return;
+		
+		//System.out.println("Passei aqui");
+		
+		int votesClasses[]=new int[5];
+		for(int x:votesTF)
+		{
+			votesClasses[x]++;
+		}
+		
+		int maxClass=-1;
+		int maxValue=-1;
+		for(int x=0;x<votesClasses.length;x++)
+		{
+			if(votesClasses[x]>maxValue)
+			{
+				maxValue=votesClasses[x];
+				maxClass=x;
+			}
+			
+			
+		}
+		
+		int totalForce=(votesClasses[0]+votesClasses[1])-(votesClasses[3]+votesClasses[4]);
+
+		if(votesClasses[maxClass]>20 )
+		{
+			
+			if(totalForce>0)
+			{
+				if(maxClass==PREDICT_STRONG_DOWN) {trailDown();forceCloseTMUp();}
+				if(maxClass==PREDICT_WEEAK_DOWN) {swingDown();forceCloseTMUp();}
+			}
+			if(totalForce<0)
+			{
+				if(maxClass==PREDICT_WEEAK_UP) {swingUp();forceCloseTMDown();}
+				if(maxClass==PREDICT_STRONG_UP) {trailUp();forceCloseTMDown();}
+			}
+		}
+
+	}
+	
+	public void executePredictions()
+	{
+		
+		if(useTensorFlow)
+			executePredictionsTensorFlow();
+		else
+			executePredictionsEncog();
 			 
 		
 	}
@@ -379,7 +542,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 			
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd));
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -388,11 +551,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 				false);
 		
 		SwingOptions so=new SwingOptions(betOpen, this);
-		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
-		so.setWaitFramesNormal(80);   //2.25- 3 minutes
+		so.setWaitFramesOpen(30);      // 0.75 minute 1,5
+		so.setWaitFramesNormal(40);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+4);
-		so.setTicksLoss(1/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]/*+2*/);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
 		so.setGoOnfrontInBestPrice(false);
@@ -424,7 +587,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd));
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -435,11 +598,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		
 		SwingOptions so=new SwingOptions(betOpen, this);
-		so.setWaitFramesOpen(40);      // 0.75 minute 1,5
-		so.setWaitFramesNormal(80);   //2.25- 3 minutes
+		so.setWaitFramesOpen(30);      // 0.75 minute 1,5
+		so.setWaitFramesNormal(40);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]+4);
-		so.setTicksLoss(1/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]/*+2*/);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
 		so.setGoOnfrontInBestPrice(false);
@@ -470,7 +633,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)-1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd));
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -479,11 +642,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 				false);
 		
 		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
-		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
-		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
+		tso.setWaitFramesOpen(30);      // 0.75 minute 1,5
+		tso.setWaitFramesNormal(40);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]+4);
-		tso.setTicksLoss(2/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]/*+2*/);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);
@@ -520,7 +683,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
-		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd)+1);
+		entryOdd=Utils.indexToOdd(Utils.oddToIndex(entryOdd));
 		
 		BetData betOpen=new BetData(rd,
 				3.00,
@@ -529,11 +692,11 @@ public class RunnerCategoryData implements TradeMechanismListener{
 				false);
 		
 		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
-		tso.setWaitFramesOpen(40);      // 0.75 minute 1,5
-		tso.setWaitFramesNormal(90);   //2.25- 3 minutes
+		tso.setWaitFramesOpen(30);      // 0.75 minute 1,5
+		tso.setWaitFramesNormal(40);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]+4);
-		tso.setTicksLoss(2/*(int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]/*+2*/);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);
@@ -592,13 +755,13 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			//System.out.println("Not Valid window");
 			return null;
 		}
-		// 7 frames de interpolação cada imput  (está em DataWindowsSizes)
+		// 7 frames de interpolaï¿½ï¿½o cada imput  (estï¿½ em DataWindowsSizes)
 		
-		// evolução da odd do proprio 
-		// evolução da odd do vizinho (ou favorito)
-		// evolução da oferta correspondida 
-		// evolução dos backs disponiveis  
-		// evolução dos lays disponiveis 
+		// evoluï¿½ï¿½o da odd do proprio 
+		// evoluï¿½ï¿½o da odd do vizinho (ou favorito)
+		// evoluï¿½ï¿½o da oferta correspondida 
+		// evoluï¿½ï¿½o dos backs disponiveis  
+		// evoluï¿½ï¿½o dos lays disponiveis 
 		
 		// 7 x 5 = 35 inputs 
 		

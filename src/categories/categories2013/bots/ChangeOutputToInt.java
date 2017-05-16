@@ -163,8 +163,8 @@ public class ChangeOutputToInt {
 		
 		Root root=new Root(0);
 		
-		int i=607;
-		//for(int i=0;i<648;i++)
+		//int i=607;
+		for(int i=0;i<648;i++)
 		{
 			
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
@@ -180,6 +180,11 @@ public class ChangeOutputToInt {
 				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNormalizeData-out.csv");
 				
 				//rawData=null;
+			}
+			else
+			{
+				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath());
+				System.out.println("Category ID:"+i+"  file does not exist" );
 			}
 		}
 		
