@@ -1,9 +1,12 @@
-package categories.categories2013;
+package categories.categories2013.scripts;
 
 import java.io.File;
 import java.util.Vector;
 
-public class DeleteNormalizedData {
+import categories.categories2013.CategoryNode;
+import categories.categories2013.Root;
+
+public class DeleteNNRawData {
 
 public static void main(String[] args) {
 		
@@ -15,7 +18,7 @@ public static void main(String[] args) {
 		for(int i=0;i<648;i++)
 		{
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawData.csv";
 			
 			
 			File file = new File(fileName);

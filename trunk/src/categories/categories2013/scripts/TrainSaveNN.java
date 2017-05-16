@@ -1,4 +1,4 @@
-package categories.categories2013.bots;
+package categories.categories2013.scripts;
 
 import java.io.File;
 import java.util.Calendar;
@@ -13,6 +13,7 @@ import org.encog.util.simple.EncogUtility;
 
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
+import categories.categories2013.bots.DataWindowsSizes;
 
 public class TrainSaveNN {
 
