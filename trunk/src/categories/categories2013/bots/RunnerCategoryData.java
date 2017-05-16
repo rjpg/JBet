@@ -570,7 +570,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tmUp.add(swing);
 		
 		System.err.println("Executing Prediction Swing UP "+rd.getName() );
-		rd.getMarketData().pause=true;
+		//rd.getMarketData().pause=true;
 		
 		System.out.println("Swing Started - going to state EXECUTING_SWING");	
 	
@@ -617,7 +617,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tmDown.add(swing);
 		
 		System.err.println("Executing Prediction Swing DOWN "+rd.getName() );
-		rd.getMarketData().pause=true;
+		//rd.getMarketData().pause=true;
 		
 		
 		System.out.println("Swing Started - going to state EXECUTING_SWING");	
@@ -663,7 +663,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tmUp.add(trailingStop);
 		
 		System.err.println("Executing Prediction Trail UP "+rd.getName() );
-		rd.getMarketData().pause=true;
+		//rd.getMarketData().pause=true;
 		
 		
 		System.out.println("TrailingStop Started - going to state EXECUTING_TRAIL");
@@ -691,6 +691,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 				BetData.BACK,
 				false);
 		
+		Utils.getAmountBackFrame(rd, 0);
 		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
 		tso.setWaitFramesOpen(30);      // 0.75 minute 1,5
 		tso.setWaitFramesNormal(40);   //2.25- 3 minutes
@@ -713,7 +714,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tmDown.add(trailingStop);
 		
 		System.err.println("Executing Prediction trail DOWN "+rd.getName() );
-		rd.getMarketData().pause=true;
+		//rd.getMarketData().pause=true;
 		
 		
 		System.out.println("TrailingStop Started - going to state EXECUTING_TRAIL");	
