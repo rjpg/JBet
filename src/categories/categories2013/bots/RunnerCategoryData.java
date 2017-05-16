@@ -71,7 +71,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	
 	public Vector<Double> votesEncog=new Vector<Double>();
 	public Vector<Integer> votesTF=new Vector<Integer>();
-	public static int NUMBER_OF_VOTES=60;
+	public static int NUMBER_OF_VOTES=30;
 	
 	public static boolean TRADE_AT_BEST_PRICE=true;
 	
@@ -115,16 +115,16 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			
 			if(cat.get(2).getPath().equals("nofavorite"))
 			{
-				neighbour=Utils.getNeighbour(rd);
+				neighbour=Utils.getNeighbour(rd,0);
 				System.out.println("no favorite : "+neighbour.getName());
 				
 			}
 			else
 			{
 				if(cat.get(6).getPath().equals("lowOdd"))
-					neighbour=Utils.getNeighbour(rd);
+					neighbour=Utils.getNeighbour(rd,0);
 				else
-					neighbour=Utils.getFavorite(rd.getMarketData());
+					neighbour=Utils.getFavorite(rd.getMarketData(),0);
 				
 				System.out.println("has favorite : "+neighbour.getName());
 			}
@@ -210,6 +210,13 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		{
 			String catPath= CategoryNode.getAncestorsStringPath(cat)+"ModelSaveFinal/";
 			File[] directories = new File(catPath).listFiles(File::isDirectory);
+			
+			if(directories==null)
+			{
+				System.out.println("Tensoflow model does not exists on : "+catPath);
+				return -1;
+			}
+			
 			for (int i=0;i<directories.length;i++)
 			{
 				System.out.println(" #################### MODEL DIRS ############### \n"+directories[i].getPath());
@@ -482,6 +489,10 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			return;
 		
 		//System.out.println("Passei aqui");
+		// test if it was stable last 30 frames 
+		
+		
+		
 		
 		int votesClasses[]=new int[5];
 		for(int x:votesTF)
@@ -489,22 +500,16 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			votesClasses[x]++;
 		}
 		
-		int maxClass=-1;
-		int maxValue=-1;
+		int maxClass=0;
+		
 		for(int x=0;x<votesClasses.length;x++)
-		{
-			if(votesClasses[x]>maxValue)
-			{
-				maxValue=votesClasses[x];
+			if(votesClasses[x]>votesClasses[maxClass])
 				maxClass=x;
-			}
 			
-			
-		}
 		
 		int totalForce=(votesClasses[0]+votesClasses[1])-(votesClasses[3]+votesClasses[4]);
 
-		if(votesClasses[maxClass]>20 )
+		if(votesClasses[maxClass]>10 )
 		{
 			
 			if(totalForce>0)
