@@ -1,4 +1,4 @@
-package categories.categories2013;
+package categories.categories2013.scripts;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -17,6 +17,9 @@ import DataRepository.RunnersData;
 import DataRepository.Utils;
 import GUI.MyChart2D;
 import categories.categories2011.Histogram;
+import categories.categories2013.CategoryNode;
+import categories.categories2013.OddInterval;
+import categories.categories2013.Root;
 
 public class ProcessLiquidityFiles {
 

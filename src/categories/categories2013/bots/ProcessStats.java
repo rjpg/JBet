@@ -7,6 +7,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import categories.categories2013.scripts.ProcessNNRawData;
+
 public class ProcessStats {
 	
 	public Hashtable<Integer, Double> stats=new Hashtable<Integer, Double>();

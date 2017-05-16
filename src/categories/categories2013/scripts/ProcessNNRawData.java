@@ -1,4 +1,4 @@
-package categories.categories2013.bots;
+package categories.categories2013.scripts;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -19,6 +19,7 @@ import aw.util.Range;
 import categories.categories2011.Histogram;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
+import categories.categories2013.bots.DataWindowsSizes;
 import demo.util.Display;
 
 public class ProcessNNRawData {

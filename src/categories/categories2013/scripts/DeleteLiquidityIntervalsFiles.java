@@ -1,7 +1,10 @@
-package categories.categories2013;
+package categories.categories2013.scripts;
 
 import java.io.File;
 import java.util.Vector;
+
+import categories.categories2013.CategoryNode;
+import categories.categories2013.Root;
 
 public class DeleteLiquidityIntervalsFiles {
 

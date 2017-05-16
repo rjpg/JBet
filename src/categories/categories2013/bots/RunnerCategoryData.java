@@ -32,6 +32,7 @@ import categories.categories2011.CategoriesManager;
 import categories.categories2013.CategoriesParameters;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Liquidity;
+import categories.categories2013.scripts.ProcessNNRawData;
 
 public class RunnerCategoryData implements TradeMechanismListener{
 
@@ -537,7 +538,12 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
-			entryOdd=Utils.getOddBackFrame(rd, 0);
+			if (Utils.getAmountBackFrame(rd, 0)>Utils.getAmountLayFrame(rd, 0)*2)
+				entryOdd=Utils.getOddLayFrame(rd, 0);
+			else if(Utils.getAmountBackFrame(rd, 0) *2 < Utils.getAmountLayFrame(rd, 0))
+				entryOdd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)) -1);
+			else
+				entryOdd=Utils.getOddBackFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 			
@@ -554,7 +560,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		so.setWaitFramesOpen(30);      // 0.75 minute 1,5
 		so.setWaitFramesNormal(40);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
 		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
@@ -583,7 +589,12 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
-			entryOdd=Utils.getOddLayFrame(rd, 0);
+			if (Utils.getAmountBackFrame(rd, 0)*2<Utils.getAmountLayFrame(rd, 0))
+				entryOdd=Utils.getOddBackFrame(rd, 0);
+			else if(Utils.getAmountBackFrame(rd, 0)>Utils.getAmountLayFrame(rd, 0)*2)
+				entryOdd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)) +1);
+			else
+				entryOdd=Utils.getOddLayFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
@@ -601,7 +612,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		so.setWaitFramesOpen(30);      // 0.75 minute 1,5
 		so.setWaitFramesNormal(40);   //2.25- 3 minutes
 		so.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		so.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
 		so.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
 		so.setForceCloseOnStopLoss(false);
 		so.setInsistOpen(false);
@@ -629,7 +640,12 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
-			entryOdd=Utils.getOddBackFrame(rd, 0);
+			if (Utils.getAmountBackFrame(rd, 0)>Utils.getAmountLayFrame(rd, 0)*2)
+				entryOdd=Utils.getOddLayFrame(rd, 0);
+			else if(Utils.getAmountBackFrame(rd, 0) *2 < Utils.getAmountLayFrame(rd, 0))
+				entryOdd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)) -1);
+			else
+				entryOdd=Utils.getOddBackFrame(rd, 0);
 		else
 			entryOdd=Utils.getOddLayFrame(rd, 0);
 		
@@ -645,8 +661,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		tso.setWaitFramesOpen(30);      // 0.75 minute 1,5
 		tso.setWaitFramesNormal(40);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
-		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);
@@ -679,7 +695,14 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		double entryOdd=0;
 		if(TRADE_AT_BEST_PRICE)
-			entryOdd=Utils.getOddLayFrame(rd, 0);
+		{
+			if (Utils.getAmountBackFrame(rd, 0)*2<Utils.getAmountLayFrame(rd, 0))
+				entryOdd=Utils.getOddBackFrame(rd, 0);
+			else if(Utils.getAmountBackFrame(rd, 0)>Utils.getAmountLayFrame(rd, 0)*2)
+				entryOdd=Utils.indexToOdd(Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)) +1);
+			else
+				entryOdd=Utils.getOddLayFrame(rd, 0);
+		}
 		else
 			entryOdd=Utils.getOddBackFrame(rd, 0);
 		
@@ -691,13 +714,13 @@ public class RunnerCategoryData implements TradeMechanismListener{
 				BetData.BACK,
 				false);
 		
-		Utils.getAmountBackFrame(rd, 0);
+		System.out.println("Ammount Back "+Utils.getAmountBackFrame(rd, 0));
 		TrailingStopOptions tso=new TrailingStopOptions(betOpen, this);
 		tso.setWaitFramesOpen(30);      // 0.75 minute 1,5
 		tso.setWaitFramesNormal(40);   //2.25- 3 minutes
 		tso.setWaitFramesBestPrice(30);  // 0.75 - 1.5 minute
-		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
-		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][0]);
+		tso.setTicksProfit((int)minmax[DataWindowsSizes.INPUT_NEURONS][1]);
+		tso.setTicksLoss((int)minmax[DataWindowsSizes.INPUT_NEURONS+1][1]);
 		tso.setForceCloseOnStopLoss(false);
 		tso.setInsistOpen(false);
 		tso.setGoOnfrontInBestPrice(false);

@@ -1,4 +1,4 @@
-package categories.categories2013.bots;
+package categories.categories2013.scripts;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
