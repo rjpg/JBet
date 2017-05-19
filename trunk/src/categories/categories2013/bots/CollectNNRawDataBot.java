@@ -32,7 +32,7 @@ public class CollectNNRawDataBot extends Bot {
 	
 	Vector<RunnerCategoryData> rcdv=null;
 	
-	String fileName="NNRawData.csv";
+	String fileName="NNRawDataTest.csv";
 	
 	Vector<CollectSamplesInfo> csiv=null;
 	
