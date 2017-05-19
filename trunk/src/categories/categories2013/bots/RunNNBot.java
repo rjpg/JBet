@@ -79,18 +79,18 @@ public class RunNNBot extends Bot {
 				//int idcat=cat.get(6).getIdStart();
 				//if(pc.isProfitableCat(idcat))
 				{
-					if(predict==1)
+					//if(predict==1)
 					{
 						int result=rcd.predict();
-						System.out.println("result for "+rcd.getRd().getName()+" : "+result);
+						//System.out.println("result for "+rcd.getRd().getName()+" : "+result);
 					}		
 							
-					if(execute==60)
+					//if(execute==1)
 						rcd.executePredictions();
 							
 				}
 			}
-			if(execute==60)
+			if(execute==1)
 				execute=0;
 			if(predict==1)
 				predict=0;

@@ -20,6 +20,8 @@ import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 
 import bets.BetData;
+import bots.MecanicBot;
+import bots.StudyBot;
 import TradeMechanisms.TradeMechanism;
 import TradeMechanisms.TradeMechanismListener;
 import TradeMechanisms.swing.Swing;
@@ -71,7 +73,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	
 	public Vector<Double> votesEncog=new Vector<Double>();
 	public Vector<Integer> votesTF=new Vector<Integer>();
-	public static int NUMBER_OF_VOTES=30;
+	public static int NUMBER_OF_VOTES=10;
 	
 	public static boolean TRADE_AT_BEST_PRICE=true;
 	
@@ -488,6 +490,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		if(votesTF.size()<NUMBER_OF_VOTES)
 			return;
 		
+		
+		
 		//System.out.println("Passei aqui");
 		// test if it was stable last 30 frames 
 		
@@ -509,18 +513,46 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		int totalForce=(votesClasses[0]+votesClasses[1])-(votesClasses[3]+votesClasses[4]);
 
-		if(votesClasses[maxClass]>10 )
+		
+		
+		
+		if(votesClasses[maxClass]>NUMBER_OF_VOTES/2 )
 		{
 			
 			if(totalForce>0)
 			{
-				if(maxClass==PREDICT_STRONG_DOWN) {trailDown();forceCloseTMUp();}
-				if(maxClass==PREDICT_WEEAK_DOWN) {swingDown();forceCloseTMUp();}
+				if(		Utils.isValidWindow(rd,MecanicBot.WINDOW_SIZE+1,StudyBot.WINDOW_SIZE+1) &&
+						Utils.isRdConstantOddBackInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
+						Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
+						Utils.getOddBackFrame(rd, 0)<20 &&
+						Utils.isWomGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+						Utils.isAmountLayGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+						Utils.isAmountBackGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+						Utils.isAmountLayBiggerThanBack(rd,0,0.30)  &&
+						//Utils.isAmountLayBiggerThanBack(rd,0)  &&
+						//Utils.getWomFrame(rd, 0) < 0)
+						Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) > Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
+				{
+					if(maxClass==PREDICT_STRONG_DOWN) {trailDown();forceCloseTMUp();}
+					if(maxClass==PREDICT_WEEAK_DOWN) {swingDown();forceCloseTMUp();}
+				}
 			}
 			if(totalForce<0)
 			{
+				if(Utils.isRdConstantOddLayInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
+				Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
+				Utils.getOddBackFrame(rd, 0)<20 &&
+				Utils.isWomGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0)  &&
+				Utils.isAmountLayGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+				Utils.isAmountBackGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+				Utils.isAmountBackBiggerThanLay(rd,0,0.30) &&
+				//Utils.isAmountBackBiggerThanLay(rd,0) &&
+				//Utils.getWomFrame(rd, 0) > 0 &&
+				Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) < Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
+				{
 				if(maxClass==PREDICT_WEEAK_UP) {swingUp();forceCloseTMDown();}
 				if(maxClass==PREDICT_STRONG_UP) {trailUp();forceCloseTMDown();}
+				}
 			}
 		}
 
