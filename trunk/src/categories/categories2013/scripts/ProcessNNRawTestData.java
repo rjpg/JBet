@@ -15,14 +15,13 @@ import org.encog.ml.data.specific.CSVNeuralDataSet;
 import org.encog.util.simple.EncogUtility;
 
 import GUI.MyChart2D;
-import aw.util.Range;
 import categories.categories2011.Histogram;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
 import categories.categories2013.bots.DataWindowsSizes;
 import demo.util.Display;
 
-public class ProcessNNRawData {
+public class ProcessNNRawTestData {
 	
 
 	
@@ -79,6 +78,51 @@ public class ProcessNNRawData {
 		}
 		return ret;
 	}
+	
+	public static Vector<double[]> loadMinMaxFileIntoMemory(String fileName)
+	{
+		
+		Vector<double[]> ret=new Vector<double[]>();
+		
+		File ff=new File(fileName);
+		BufferedReader inputFile=getBufferedReader(ff);
+		
+		if(inputFile == null)
+			return null;
+		
+		String s;
+		try {
+			for(int line=0;line<DataWindowsSizes.INPUT_NEURONS+2;line++)
+			{
+				s=inputFile.readLine();
+				String saux[]=s.split(" ");
+				double dataExample[]=new double[2]; 
+				
+				for (int i=0;i<2;i++)
+					dataExample[i]=Double.parseDouble(saux[i]);
+				
+				//System.out.println(fileName);
+				//System.out.println(dataExample[35]);
+				
+				ret.add(dataExample);
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+		System.out.println("END OF FILE : "+ fileName );
+		try {
+			inputFile.close();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
 	
 	
 	public static Vector<double[]> removeToCollectExamples(Vector<double[]> examples)
@@ -243,7 +287,6 @@ public class ProcessNNRawData {
 			//	points.add(-minmax[i+1][0]);
 			//	points.add(-minmax[i+1][1]);
 				
-				/*
 				JFrame f=showHistogramChart(histogram, points,""+i);
 				try {
 					Thread.sleep(1000);
@@ -261,7 +304,6 @@ public class ProcessNNRawData {
 				
 				f.setVisible(false);
 				f.dispose();
-				*/
 				
 			}
 			
@@ -288,17 +330,17 @@ public class ProcessNNRawData {
 	{
 		File file = new File(fileName);
 		if(file.exists()) { 
-			System.out.println("File found in "+fileName);
+			System.out.println("File to be deleted found in  "+fileName);
 			if(file.delete()){
     			System.out.println(file.getName() + " is deleted!");
     		}else{
-    			System.out.println("Delete operation is failed.");
+    			System.out.println("Delete operation fail.");
     		}
 			System.gc();
 		}
 		else
 		{
-			System.out.println("File Not found in "+fileName);
+			System.out.println("File do be deleted Not found in "+fileName);
 		}
 	}
 	
@@ -361,7 +403,6 @@ public class ProcessNNRawData {
 					
 					normalExample[i]=normalizeOutput(rawExample[i],minmax[i+1][0],minmax[i+1][1]);
 					//System.out.println("Normalize["+i+"]="+rawExample[i]+" with ("+minmax[i+1][0]+","+minmax[i+1][1]+") = "+normalExample[i]);
-					
 				}
 				else
 				{
@@ -377,7 +418,6 @@ public class ProcessNNRawData {
 				//	e.printStackTrace();
 				//}
 			}
-			
 			ret.add(normalExample);
 		}
 		
@@ -495,16 +535,14 @@ public class ProcessNNRawData {
 			CategoryNode.printIDs(root);
 			//CategoryNode.buildDirectories(root);
 			
-			
-			
-			int i=36;//203;
-			//for(int i=0;i<648;i++)
+			//int i=36;//203;
+			for(int i=0;i<648;i++)
 			{
 				System.out.println("-----------------------------------------------------");
 				System.out.println("--- Processing Category "+i+" ---");
 				Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawData.csv";
-				
+				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawDataTest.csv";
+				String fileNameMinMax=CategoryNode.getAncestorsStringPath(cat)+"NNMinMax.csv";
 				
 				File file = new File(fileName);
 				if(file.exists()) { 
@@ -514,19 +552,19 @@ public class ProcessNNRawData {
 					Vector<double[]> examples =loadFileIntoMemory(fileName);
 					System.out.println("Number of examples : "+examples.size() );
 					
-					Vector<double[]> collectExamples =removeToCollectExamples(examples);
-					System.out.println("Removed - Number of examples : "+collectExamples.size() );
 					
-					double minmax[][]=findMinMax(collectExamples);
+					Vector<double[]> minmaxV =loadMinMaxFileIntoMemory(fileNameMinMax);
+					double[][] minmax=new double[minmaxV.size()][2];
+					minmaxV.toArray(minmax);
 					
 					// para deixar no original 
 					// writeMinMaxValues(minmax,cat);
 					
-					Vector<double[]> normalizeExamples=normalize(collectExamples,minmax);
+					Vector<double[]> normalizeExamples=normalize(examples,minmax);
 					System.out.println("Normalized - Number of examples : "+normalizeExamples.size() );
 					
 					// para deixar no original
-					//writeTalbleFile(normalizeExamples,cat,"NNNormalizeData.csv");
+					writeTalbleFile(normalizeExamples,cat,"NNNTestNormalizeData.csv");
 					
 					System.gc();
 					
