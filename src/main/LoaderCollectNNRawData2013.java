@@ -1,5 +1,6 @@
 package main;
 
+
 import generated.exchange.BFExchangeServiceStub.Market;
 import generated.global.BFGlobalServiceStub.BFEvent;
 import generated.global.BFGlobalServiceStub.EventType;
@@ -51,7 +52,7 @@ import categories.categories2013.bots.CollectSamplesInfo;
 import categories.categories2013.bots.RunNNBot;
 import demo.util.Display;
 
-public class LoaderRunNN2013 implements MarketChangeListener,MarketProviderListerner{
+public class LoaderCollectNNRawData2013 implements MarketChangeListener,MarketProviderListerner{
 	
 	
 	
@@ -76,7 +77,7 @@ public class LoaderRunNN2013 implements MarketChangeListener,MarketProviderListe
 	//interface
 	MarketMainFrame mmf;
 	
-	public LoaderRunNN2013() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+	public LoaderCollectNNRawData2013() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		// Initialise logging and turn logging off. Change OFF to DEBUG for detailed output.
@@ -159,11 +160,7 @@ public class LoaderRunNN2013 implements MarketChangeListener,MarketProviderListe
 			
 		
 			
-			if(Parameters.runNN2013Bot)
-			{
-				new RunNNBot(md);
-			}
-		
+
 			// /////////////////////after////////////////////////////////////////////
 			md.startPolling();
 
@@ -190,10 +187,7 @@ public class LoaderRunNN2013 implements MarketChangeListener,MarketProviderListe
 				}
 				
 				
-				if(Parameters.runNN2013Bot)
-				{
-					new RunNNBot(md);
-				}
+				new CollectNNRawDataBot(md);
 				
 				
 				
@@ -255,8 +249,8 @@ public class LoaderRunNN2013 implements MarketChangeListener,MarketProviderListe
 					public void actionPerformed(ActionEvent e) {
 						if(!Parameters.replay)
 						{
-							LoaderRunNN2013.this.md.stopPolling();
-							LoaderRunNN2013.this.logout();
+							LoaderCollectNNRawData2013.this.md.stopPolling();
+							LoaderCollectNNRawData2013.this.logout();
 							
 							System.out.println("bye bye");
 							System.exit(0);
@@ -548,9 +542,9 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 		Parameters.horselayBots=false; 
 		
 		Parameters.collectHorseLiquidityBot=false;
-		Parameters.runNN2013Bot=true;
+		
 		
 		Parameters.simulation=true;
-		new LoaderRunNN2013();
+		new LoaderCollectNNRawData2013();
 		}
 }
