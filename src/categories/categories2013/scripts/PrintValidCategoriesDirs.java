@@ -17,7 +17,7 @@ public class PrintValidCategoriesDirs {
 			{
 				
 				Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNTestNormalizeData-out.csv";
 				
 				
 				

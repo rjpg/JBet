@@ -168,7 +168,7 @@ public class ChangeOutputToInt {
 		{
 			
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNTestNormalizeData.csv";
 			
 			
 			
@@ -177,7 +177,7 @@ public class ChangeOutputToInt {
 				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath());
 				
 				Vector<double[]> rawData=loadFileIntoMemory(file);
-				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNormalizeData-out.csv");
+				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNTestNormalizeData-out.csv");
 				
 				//rawData=null;
 			}
