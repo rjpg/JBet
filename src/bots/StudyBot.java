@@ -8,8 +8,6 @@ import javax.swing.text.DefaultEditorKit.PasteAction;
 
 import main.Parameters;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
-
 import correctscore.MessageJFrame;
 
 import DataRepository.MarketChangeListener;

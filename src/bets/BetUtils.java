@@ -13,12 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-import org.encog.mathutil.Equilateral;
-
 import bfapi.handler.ExchangeAPI;
-
-import sun.nio.cs.ext.MacHebrew;
-import sun.nio.cs.ext.MacThai;
 
 import DataRepository.MarketData;
 import DataRepository.OddData;

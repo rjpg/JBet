@@ -369,7 +369,7 @@ public class ProcessNNRawTestData {
 			System.err.println("could not open "+fileName);
 			return;
 		}
-		
+
 		try {
 			out.write(s);
 			out.newLine();

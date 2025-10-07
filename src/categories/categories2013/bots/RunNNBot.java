@@ -3,13 +3,17 @@ package categories.categories2013.bots;
 import java.awt.Color;
 import java.util.Vector;
 
+import javax.swing.JFrame;
+
 import DataRepository.MarketChangeListener;
 import DataRepository.MarketData;
 import DataRepository.RunnersData;
+import GUI.MyChart2D;
 import bots.Bot;
 import categories.categories2013.CategoriesParameters;
 import categories.categories2013.CategoryNode;
 import categories.categories2013.Root;
+import main.Parameters;
 
 public class RunNNBot extends Bot {
 
@@ -23,6 +27,10 @@ public class RunNNBot extends Bot {
 	Vector<RunnerCategoryData> rcdv=null;
 
 	ProcessStats pc=new ProcessStats();
+	
+	// if graphical bots
+	MyChart2D chart=null;
+	
 	
 	public RunNNBot(MarketData md) {
 		super(md, "RunNNBot");
@@ -44,8 +52,35 @@ public class RunNNBot extends Bot {
 		
 		//for(CategoryNode cn:cnv)
 		//	System.out.print(cn.getPath()+"\\");
-		
+		if(Parameters.graphicalInterfaceBots==true)
+			initChartFrame();
 	}
+	
+	void initChartFrame()
+	{
+		frame = new JFrame("P&L Chart");
+		
+		chart=new MyChart2D();
+		//chart.setXRange(0, 3000);
+		chart.setMaxPoints(3000);
+		chart.setAutoscrolls(false);
+		//chart.setScaleY(false);
+		//chart.setForceXRange(new Range(50.1, 50));
+		chart.setDecimalsX(0);
+		frame.add(chart);
+		frame.setSize(1000, 500);
+		frame.setVisible(true);
+	}
+	
+	@Override
+	public void setAmountGreen(double amountGreenA) {
+		// TODO Auto-generated method stub
+		super.setAmountGreen(amountGreenA);
+		chart.addValue("P&L", getGreens(), getAmountGreen(), Color.GREEN);
+		chart.addValue("zero", getGreens(), 0, Color.GRAY);
+	}
+	
+	
 
 	public void newMarket(MarketData md)
 	{
@@ -62,8 +97,19 @@ public class RunNNBot extends Bot {
 	
 	int predict=0;
 	int execute=0;
+	
+	int frames_in_near=0;
 	public void update()
 	{
+		
+		if(nearActive)
+		{
+			System.out.println("frames in Near : "+ frames_in_near);
+			frames_in_near++;
+			if(frames_in_near==150)
+				getMd().pause=true;
+		}
+		
 		if(getMinutesToStart()==0) return;
 		
 		updateRunnerCategoryData();
@@ -79,20 +125,20 @@ public class RunNNBot extends Bot {
 				//int idcat=cat.get(6).getIdStart();
 				//if(pc.isProfitableCat(idcat))
 				{
-					//if(predict==1)
+					if(predict==1)
 					{
 						int result=rcd.predict();
 						//System.out.println("result for "+rcd.getRd().getName()+" : "+result);
 					}		
 							
-					//if(execute==1)
+					if(execute==1)
 						rcd.executePredictions();
 							
 				}
 			}
-			if(execute==1)
+			if(execute==10)
 				execute=0;
-			if(predict==1)
+			if(predict==2)
 				predict=0;
 				
 				
@@ -153,7 +199,7 @@ public class RunNNBot extends Bot {
 				else
 				{
 					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
-					rcdv.add(new RunnerCategoryData(rd, cat));
+					rcdv.add(new RunnerCategoryData(rd, cat,this));
 				}
 				
 			}
@@ -187,7 +233,7 @@ public class RunNNBot extends Bot {
 				else
 				{
 					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
-					rcdv.add(new RunnerCategoryData(rd, cat));
+					rcdv.add(new RunnerCategoryData(rd, cat,this));
 				}
 				
 			}
@@ -197,6 +243,10 @@ public class RunNNBot extends Bot {
 		{
 			nearActive=true;
 			
+			frames_in_near=0;	
+			
+			System.out.println("Frames on near :"+ getMd().getRunners().get(0).getDataFrames().size());
+			getMd().pause=true;
 			System.out.println("activating near");
 			
 			farActive=true;
@@ -218,7 +268,7 @@ public class RunNNBot extends Bot {
 				else
 				{
 					System.out.println(rd.getName()+" category id (start):"+cat.get(cat.size()-1).getIdStart()+" (end):"+cat.get(cat.size()-1).getIdEnd()+" path : "+CategoryNode.getAncestorsStringPath(cat));
-					rcdv.add(new RunnerCategoryData(rd, cat));
+					rcdv.add(new RunnerCategoryData(rd, cat,this));
 				}
 				
 			}

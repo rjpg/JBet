@@ -1,7 +1,11 @@
 package categories.categories2013.bots;
 
+import java.util.Vector;
+
 import DataRepository.RunnersData;
 import DataRepository.Utils;
+import akka.japi.pf.Match;
+import categories.categories2018.DataWindowsSizes2018;
 
 public class UtilsCollectData {
 
@@ -192,4 +196,106 @@ public class UtilsCollectData {
 		//return Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
 		return ret;
 	}
+	
+	public static double getOddLayTickVariationIntegral(RunnersData rd,int pastFrame, int windowSize, int refFramesSize)
+	{
+		
+		double indexRef=0;
+		for(int i=pastFrame+windowSize;i<refFramesSize+windowSize+pastFrame;i++)
+		{
+			indexRef+=Utils.oddToIndex(Utils.getOddLayFrame(rd, i));
+			//System.out.println("Odd Lay "+Utils.getOddLayFrame(rd, i)+" index "+Utils.oddToIndex(Utils.getOddLayFrame(rd, i))+" on frame "+i);
+		}
+		indexRef/=refFramesSize;
+		//System.out.println("Index Ref "+ indexRef);
+		
+		double ret=0;
+		for(int i=pastFrame;i<windowSize+pastFrame;i++)
+		{
+			ret-=(indexRef-(double)Utils.oddToIndex(Utils.getOddLayFrame(rd,i)));
+		}
+		//System.out.println("Variation ["+pastFrame+"]["+windowSize+"]="+(Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1)))+ " Odd["+pastFrame+"]="+Utils.getOddLayFrame(rd,pastFrame)+" Odd["+(windowSize+pastFrame-1)+"]="+Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		//return Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		return ret;
+	}
+	
+	public static double getOddLayTickVariationIntegralABSStep(RunnersData rd,int pastFrame, int windowSize, int refFramesSize)
+	{
+		
+		double indexRef=0;
+		for(int i=pastFrame+windowSize;i<refFramesSize+windowSize+pastFrame;i++)
+		{
+			indexRef+=Utils.oddToIndex(Utils.getOddLayFrame(rd, i));
+			//System.out.println("Odd Lay "+Utils.getOddLayFrame(rd, i)+" index "+Utils.oddToIndex(Utils.getOddLayFrame(rd, i))+" on frame "+i);
+		}
+		indexRef/=refFramesSize;
+		//System.out.println("Index Ref "+ indexRef);
+		
+		double ret=0;
+		for(int i=pastFrame;i<windowSize+pastFrame;i++)
+		{
+			
+			ret+=Math.abs((indexRef-(double)Utils.oddToIndex(Utils.getOddLayFrame(rd,i))));
+		}
+		//System.out.println("Variation ["+pastFrame+"]["+windowSize+"]="+(Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1)))+ " Odd["+pastFrame+"]="+Utils.getOddLayFrame(rd,pastFrame)+" Odd["+(windowSize+pastFrame-1)+"]="+Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		//return Utils.oddToIndex(Utils.getOddLayFrame(rd,pastFrame))-Utils.oddToIndex(Utils.getOddLayFrame(rd, windowSize+pastFrame-1));
+		return ret;
+	}
+
+	
+	
+	public static double getWomAVGWindow (RunnersData rd,int pastFrame, int windowSize,int depth,boolean includeGaps)
+	{
+		double ac=0;
+		for(int i=0;i<windowSize+1;i++)
+		{
+			ac+=Utils.getWomFrame(rd,depth,includeGaps,i+pastFrame);
+		}
+		
+		return ac/windowSize+1;
+	}
+	
+	public static double getWomOthersAVGWindow (RunnersData rd,int pastFrame, int windowSize,int depth,boolean includeGaps,double oddLimit)
+	{
+		
+		
+		Vector<RunnersData> usedRunners=new Vector<RunnersData>();
+		for(RunnersData rdIteretor:rd.getMarketData().getRunners())
+			if(rdIteretor!=rd && Utils.getOddBackFrame(rdIteretor, pastFrame)<oddLimit)
+				usedRunners.add(rdIteretor);
+
+		if(usedRunners.size()==0)
+			return 0;
+		
+		double ac=0;
+		for(RunnersData rdOther:usedRunners)
+			ac+=getWomAVGWindow (rdOther, pastFrame, windowSize, depth, includeGaps);
+			
+		return ac/usedRunners.size();
+	}
+	
+	public static double[] getMaxTickVariation(RunnersData rd,int pastFrame, int windowSize,int refFramesSize)
+	{
+		double ret[]=new double[2]; //  [0]-up [1]-down 
+		
+		if(!Utils.isValidWindow(rd, windowSize, pastFrame ))
+		{
+			System.out.println("Not Valid window at getMaxTickVariation()");
+			return null;
+		}
+		
+		double refOdd=Utils.getOddLayAVG(rd, refFramesSize, pastFrame+windowSize);
+		
+		for(int i=pastFrame;i<pastFrame+windowSize;i++)
+		{
+			double present=Utils.getOddLayFrame(rd, i);
+			int var=Utils.oddToIndex(Utils.nearValidOdd(present))-Utils.oddToIndex(Utils.nearValidOdd(refOdd));
+			if(ret[0]<var) ret[0]=var;
+			if(ret[1]>var) ret[1]=var;
+			
+		}
+		
+		return ret;
+	}
+	
 }

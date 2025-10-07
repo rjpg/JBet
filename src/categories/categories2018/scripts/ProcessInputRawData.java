@@ -1,4 +1,4 @@
-package categories.categories2013.scripts;
+package categories.categories2018.scripts;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -15,14 +15,16 @@ import org.encog.ml.data.specific.CSVNeuralDataSet;
 import org.encog.util.simple.EncogUtility;
 
 import GUI.MyChart2D;
-import aw.util.Range;
+
 import categories.categories2011.Histogram;
 import categories.categories2013.CategoryNode;
-import categories.categories2013.Root;
-import categories.categories2013.bots.DataWindowsSizes;
+import categories.categories2018.DataWindowsSizes2018;
+import categories.categories2018.cattree.Root2018;
 import demo.util.Display;
 
-public class ProcessNNRawData {
+
+
+public class ProcessInputRawData {
 	
 
 	
@@ -53,9 +55,9 @@ public class ProcessNNRawData {
 			while ((s=inputFile.readLine()) != null)
 			{
 				String saux[]=s.split(" ");
-				double dataExample[]=new double[DataWindowsSizes.INPUT_NEURONS+1]; 
+				double dataExample[]=new double[DataWindowsSizes2018.TIME_SERIES]; 
 				
-				for (int i=0;i<DataWindowsSizes.INPUT_NEURONS+1;i++)
+				for (int i=0;i<DataWindowsSizes2018.TIME_SERIES;i++)
 					dataExample[i]=Double.parseDouble(saux[i]);
 				
 				//System.out.println(fileName);
@@ -89,7 +91,7 @@ public class ProcessNNRawData {
 		
 		
 		
-		if(size<=DataWindowsSizes.COLLECT_EXAMPLES)
+		if(size<=DataWindowsSizes2018.COLLECT_EXAMPLES)
 		{
 			for(int i=0;i<examples.size();i++)
 				ret.add(examples.get(i));
@@ -97,9 +99,9 @@ public class ProcessNNRawData {
 		}
 			
 		
-		double step=(double)size/(double)DataWindowsSizes.COLLECT_EXAMPLES;
+		double step=(double)size/(double)DataWindowsSizes2018.COLLECT_EXAMPLES;
 		double doubleIndex=0;
-		for(int i =0;i<DataWindowsSizes.COLLECT_EXAMPLES;i++)
+		for(int i =0;i<DataWindowsSizes2018.COLLECT_EXAMPLES;i++)
 		{
 			ret.add(examples.get((int)doubleIndex));
 			doubleIndex+=step;
@@ -170,7 +172,7 @@ public class ProcessNNRawData {
 		{
 		
 			chart.addValue("interval", point-1, 0, Color.RED);
-			chart.addValue("interval", point, 100, Color.RED);
+			chart.addValue("interval", point, 1000, Color.RED);
 			chart.addValue("interval", point+1, 0, Color.RED);
 		}
 		
@@ -180,12 +182,13 @@ public class ProcessNNRawData {
 		return frame;
 	}
 	
-	public static double[][] findMinMax(Vector<double[]> examples)
+	public static double[][] findMinMax(Vector<double[]> examples,double filters[])
 	{
-		double minmax[][]=new double[DataWindowsSizes.INPUT_NEURONS+2][2];
+		double minmax[][]=new double[DataWindowsSizes2018.TIME_SERIES][2];
 		
 		
-		for(int i=0;i<DataWindowsSizes.INPUT_NEURONS+1;i++)
+		
+		for(int i=0;i<DataWindowsSizes2018.TIME_SERIES;i++)
 		{
 			Vector<Double> column=new Vector<Double>();
 			for(double columns[]:examples)
@@ -195,39 +198,13 @@ public class ProcessNNRawData {
 			
 			Histogram histogram=buildHistogram(column);
 			
-			double filter=90;
-			if(i==DataWindowsSizes.INPUT_NEURONS)
-				filter=95;
-			minmax[i][0]=histogram.getMinFiltred(filter);
-			minmax[i][1]=histogram.getMaxFiltred(filter);
 			
-			if(i==DataWindowsSizes.INPUT_NEURONS)
-			{
-				
-				/// special process to find min max for output train for symmetry in int
-				double minOutput=(int)(Math.abs(minmax[DataWindowsSizes.INPUT_NEURONS][0])+0.5);
-				if(minmax[DataWindowsSizes.INPUT_NEURONS][1]>minOutput)
-				{
-					minmax[DataWindowsSizes.INPUT_NEURONS][0]=-minOutput;
-					minmax[DataWindowsSizes.INPUT_NEURONS][1]=minOutput;
-				}
-				else
-				{
-					minmax[DataWindowsSizes.INPUT_NEURONS][0]=-(int)(minmax[DataWindowsSizes.INPUT_NEURONS][1]+0.5);
-					minmax[DataWindowsSizes.INPUT_NEURONS][1]=(int)(minmax[DataWindowsSizes.INPUT_NEURONS][1]+0.5);
-				}
-				//System.out.println("Output min max :"+minmax[DataWindowsSizes.INPUT_NEURONS][0]+" "+minmax[DataWindowsSizes.INPUT_NEURONS][1]);
-				
-				
-				minmax[i+1][0]=Math.round(histogram.getMaxFiltred(65));
-				minmax[i+1][1]=Math.round(histogram.getMaxFiltred(77));
-				// this is to consider - no-move - small-move - big-move
-				//System.out.println(" Max  "+minmax[i+1][0]+"[");
-				
-				
-				//System.out.println(" no move  "+minmax[i+1][0]+"[");
-				//System.out.println(" small move  "+minmax[i+1][1]+"[");
-			}
+			double filter=99;
+			
+			minmax[i][0]=histogram.getMinFiltred(filters[i]);
+			minmax[i][1]=histogram.getMaxFiltred(filters[i]);
+			
+
 			
 			Vector<Double> points=new Vector<Double>();
 			points.add(minmax[i][0]);
@@ -236,46 +213,46 @@ public class ProcessNNRawData {
 			
 			
 			//if(i==DataWindowsSizes.INPUT_NEURONS)
-			{
-			//	points.add(minmax[i+1][0]);
-			//	points.add(minmax[i+1][1]);
-				
-			//	points.add(-minmax[i+1][0]);
-			//	points.add(-minmax[i+1][1]);
-				
-				/*
-				JFrame f=showHistogramChart(histogram, points,""+i);
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				try {
-					Display.getStringAnswer("pause - input : "+i);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				f.setVisible(false);
-				f.dispose();
-				*/
-				
+//			{
+//				points.add(minmax[i+1][0]);
+//				points.add(minmax[i+1][1]);
+//				
+//				points.add(-minmax[i+1][0]);
+//				points.add(-minmax[i+1][1]);
+//				
+//				
+//				JFrame f=showHistogramChart(histogram, points,""+i);
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//				try {
+//					Display.getStringAnswer("pause - input : "+i);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//				f.setVisible(false);
+//				//f.dispose();
+//				
+//				
+//			}
+			
+			
+			JFrame f=showHistogramChart(histogram, points,""+i);
+			
+			try {
+				Display.getStringAnswer("pause - input : "+i);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
-			
-//			JFrame f=showHistogramChart(histogram, points,""+i);
-//			
-//			try {
-//				Display.getStringAnswer("pause - input : "+i);
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//			f.dispose();
+			//f.dispose();
 		}
 		
 		
@@ -309,7 +286,7 @@ public class ProcessNNRawData {
 		deleteFile(fileName);
 		
 		String s="";
-		for(int i=0;i<DataWindowsSizes.INPUT_NEURONS+2;i++)
+		for(int i=0;i<DataWindowsSizes2018.TIME_SERIES;i++)
 		{
 			s+=minmax[i][0]+" "+minmax[i][1]+"\n";
 		}
@@ -344,6 +321,8 @@ public class ProcessNNRawData {
 			e.printStackTrace();
 		}
 		
+		System.out.println("Writting on "+fileName+" is done.");
+		
 	}
 	
 	public static Vector<double[]> normalize(Vector<double[]> examples,double[][] minmax)
@@ -352,30 +331,14 @@ public class ProcessNNRawData {
 		
 		for(double[] rawExample:examples)
 		{
-			double normalExample[]=new double[DataWindowsSizes.INPUT_NEURONS+1];
+			double normalExample[]=new double[DataWindowsSizes2018.TIME_SERIES];
 		
-			for(int i=0;i<DataWindowsSizes.INPUT_NEURONS+1;i++)
+			for(int i=0;i<DataWindowsSizes2018.TIME_SERIES;i++)
 			{	
-				if(i==DataWindowsSizes.INPUT_NEURONS)
-				{
-					
-					normalExample[i]=normalizeOutput(rawExample[i],minmax[i+1][0],minmax[i+1][1]);
-					//System.out.println("Normalize["+i+"]="+rawExample[i]+" with ("+minmax[i+1][0]+","+minmax[i+1][1]+") = "+normalExample[i]);
-					
-				}
-				else
-				{
-					
+				
 					normalExample[i]=normalizeValue(rawExample[i], minmax[i][0], minmax[i][1]);
 					//System.out.println("Normalize["+i+"]="+rawExample[i]+" with ("+minmax[i][0]+","+minmax[i][1]+") = "+normalExample[i]);
-				}
 				
-				//try {
-				//	Display.getStringAnswer("pause - input : "+i);
-				//} catch (IOException e) {
-				//	// TODO Auto-generated catch block
-				//	e.printStackTrace();
-				//}
 			}
 			
 			ret.add(normalExample);
@@ -476,34 +439,46 @@ public class ProcessNNRawData {
 	public static void writeEncogFile(Vector<CategoryNode> cat)
 	{
 		String encogFileName=CategoryNode.getAncestorsStringPath(cat)+"nn-train-data.egb";
-		String normalFileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
+		String normalFileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeDataIn.csv";
 		
 		deleteFile(encogFileName);
 		
 		System.out.println("Writing binary Encog training to "+encogFileName);
 		File normalizaedCVSFile=new File(normalFileName);
 		File targetEGBFile=new File(encogFileName);
-		CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), DataWindowsSizes.INPUT_NEURONS, 1, false);
+		CSVNeuralDataSet csvnds=new CSVNeuralDataSet(normalizaedCVSFile.getAbsolutePath(), DataWindowsSizes2018.INPUT_NEURONS, 1, false);
 		EncogUtility.saveEGB(targetEGBFile, csvnds);
 		System.out.println("Write Complete.");
 	}
 
 	public static void main(String[] args) {
 			
-			Root root=new Root(0);
+			Root2018 root=new Root2018(0);
 			
 			CategoryNode.printIDs(root);
 			//CategoryNode.buildDirectories(root);
 			
 			
+			double filters[] =new double[DataWindowsSizes2018.TIME_SERIES];
 			
-			int i=36;//203;
+			for(int i=0;i<DataWindowsSizes2018.TIME_SERIES;i++)
+				filters[i]=98;
+			
+			
+			
+			filters[0]=filters[1]=98.;
+			filters[2]=filters[3]=filters[4]=97.;
+			filters[5]=filters[6]=98.;
+			filters[7]=filters[8]=99.9;
+			
+			int i=41;//203;
 			//for(int i=0;i<648;i++)
 			{
 				System.out.println("-----------------------------------------------------");
 				System.out.println("--- Processing Category "+i+" ---");
 				Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawData.csv";
+				String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNRawDataIn2018.csv";
+				
 				
 				
 				File file = new File(fileName);
@@ -514,10 +489,13 @@ public class ProcessNNRawData {
 					Vector<double[]> examples =loadFileIntoMemory(fileName);
 					System.out.println("Number of examples : "+examples.size() );
 					
-					Vector<double[]> collectExamples =removeToCollectExamples(examples);
-					System.out.println("Removed - Number of examples : "+collectExamples.size() );
+					//Vector<double[]> collectExamples =removeToCollectExamples(examples);
+					//System.out.println("Removed - Number of examples : "+collectExamples.size() );
+					Vector<double[]> collectExamples =examples; // do not remove nothing
 					
-					double minmax[][]=findMinMax(collectExamples);
+					double minmax[][]=findMinMax(collectExamples,filters);
+					
+					System.out.println(minmax[0].length+" X "+ minmax.length);
 					
 					// para deixar no original 
 					// writeMinMaxValues(minmax,cat);
@@ -526,8 +504,9 @@ public class ProcessNNRawData {
 					System.out.println("Normalized - Number of examples : "+normalizeExamples.size() );
 					
 					// para deixar no original
-					writeTalbleFile(normalizeExamples,cat,"NNNormalizeData.csv");
+					writeTalbleFile(normalizeExamples,cat,"NNNormalizeDataIn.csv");
 					
+					writeMinMaxValues(minmax, cat);
 					System.gc();
 					
 					//para deixar no original

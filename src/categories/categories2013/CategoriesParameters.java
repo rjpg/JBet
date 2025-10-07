@@ -2,7 +2,7 @@ package categories.categories2013;
 
 public class  CategoriesParameters {
 
-	 public  static boolean COLLECT = true;
+	 public  static boolean COLLECT = false;
 	 
 	 
 	 public static int MINUTES_PREDICTION = 1;

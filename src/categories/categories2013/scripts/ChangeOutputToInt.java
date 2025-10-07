@@ -132,7 +132,17 @@ public class ChangeOutputToInt {
 				lineExample+=ex[i]+",";
 			}
 			
-			lineExample+=(int)(((ex[ex.length-1]+1)*2)+0.01);
+			int outputClass=(int)(((ex[ex.length-1]+1)*2)+0.01);  //0,2,3,4
+			
+			///////////////////////////////////////////////////////////////////
+			if(outputClass==0 || outputClass==1)
+				outputClass=0;
+			else if(outputClass==2)
+				outputClass=1;
+			else outputClass = 2;                     // transform  to  0,1,2
+			///////////////////////////////////////////////////////////////////
+			
+			lineExample+=outputClass;
 			
 			//lineExample = lineExample.substring(0, lineExample.length() - 1);
 			//lineExample+="\n";
@@ -163,12 +173,12 @@ public class ChangeOutputToInt {
 		
 		Root root=new Root(0);
 		
-		//int i=607;
-		for(int i=0;i<648;i++)
+		int i=607;
+		//for(int i=0;i<648;i++)
 		{
 			
 			Vector<CategoryNode> cat=CategoryNode.getAncestorsById(root,i);
-			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNTestNormalizeData.csv";
+			String fileName=CategoryNode.getAncestorsStringPath(cat)+"NNNormalizeData.csv";
 			
 			
 			
@@ -177,13 +187,13 @@ public class ChangeOutputToInt {
 				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath());
 				
 				Vector<double[]> rawData=loadFileIntoMemory(file);
-				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNTestNormalizeData-out.csv");
+				writeTalbleFile(rawData,file.getParentFile().getAbsolutePath()+"/NNNormalizeData-out-2.csv");
 				
 				//rawData=null;
 			}
 			else
 			{
-				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath());
+				System.out.println("Category ID:"+i+"  "+file.getParentFile().getAbsolutePath()+"NNNormalizeData.csv");
 				System.out.println("Category ID:"+i+"  file does not exist" );
 			}
 		}

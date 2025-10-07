@@ -20,6 +20,7 @@ import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 
 import bets.BetData;
+import bots.Bot;
 import bots.MecanicBot;
 import bots.StudyBot;
 import TradeMechanisms.TradeMechanism;
@@ -79,6 +80,8 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	
 	public Vector<TradeMechanism> tmUp=new Vector<TradeMechanism>();
 	public Vector<TradeMechanism> tmDown=new Vector<TradeMechanism>();
+	
+	public Bot botInUse=null;
 	
 	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA) {
 		rd=rdA;
@@ -148,6 +151,12 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		loadExecutionModelData();
 	
+	}
+	
+	public RunnerCategoryData(RunnersData rdA,Vector<CategoryNode> catA, Bot bot) {
+		this(rdA,catA);
+		botInUse=bot;
+		
 	}
 	
 	public static BufferedReader getBufferedReader(File f)
@@ -393,7 +402,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	            .run().get(0);
 		
 		 float[][] m = new float[1][5];
-         float[][] vector = result.copyTo(m);
+         float[][] vector = (float[][])result.copyTo(m);
          float maxVal = 0;
          int inc = 0;
          int predict = -1;
@@ -430,10 +439,10 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		
 		
 		// force not use far (hack) - use only last 5 min.
-		//if(cat.get(5).getPath().equals("farFromBegining"))
-		//{
-		//	return PREDICT_NO_DATA_ERROR;
-		//}
+		if(!cat.get(5).getPath().equals("nearFromBegining"))
+		{
+			return PREDICT_NO_DATA_ERROR;
+		}
 		//System.out.println("cheguri aqui ");
 		if(useTensorFlow)
 			return predictTensorFlow(rawInputs);
@@ -521,17 +530,18 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			
 			if(totalForce>0)
 			{
-				if(		Utils.isValidWindow(rd,MecanicBot.WINDOW_SIZE+1,StudyBot.WINDOW_SIZE+1) &&
-						Utils.isRdConstantOddBackInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
-						Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
-						Utils.getOddBackFrame(rd, 0)<20 &&
-						Utils.isWomGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
-						Utils.isAmountLayGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
-						Utils.isAmountBackGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
-						Utils.isAmountLayBiggerThanBack(rd,0,0.30)  &&
-						//Utils.isAmountLayBiggerThanBack(rd,0)  &&
-						//Utils.getWomFrame(rd, 0) < 0)
-						Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) > Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
+				
+//				if(		Utils.isValidWindow(rd,MecanicBot.WINDOW_SIZE+1,StudyBot.WINDOW_SIZE+1) &&
+//						Utils.isRdConstantOddBackInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
+//						Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
+//						Utils.getOddBackFrame(rd, 0)<20 &&
+//						Utils.isWomGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+//						Utils.isAmountLayGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+//						Utils.isAmountBackGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+//						Utils.isAmountLayBiggerThanBack(rd,0,0.30)  &&
+//						//Utils.isAmountLayBiggerThanBack(rd,0)  &&
+//						//Utils.getWomFrame(rd, 0) < 0)
+//						Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) > Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
 				{
 					if(maxClass==PREDICT_STRONG_DOWN) {trailDown();forceCloseTMUp();}
 					if(maxClass==PREDICT_WEEAK_DOWN) {swingDown();forceCloseTMUp();}
@@ -539,16 +549,16 @@ public class RunnerCategoryData implements TradeMechanismListener{
 			}
 			if(totalForce<0)
 			{
-				if(Utils.isRdConstantOddLayInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
-				Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
-				Utils.getOddBackFrame(rd, 0)<20 &&
-				Utils.isWomGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0)  &&
-				Utils.isAmountLayGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
-				Utils.isAmountBackGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
-				Utils.isAmountBackBiggerThanLay(rd,0,0.30) &&
-				//Utils.isAmountBackBiggerThanLay(rd,0) &&
-				//Utils.getWomFrame(rd, 0) > 0 &&
-				Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) < Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
+//				if(Utils.isRdConstantOddLayInWindow(rd,MecanicBot.WINDOW_SIZE,0)  && 
+//				Math.abs(Utils.oddToIndex(Utils.getOddBackFrame(rd, 0))-Utils.oddToIndex(Utils.getOddLayFrame(rd, 0)))<=1 &&
+//				Utils.getOddBackFrame(rd, 0)<20 &&
+//				Utils.isWomGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0)  &&
+//				Utils.isAmountLayGoingDown(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+//				Utils.isAmountBackGoingUp(rd,MecanicBot.WINDOW_SIZE-1,0) &&
+//				Utils.isAmountBackBiggerThanLay(rd,0,0.30) &&
+//				//Utils.isAmountBackBiggerThanLay(rd,0) &&
+//				//Utils.getWomFrame(rd, 0) > 0 &&
+//				Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,MecanicBot.WINDOW_SIZE+1) < Utils.getWomAVGWindow(rd,MecanicBot.WINDOW_SIZE+1,0))
 				{
 				if(maxClass==PREDICT_WEEAK_UP) {swingUp();forceCloseTMDown();}
 				if(maxClass==PREDICT_STRONG_UP) {trailUp();forceCloseTMDown();}
@@ -891,6 +901,7 @@ public class RunnerCategoryData implements TradeMechanismListener{
 	private void writeResultsToFile(TradeMechanism tm)
 	{
 		String line=cat.get(6).getIdStart()+" "+tm.getEndPL()+" ";
+		
 		if(tm instanceof Swing)
 		{
 			line+="1 ";
@@ -902,6 +913,12 @@ public class RunnerCategoryData implements TradeMechanismListener{
 		}
 		
 		line+=tm.getStatisticsValues().split(" ")[10]+" ";
+		
+		if(botInUse!=null)
+		{
+			botInUse.setAmountGreen(botInUse.getAmountGreen()+tm.getEndPL());
+			botInUse.setGreens(botInUse.getGreens()+1);
+		}
 		//System.out.println(tm.getStatisticsFields());
 	
 		String fileName="stats.txt";
