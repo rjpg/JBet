@@ -8,6 +8,7 @@
 			<include name="*.jar" />
 		</fileset>
 	</path>
+	
     <target name="init">
         <mkdir dir="classes"/>
         <copy includeemptydirs="false" todir="classes">
@@ -62,3 +63,4 @@
         </java>
     </target>
 </project>
+
