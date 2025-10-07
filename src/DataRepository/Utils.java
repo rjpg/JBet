@@ -22,8 +22,6 @@ import bfapi.handler.ExchangeAPI.Exchange;
 import bots.MecanicBot;
 import bots.StudyBot;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
-
 import demo.util.APIContext;
 import demo.util.Display;
 
@@ -234,8 +232,8 @@ public class Utils {
 		}
 		//System.out.println("AVG ODD:"+(totalBets/totalStake));
 	
-		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dá muito edge
-		// não fazer near mas sim erredondar para 2 casas
+		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dï¿½ muito edge
+		// nï¿½o fazer near mas sim erredondar para 2 casas
 		if(totalStake==0)
 			return 0.00;
 		else
@@ -260,8 +258,8 @@ public class Utils {
 		}
 		//System.out.println("AVG ODD:"+(totalBets/totalStake));
 	
-		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dá muito edge
-		// não fazer near mas sim erredondar para 2 casas
+		//return Utils.nearValidOdd(totalBets/totalStake); near valid odd dï¿½ muito edge
+		// nï¿½o fazer near mas sim erredondar para 2 casas
 		if(totalStake==0)
 			return 0.00;
 		else
@@ -407,7 +405,7 @@ public class Utils {
 			RunnersData rdaux=getNeighbourMinDiff(md, rd,ticksDifAux);
 			if(rdaux==null)
 			{
-				//System.out.println("é null");
+				//System.out.println("ï¿½ null");
 				return null;
 				
 			}
@@ -793,7 +791,7 @@ public class Utils {
 				i--;
 		}
 		
-		System.out.println("wom amount back = "+womBack);
+		//System.out.println("wom amount back = "+womBack);
 		
 		double oddLay=hd.getOddLay();     //odd offer for Lay bets
 		Vector<OddData> lp=hd.getLayPrices();  // get all Lay prices with amounts (OddData)
@@ -818,7 +816,7 @@ public class Utils {
 				i--;
 		}
 		
-		System.out.println("wom amount Lay = "+womLay);
+		//System.out.println("wom amount Lay = "+womLay);
 		
 		double womTotal=womBack+womLay;
 		
@@ -1410,7 +1408,7 @@ public class Utils {
 	public static void main(String[] args)
 	{
 		Utils.init();
-		System.out.println("olá");
+		System.out.println("olï¿½");
 		for(int i=0;i<STEPS;i++)
 		{
 			System.out.println("odd="+ Utils.indexToOdd(i) + " index="+ Utils.oddToIndex(Utils.indexToOdd(i))+ " i="+i);
@@ -1485,7 +1483,10 @@ public class Utils {
         for (int i=0;i<STEPS-1;i++)
         {
         	
-        	System.out.println(Utils.indexToOdd(i)+ " Gain: "+(100-Utils.closeAmountBack(Utils.indexToOdd(i),  100,  Utils.indexToOdd(i+1))));
+        	//if(Utils.indexToOdd(i)>2.2 && Utils.indexToOdd(i)<11)
+        	//	System.out.println((100-Utils.closeAmountBack(Utils.indexToOdd(i),  100,  Utils.indexToOdd(i+1))));
+        	//else
+        		System.out.println(Utils.indexToOdd(i)+ " Gain: "+(100-Utils.closeAmountBack(Utils.indexToOdd(i),  100,  Utils.indexToOdd(i+1))));
         }
        
         

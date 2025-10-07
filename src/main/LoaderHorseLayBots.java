@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.Vector;
 
-import javax.smartcardio.ATR;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -601,7 +600,7 @@ MarketSummary[] markets = resp.getMarketItems().getMarketSummary() == null
 	public void MarketChange(MarketData md, int marketEventType) {
 		//System.out.println("MarketState :"+Utils.getMarketSateFrame(md,0)+" Market Live : "+Utils.isInPlayFrame(md,0));
 		if(marketEventType==MarketChangeListener.MarketLive)
-			//if(!md.isInTrade()) // espera para fechar a operação de trading mesmo inPlay ...
+			//if(!md.isInTrade()) // espera para fechar a operaï¿½ï¿½o de trading mesmo inPlay ...
 			if(Parameters.jump_to_the_next_race)
 				MarketLiveMode(md);
 		

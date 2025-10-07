@@ -676,7 +676,7 @@ public class MarketData {
 //				{
 //
 //					inside_log_time=false;
-//					System.out.println("já passou a live: "+inside_log_time);
+//					System.out.println("jï¿½ passou a live: "+inside_log_time);
 //				}
 //			}
 //			
@@ -976,7 +976,7 @@ public class MarketData {
 				{
 
 					inside_log_time=false;
-					System.out.println("já passou a live: "+inside_log_time);
+					System.out.println("jï¿½ passou a live: "+inside_log_time);
 				}
 			}
 			//System.out.println("antes dos 10 min: "+inside_log_time);
@@ -1427,7 +1427,7 @@ public class MarketData {
 					
 					if(HorsesUtils.getTimeRaceInSeconds(name)==-1)
 					{
-						System.err.println("Invalid GR or IRE race");
+						System.err.println("Invalid GB or IRE race");
 						pause=true;
 					}
 						
@@ -1459,7 +1459,7 @@ public class MarketData {
 						if(marketNew && readOneCompleteFrame)
 						{
 							initializeBetManager();
-
+							
 							for (MarketChangeListener mcl:listeners.toArray(new MarketChangeListener[0]))
 								mcl.MarketChange(this,MarketChangeListener.MarketNew);
 
