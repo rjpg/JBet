@@ -42,7 +42,7 @@ public class HelloTF {
 	
 		
 		 float[][] m = new float[1][5];
-         float[][] vector = result.copyTo(m);
+         float[][] vector = (float[][])result.copyTo(m);
          float maxVal = 0;
          int inc = 0;
          int predict = -1;
