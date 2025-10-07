@@ -49,6 +49,7 @@ public class BetData {
 	public static final int ERROR_BALANCE_EXCEEDED=3;
 	public static final int ERROR_BET_IN_PROGRESS=4;
 
+	
 	// cancel errors
 	//public static final int ERROR_TAKEN_OR_LAPSED = 5;
 	//public static final int ERROR_NOT_CANCELED= 5;

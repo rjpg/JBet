@@ -44,7 +44,6 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	
 	public BetManagerReal(MarketData mdA) {
 		super(mdA);
-		
 		getMd().addMarketChangeListener(this);
 	}
 	
@@ -584,7 +583,7 @@ public class BetManagerReal extends BetManager implements MarketChangeListener{
 	 * This method does not take into account bet_in_progress sate. 
 	 * If there are Bet_in_progress response from API it will assume PLACING_ERROR
 	 *
-	 * @param bdsLow - vector of BetData under 2.00€
+	 * @param bdsLow - vector of BetData under 2.00ï¿½
 	 * @return 0 OK -1 All not placed -2 Some placed
 	 */
 	private int placeLowBets(Vector<BetData> bdsLow) 

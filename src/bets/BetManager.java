@@ -10,8 +10,6 @@ public abstract class  BetManager {
 	// THREAD
 	public static int SYNC_MARKET_DATA_UPDATE = 0;
 	
-	
-	
 	//Market
 	public MarketData md;
 	

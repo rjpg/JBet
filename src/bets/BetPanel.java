@@ -28,7 +28,6 @@ public class BetPanel extends JPanel{
 	public JComboBox<RunnersData> comboRunner;
 	
 	public JCheckBox checkIP;
-	
 
 	//public Market market = null;
 	public MarketData md =null;

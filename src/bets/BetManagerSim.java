@@ -20,7 +20,6 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	
 	public BetManagerSim(MarketData mdA) {
 		super(mdA);
-		
 		getMd().addMarketChangeListener(this);
 		
 	}
@@ -29,7 +28,6 @@ public class BetManagerSim extends BetManager implements MarketChangeListener{
 	public Vector<BetData> getBets() {
 		
 		return bets;
-		
 	}
 
 	@Override
